@@ -34,7 +34,8 @@ def init_superadmin():
     """Create or update superadmin from environment variables."""
     email = os.environ.get('SUPERADMIN_EMAIL')
     password = os.environ.get('SUPERADMIN_PASSWORD')
-    print(f"[INIT] SUPERADMIN_EMAIL={'SET' if email else 'MISSING'}, SUPERADMIN_PASSWORD={'SET' if password else 'MISSING'}")
+    print(f"[INIT] SUPERADMIN_EMAIL={'SET' if email else 'MISSING'}, SUPERADMIN_PASSWORD={'SET' if password else 'MISSING'}", flush=True)
+    print(f"[INIT] Password length={len(password) if password else 0}, first3={password[:3] if password else 'N/A'}, last3={password[-3:] if password else 'N/A'}", flush=True)
     if not email or not password:
         print("[INIT] Skipping superadmin creation - missing env vars")
         return
@@ -88,12 +89,19 @@ def login():
         print(f"[AUTH] POST login: email={email}", flush=True)
 
         user = User.query.filter_by(email=email).first()
-        if user and user.check_password(password) and user.is_active_user:
-            user.last_login = datetime.now(timezone.utc)
-            db.session.commit()
-            login_user(user, remember=True)
-            print(f"[AUTH] Login SUCCESS for {email}", flush=True)
-            return redirect(url_for('index'))
+        print(f"[AUTH] User found: {user is not None}", flush=True)
+        if user:
+            pw_ok = user.check_password(password)
+            print(f"[AUTH] Password len={len(password)}, check={pw_ok}, active={user.is_active_user}", flush=True)
+            # Debug: re-verify with env password
+            env_pw = os.environ.get('SUPERADMIN_PASSWORD', '')
+            print(f"[AUTH] Env password len={len(env_pw)}, match_input={password == env_pw}", flush=True)
+            if pw_ok and user.is_active_user:
+                user.last_login = datetime.now(timezone.utc)
+                db.session.commit()
+                login_user(user, remember=True)
+                print(f"[AUTH] Login SUCCESS for {email}", flush=True)
+                return redirect(url_for('index'))
 
         flash('Email o contraseña incorrectos.', 'error')
         print(f"[AUTH] Login FAILED for {email}", flush=True)
