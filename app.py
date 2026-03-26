@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
 from flask_login import LoginManager, login_required, current_user
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 from models import db, User, Content, Category, PageView
 from datetime import datetime, timezone
@@ -8,10 +9,12 @@ from datetime import datetime, timezone
 load_dotenv()
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 db.init_app(app)
 
