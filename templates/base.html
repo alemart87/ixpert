@@ -29,7 +29,7 @@
                 {% if current_user.is_superadmin %}
                 <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Admin</a>
                 {% endif %}
-                <a href="{{ url_for('auth.logout') }}" class="nav-logout">Salir</a>
+                <a href="{{ url_for('logout') }}" class="nav-logout">Salir</a>
             {% endif %}
         </div>
     </nav>

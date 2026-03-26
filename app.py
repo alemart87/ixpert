@@ -20,7 +20,7 @@ db.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'login'
 login_manager.login_message = 'Debes iniciar sesión para acceder.'
 login_manager.login_message_category = 'warning'
 
@@ -64,13 +64,58 @@ def init_superadmin():
 
 
 # Register blueprints
-from auth import auth_bp
 from admin import admin_bp
 from analytics import analytics_bp
 
-app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
+
+
+# ===== Auth routes directly in app (no blueprint) =====
+from flask_login import login_user, logout_user
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    print(f"[AUTH] /login hit: method={request.method}", flush=True)
+
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        print(f"[AUTH] POST login: email={email}", flush=True)
+
+        user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password) and user.is_active_user:
+            user.last_login = datetime.now(timezone.utc)
+            db.session.commit()
+            login_user(user, remember=True)
+            print(f"[AUTH] Login SUCCESS for {email}", flush=True)
+            return redirect(url_for('index'))
+
+        flash('Email o contraseña incorrectos.', 'error')
+        print(f"[AUTH] Login FAILED for {email}", flush=True)
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('login'))
+
+
+@app.route('/debug/check')
+def debug_check():
+    users = User.query.all()
+    return jsonify({
+        'users': [{'id': u.id, 'email': u.email, 'role': u.role, 'active': u.is_active_user} for u in users],
+        'total': len(users)
+    })
 
 
 @app.context_processor
