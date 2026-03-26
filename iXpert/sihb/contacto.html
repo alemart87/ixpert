@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <section style="background-color: #001b5e; color: white; padding: 40px 20px; font-family: Arial, sans-serif;">
+        <div style="max-width: 1000px; margin: auto;">
+
+            <!-- Título -->
+            <h2 style="font-size: 28px; margin-bottom: 20px; color: #ffffff; border-bottom: 2px solid #ff6600; padding-bottom: 10px;">
+                Líneas Telefónicas y Correos
+            </h2>
+
+            <!-- Mensaje de bienvenida -->
+            <div style="background-color: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                “Bienvenido a la Banca Telefónica de Personas Jurídicas, gracias por llamar al servicio de atención al cliente Banca Empresarial”
+            </div>
+
+            <!-- Opciones de marcación -->
+            <div style="background-color: rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 8px; margin-bottom: 30px; font-size: 15px;">
+                <p><strong style="color: #ff6600;">MARQUE 1</strong>: para comunicarse con un representante del servicio de atención al cliente</p>
+                <p><strong style="color: #ff6600;">MARQUE 0</strong>: para acceder a la Banca telefónica</p>
+                <p><strong style="color: #ff6600;">MARQUE #</strong>: si no posee clave, su llamada será derivada a un representante</p>
+            </div>
+
+            <!-- Teléfonos -->
+            <h3 style="color: #0000ff; font-size: 22px; margin-bottom: 10px;">Líneas telefónicas disponibles</h3>
+            <table style="width: 100%; font-size: 14px; border-collapse: collapse; margin-bottom: 40px; background-color: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                <thead style="background-color: rgba(255,255,255,0.1); color: #ffffff;">
+                    <tr>
+                        <th style="text-align: left; padding: 10px;">Nombre de la línea</th>
+                        <th style="text-align: left; padding: 10px;">Nro. de teléfono</th>
+                    </tr>
+                </thead>
+                <tbody style="border-top: 1px solid rgba(255,255,255,0.2);">
+                    <tr>
+                        <td style="padding: 10px;">Soporte IHB</td>
+                        <td style="padding: 10px;">(021) 617 1018</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">CIB</td>
+                        <td style="padding: 10px;">(021) 617 1300</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">Asistente Middle Office (MO)</td>
+                        <td style="padding: 10px;">(021) 217 3245</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Correos -->
+            <h3 style="color: #0000ff; font-size: 22px; margin-bottom: 10px;">Perfiles de correos</h3>
+            <table style="width: 100%; font-size: 14px; border-collapse: collapse; background-color: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden;">
+                <thead style="background-color: rgba(255,255,255,0.1); color: #ffffff;">
+                    <tr>
+                        <th style="text-align: left; padding: 10px;">Descripción</th>
+                        <th style="text-align: left; padding: 10px;">Perfil</th>
+                        <th style="text-align: left; padding: 10px;">Tipo</th>
+                    </tr>
+                </thead>
+                <tbody style="border-top: 1px solid rgba(255,255,255,0.2);">
+                    <tr>
+                        <td style="padding: 10px;">Consultas / reclamos de clientes PJ sobre productos empresariales</td>
+                        <td style="padding: 10px;">SAC Empresarial</td>
+                        <td style="padding: 10px;">Interno</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">Clientes externos sobre productos empresariales</td>
+                        <td style="padding: 10px;">SAC Empresas</td>
+                        <td style="padding: 10px;">Externo</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">Consultas / reclamos sobre la web PJ</td>
+                        <td style="padding: 10px;">Soporte Interhome</td>
+                        <td style="padding: 10px;">Interno</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">Clientes externos sobre la web PJ</td>
+                        <td style="padding: 10px;">24 Hs en Internet</td>
+                        <td style="padding: 10px;">Externo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>

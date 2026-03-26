@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAT_CIB</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #153b7d;
+    }
+    .filter-bar {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+    }
+    input, select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      flex: 1;
+    }
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 15px;
+    }
+    .card {
+      background-color: white;
+      border-left: 6px solid orange;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #153b7d;
+    }
+    .card p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+        footer {
+      background-color: #000000;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+    }
+            .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    section {
+      padding: 20px;
+      margin: 10px auto;
+      max-width: 1000px;
+      border-bottom: 2px solid #ff6600;
+    }
+  </style>
+</head>
+<body>
+  <h1>Matriz de Gestión CIB</h1>
+
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Buscar gestión...">
+  </div>
+
+  <div class="card-container" id="cardContainer">
+
+    <!-- Tarjetas -->
+    <div class="card">
+    <h3>Acceso a servicios (homebanking/app)</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Llamada/mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente/Error IHB</p>
+    <p><strong>Procedimiento:</strong> Se indica procedimiento para el acceso</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Ejemplo</p>
+    </div>
+
+    <div class="card">
+    <h3>Acceso a servicios (homebanking/app)</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mesa de Ayuda/Mail</p>
+    <p><strong>Motivo:</strong> —</p>
+    <p><strong>Procedimiento:</strong> Se solicita print de pantalla para verificar el inconveniente y cargar un soporte en caso de que corresponda</p>
+    <p><strong>Plazo:</strong> 72hs</p>
+    <p><strong>Área:</strong> Mail</p>
+    </div>
+
+    <div class="card">
+    <h3>Acceso a servicios (homebanking/app)</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> —</p>
+    <p><strong>Motivo:</strong> —</p>
+    <p><strong>Procedimiento:</strong> N/A</p>
+    <p><strong>Plazo:</strong> N/A</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Referencias bancarias</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Si la referencia ya se encuentra en agencia</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> Referencias PJ</p>
+    </div>
+
+    <div class="card">
+    <h3>Referencias bancarias</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo</p>
+    <p><strong>Procedimiento:</strong> Si la referencia fue generado de con datos incorrectos</p>
+    <p><strong>Plazo:</strong> 48 a 72 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Referencias bancarias</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Celeridad del pedido</p>
+    <p><strong>Procedimiento:</strong> Solicitud entregado a través formulario en agencias para celeridad</p>
+    <p><strong>Plazo:</strong> 48 a 72 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Swift de transferencias al exterior recibida/enviada</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Si fue recibido la operación + Swift</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> OIT + Lourdes + Maria Del Mar + Noelia</p>
+    </div>
+
+    <div class="card">
+    <h3>Swift de transferencias al exterior recibida/enviada</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedio del cliente</p>
+    <p><strong>Procedimiento:</strong> En caso que otro dpto haya recibido/solicita nueva generación</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Boletas de depósito</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Solicita preparación de boletas para depósito / cliente pasa a retirar de agencias</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Middle Office IBBA</p>
+    </div>
+
+    <div class="card">
+    <h3>Depósitos no acreditados</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Consulta si fue depositado</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> Depende del usuario quien depositó, se ve con Jova si aún no tenemos el sistema</p>
+    </div>
+
+    <div class="card">
+    <h3>Depósitos no acreditados</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo</p>
+    <p><strong>Procedimiento:</strong> Solicita corrección del número de boleta</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Lotes pendientes de recepción</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido de CUSTODIA</p>
+    <p><strong>Procedimiento:</strong> Lotes pendientes de transmisión por el cliente</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Remitir al cliente el detalle del lote</p>
+    </div>
+
+    <div class="card">
+    <h3>Depósitos en efectivo/cheque - discrepancia en n° de boleta</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Consulta si fue depositado</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> Depende del usuario quien depositó, se ve con Jova si aún no tenemos el sistema</p>
+    </div>
+
+    <div class="card">
+    <h3>Depósitos en efectivo/cheque - discrepancia en n° de boleta</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo</p>
+    <p><strong>Procedimiento:</strong> Solicita corrección del número de boleta</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Depósitos en efectivo/cheque - discrepancia en n° de boleta</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Celeridad del pedido</p>
+    <p><strong>Procedimiento:</strong> Solicita corrección del número de boleta</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Cheques rechazados</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Ubicación de cheque rechazado</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> SAC.com</p>
+    </div>
+
+    <div class="card">
+    <h3>Cheques rechazados</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido al o del cliente</p>
+    <p><strong>Procedimiento:</strong> Autorización al cliente para salvar algún cheque (Ej. Rechazado por firma deficiente, etc)</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> Ver con el cliente</p>
+    </div>
+
+    <div class="card">
+    <h3>Pin de acceso "24 hs en internet"</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Estado de pin de acceso / bloqueado activo</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> SAC.com</p>
+    </div>
+
+    <div class="card">
+    <h3>Pin de acceso "24 hs en internet"</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Autorización para desbloqueo de pin / Comprobantes de pagos</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Estos se gestionan con el Cord + oficial de la empresa / Rossa o Gabi</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias al exterior</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Si fue rechazada la operación o confirmar estado final</p>
+    <p><strong>Plazo:</strong> 24 hs</p>
+    <p><strong>Área:</strong> OIT + Lourdes + Maria Del Mar + Noelia</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias al exterior</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido al o del cliente</p>
+    <p><strong>Procedimiento:</strong> Liberación de transferencias al exterior / pedido de documentos o nuevo ID de pago</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias al exterior</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo</p>
+    <p><strong>Procedimiento:</strong> En caso que haya pasado el plazo y aún no se procesó / transferencias rechazadas sin crédito en cuenta</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Copia de documentos / boleta o cheques</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Consulta costo del documento</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Ver tarifario</p>
+    </div>
+
+    <div class="card">
+    <h3>Copia de documentos / boleta o cheques</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Solicita las copias para conciliaciones o balances de la empresa</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Rembolso de intereses</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Reversiones anteriores</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Bancard web</p>
+    </div>
+
+    <div class="card">
+    <h3>Rembolso de intereses</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Solicita exoneración o reversiones (tc/cuenta)</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Ok del Cord + oficial de cuentas / cálculo con Liquidaciones o MO</p>
+    </div>
+
+    <div class="card">
+    <h3>Rembolso de intereses</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo / menor tasación conversado con el Oficial + decisión comercial</p>
+    <p><strong>Procedimiento:</strong> Pérdida interna o lo conversado con el oficial</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Ver el cálculo negociado con MO</p>
+    </div>
+
+    <div class="card">
+    <h3>Ordenante de transferencias / proveedores</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> No logra verificar en la WEB</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> CA / SNPI</p>
+    </div>
+
+    <div class="card">
+    <h3>Custodia de Cheques</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Cheques en custodia / custodiar / lotes pendientes de recepción</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> WEB</p>
+    </div>
+
+    <div class="card">
+    <h3>Custodia de Cheques</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> N° de boletas con que se depositaron / historial de cheques / autorización para depósito manual</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> CUSTODIA</p>
+    </div>
+
+    <div class="card">
+    <h3>Custodia de Cheques</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Reclama funcionalidad o error del cliente</p>
+    <p><strong>Procedimiento:</strong> Cheques que no verifica en la web (los cheques depositados de forma manual no se verifican en la web)</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> CUSTODIA / ver en el backup buscando por N° de cheque</p>
+    </div>
+
+    <div class="card">
+    <h3>Tarjetas de crédito</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Estado de TC / vencimiento del plástico / deuda generada / estado de entrega</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Bancard web</p>
+    </div>
+
+    <div class="card">
+    <h3>Tarjetas de crédito</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Formulario para cancelación de TC / reubicaciones / pagos / bloqueo / contracargo / avisos de viaje</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> BPM / SAC.com</p>
+    </div>
+
+    <div class="card">
+    <h3>Tarjetas de crédito</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Error operativo / error cliente</p>
+    <p><strong>Procedimiento:</strong> Bloqueo de TC por error</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> BPM / SAC.com</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos a proveedores</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Ordenante de pagos a proveedores</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Liquidaciones</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos a proveedores</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Avisos de créditos / débitos</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> —</p>
+    </div>
+
+    <div class="card">
+    <h3>Cuenta bancaria</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Depósito en efectivo / cheques no verificados / autorizados registrados / ordenantes / comisiones</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Tesorería / Área de operaciones / AS400</p>
+    </div>
+
+    <div class="card">
+    <h3>Cuenta bancaria</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Reembolso de intereses/transf. Manual/ Boletas de depositos</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Oficial de cuentas + Mo + Rossana o Gabi</p>
+    </div>
+
+    <div class="card">
+    <h3>Cuenta bancaria</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> Mail</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Reclama funcionalidad o error del cliente</p>
+    <p><strong>Procedimiento:</strong> Discrepancias en n° de boletas de depositos/ depositos no acreditados</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Tesorería/ Area de Operaciones de cheques/ AS400</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos de salarios</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Estado de sus pagos de salarios / validación de archivo / ubicación de KIT / estado de altas</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> SAC.com / BPM</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos de salarios</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> Online / 24 hs</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Liberación de pagos "concepto aguinaldo" / Vinculación de cuenta / Bloqueo y remitir nota de reversión</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> Gestión Transaccional / PGS ADMIN</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos de servicios</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Estado de los pagos / comisiones / qué servicios puede abonar</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> SAC.com</p>
+    </div>
+
+    <div class="card">
+    <h3>Pagos de servicios</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Comprobantes de pago</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Procesadoras / entidad</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias locales</h3>
+    <p><strong>Tipo:</strong> Consulta</p>
+    <p><strong>Canal:</strong> Online</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Consulta del cliente</p>
+    <p><strong>Procedimiento:</strong> Estado de transferencias / motivo de rechazo</p>
+    <p><strong>Plazo:</strong> —</p>
+    <p><strong>Área:</strong> SAC.com / SNPI</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias locales</h3>
+    <p><strong>Tipo:</strong> Solicitud</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Pedido del cliente</p>
+    <p><strong>Procedimiento:</strong> Comprobantes / cambio de estado / reversiones</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> Soporte Clic / BPM / OIT</p>
+    </div>
+
+    <div class="card">
+    <h3>Transferencias locales</h3>
+    <p><strong>Tipo:</strong> Reclamo</p>
+    <p><strong>Canal:</strong> —</p>
+    <p><strong>Vía:</strong> Mail</p>
+    <p><strong>Motivo:</strong> Reclama funcionalidad o error del cliente</p>
+    <p><strong>Procedimiento:</strong> Rechazado BCP / -18 / Recha IF</p>
+    <p><strong>Plazo:</strong> 24 a 48 hs</p>
+    <p><strong>Área:</strong> SAC.com</p>
+    </div>
+
+    <!-- Aquí seguirían más tarjetas -->
+    
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.card');
+
+    searchInput.addEventListener('input', () => {
+      const term = searchInput.value.toLowerCase();
+      cards.forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
+      });
+    });
+  </script>
+<section> </section>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

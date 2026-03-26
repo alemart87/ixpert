@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN & iToken</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 800px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+        .button-fixed:hover {
+            background: #ff6600; /* Naranja */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tutorial: Activación de PIN de Transacción e iToken</h1>
+    </header>
+    <nav>
+        <a href="#introduccion">Inicio</a>
+        <a href="#importante">¡Importante!</a>
+        <a href="#paso2">Paso 2</a>
+        <a href="#paso3">Paso 3</a>
+        <a href="#paso4">Paso 4</a>
+        <a href="#paso5">Paso 5</a>
+        <a href="#paso6">Paso 6</a>
+        <a href="#paso7">Paso 7</a>
+        <a href="#paso7">iToken Cajero</a>
+        <a href="#confirmacion">Confirmación</a>
+        <a href="tuto10.html">PIN de Acceso</a>
+        <a href="varios/pinactivate.html">Guía de Activación</a>
+        <a href="#preguntas">Preguntas Frecuentes</a>
+    </nav>
+    <section id="introduccion">
+        <h2>Introducción</h2>
+        <p>Este tutorial te proporcionará los pasos detallados para activar el PIN de transacción y el iToken, garantizando así la máxima seguridad para nuestros clientes.</p>
+        <img src="imagenes/imagen1.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="importante">
+        <h2>¡Importante!</h2>
+        <p> Recuerde que el cliente necesita su PIN de transacción para confirmar pagos y transferencias.</p>
+        <p> <b>📌 Información Importante</b></p>
+        <ul>
+            <li> 📲 <b>Actualización:</b> El cliente debe tener la última versión de la <b>app Itaú PY</b> instalada.</li>
+            <li> 📱 <b>Un solo dispositivo:</b> ❗ Solo puede instalarse en un celular por cliente.</li>
+            <li> ⏰ <b>Zona horaria:</b> Debe estar en "Definir automáticamente" para evitar problemas.</li>
+            <li> ✅ <b>Ingreso a la App:</b> Puede ingresar con número de documento y número de cuenta (corriente o caja de ahorro).</li>
+            <li> ❌ No podrá usar el iToken si inicia sesión con número de tarjeta de crédito..</li>
+            <li> 🔐 <b>iToken activo:</b> El iToken funciona solo en el celular donde fue activado.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla para solicitar PIN">
+    </section>
+    <section id="paso2">
+        <h2>Paso 2: Pasos para Configurar</h2>
+        <p>Accede a la app Itaú PY.</p>
+        <img src="imagenes/imagen3.jpg" alt="Pantalla para configurar el PIN">
+        <p>Click en la flecha superior derecha.</p>
+        <img src="imagenes/imagen4.jpg" alt="Pantalla para ingresar el código de verificación">
+    </section>
+    <section id="paso3">
+        <h2>Paso 3: Pasos para Configurar</h2>
+        <p>Debe ingresar en la opción de "Seguridad", luego seleccionar la opción para "Solicitar PIN de transacción".</p>
+        <img src="imagenes/imagen5.jpg" alt="Pantalla de activación del iToken">
+        <img src="imagenes/imagen6.jpg" alt="Pantalla confirmatoria del iToken">
+    </section>
+    <section id="paso4">
+        <h2>Paso 4: Instalar el iToken</h2>
+        <p>En esta pantalla, asegúrate de instalar el iToken para validar transferencias y giros a billeteras. Marca "acepto los términos y condiciones" y haz clic en "continuar".</p>
+        <img src="imagenes/imagen7.jpg" alt="Pantalla para instalar el iToken con mensaje de 'Click en continuar'">
+    </section>
+    <section id="paso5">
+        <h2>Paso 5: Crear PIN de Transacción</h2>
+        <p>En esta etapa, crea tu PIN de transacción siguiendo las indicaciones para garantizar la seguridad en tus pagos y transferencias.</p>
+        <img src="imagenes/imagen8.jpg" alt="Pantalla para crear tu PIN de transacción con recomendaciones de seguridad">
+    </section>
+    <section id="paso6">
+        <h2>Paso 6: Recordar tu PIN de transacción</h2>
+        <p>Tu PIN de transacción ya está creado, pero recuerda que es fundamental para confirmar tus pagos y transferencias.</p>
+        <p>La pantalla mostrará un mensaje confirmando la creación del PIN y resaltará la importancia de memorizarlo.</p>
+        <img src="imagenes/imagen9.jpg" alt="Pantalla de confirmación del PIN con advertencia para recordar el PIN">
+        <p>Haz clic en "continuar" para proceder a la activación final.</p>
+    </section>
+    <section id="paso7">
+        <h2>Paso 7: Verificación y Confirmación Final</h2>
+        <p>En esta etapa, necesitas activar tu PIN de transacción e iToken. Por seguridad, recibirás un código de verificación a tu número de teléfono registrado. Verifica que los últimos tres dígitos de tu número sean correctos.</p>
+        <img src="imagenes/imagen10.jpg" alt="Pantalla de confirmación de número y envío de código por SMS">
+        <p>Después, ingresa el código que recibiste para completar la activación.</p>
+        <img src="imagenes/imagen11.jpg" alt="Pantalla de ingreso de código de verificación">
+        <p><b>Recuerda que este código es confidencial y no debe compartirse con nadie.</b></p>
+    </section>
+    <section id="paso8">
+        <h2>Cómo Activar su iToken en un Cajero Automático de la Red Infonet</h2>
+        <p>Si no puede realizar la activación por SMS, siga estos pasos:</p>
+        <p>1. Diríjase a un cajero automático de la <b>red Infonet.</b></p>
+        <p>2. Inserte su tarjeta de débito y <b>ingrese su PIN.</b></p>
+        <p>3. Realice una de las siguientes <b>operaciones:</b></p>
+        <ul>
+            <li> Consulta de saldo</li>
+            <li> Extracción de dinero</li>
+        </ul>
+        <p>4. Espere a que finalice la operación.</p>
+        <p>5. En pantalla aparecerá un mensaje solicitando la activación del <b>iToken.</b></p>
+        <p>6. Acepte la activación para completar el proceso.</p>
+        <p><b>Una vez realizado este procedimiento, su iToken quedará activado y listo para su uso.</b></p>
+    </section>
+    <section id="confirmacion">
+        <h2>Confirmación</h2>
+        <p>¡Has completado el proceso! Ahora puedes operar de manera segura desde la app Itaú PY.</p>
+        <img src="imagenes/imagen12.jpg" alt="Random">
+    </section>
+    <section id="preguntas">
+        <h2>Preguntas Frecuentes</h2>
+        <p><b>¿Cuál es el plazo que tengo para activar el iToken después de haber solicitado la instalación?</b>.</p>
+        <p>Podrás aceptar la activación en un cajero automático de la red infonet hasta 72 horas después de haber realizado la solicitud.</p>
+        <p><b>¿Qué hacer en estas situaciones?</b>.</p>
+        <ul>
+            <li>✅<b> Si fue al cajero automático pero no apareció el mensaje de activación:</b></li>
+            <ul>
+                <li><i>Verifique que haya realizado una consulta de saldo o extracción de dinero.</i></li>
+                <li><i></i>Si el mensaje no aparece, puede intentar en otro cajero de la red Infonet.</i></li>
+            </ul>
+            <li>🌍<b> Si está de viaje en el exterior y no puede ir a un cajero automático:</b></li>
+            <ul>
+                <li><i>Puede intentar activar el iToken a través de SMS si esta opción está disponible.</i></li>
+            </ul>
+            <li>🏡<b> Si está en el interior del país y no tiene un cajero cercano:</b></li>
+            <ul>
+                <li><i>Puede verificar si hay un cajero Infonet en la localidad más cercana.</i></li>
+            </ul>
+            <li>💳 Si no tiene tarjeta de débito física.</li>
+            <li>♿ Si tiene una discapacidad que le impide ir a un cajero automático.</li>
+        </ul>
+        <p>📌 Si luego de intentar todas las opciones no logra activarlo, procedemos a solicitar de manera <b>Excepcional.</b></p>
+        <p>✅ Podemos solicitar la activación excepcional del iToken.</p>
+        <p>📅 Tiempo de procesamiento: Hasta 72 horas hábiles.</p>
+        <p>📩 Proceso: <a href="bpm_excepcion.html" target="_blank">Ver Instructivo BPM</a></p>
+        <ul>
+            <li>El banco enviará un documento a su correo registrado.</li>
+            <li>Debe imprimirlo, firmarlo y reenviarlo al mismo correo.</li>
+            <li>Una vez recibido y validado, se completará la activación.</li>
+        </ul>
+        <p><b>¿Cómo hago en caso de pérdida o robo de mi celular?</b>.</p>
+        <p>En caso de robo o extravío del celular, será necesario que descargues la app Itaú PY en tu nuevo dispositivo móvil, instales de nuevo el iToken y actives en un cajero automático.</p>
+        <p><i>Sé paciente para brindarle al cliente la asistencia que necesita. Recuerda que sin su iToken, no podrá realizar transferencias.</i></p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla de confirmación final">
+    </section>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

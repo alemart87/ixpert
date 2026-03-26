@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capacitación - QR PIX</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      color: #222;
+      margin-top: 25px;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Capacitación QR PIX</h1>
+  </header>
+
+  <nav>
+    <a href="#que-es">¿Qué es?</a>
+    <a href="#condiciones">Condiciones</a>
+    <a href="#estado">Estado</a>
+    <a href="#limites">Límites</a>
+    <a href="#extrato">Extracto</a>
+    <a href="#devolucion">Devoluciones</a>
+    <a href="#fraude">Fraude</a>
+    <a href="#disputas">Disputas</a>
+  </nav>
+
+  <section>
+    <h2 id="que-es">📌 ¿Qué es QR PIX?</h2>
+    <div class="info-box">
+      <p>Es un servicio que permite a los clientes realizar compras en Brasil usando PIX a través del lector QR en la app Itaú PY.</p>
+      <ul>
+        <li>Mejora la experiencia de compras</li>
+        <li>Reduce el uso de efectivo en el exterior</li>
+        <li>Ofrece mayor seguridad</li>
+      </ul>
+    </div>
+
+    <h2 id="condiciones">⚙️ Condiciones Operativas</h2>
+    <ul>
+      <li>MVP disponible solo para cuentas en guaraníes</li>
+      <li>Requiere PIN de transacción en todas las operaciones</li>
+      <li>Comisión del 2.2% + IVA sobre el valor convertido en guaraníes</li>
+      <li>No disponible para clientes monoproducto TC</li>
+      <li>Se permite uso de línea de sobregiro para compras</li>
+      <li>Máximo 3 intentos fallidos por transacción</li>
+      <img src="../imagenes/imagen314.webp" alt="314" style="width: 1000px; height: auto;">
+    </ul>
+
+    <h2 id="estado">📄 Estado de la Compra</h2>
+    <ul>
+      <li>Comprobante por transacción exitosa</li>
+      <li>Factura por el 2% + IVA</li>
+      <li>Envío diario y online</li>
+      <li>Comprobante al comercio</li>
+      <img src="../imagenes/imagen315.webp" alt="315" style="width: 800px; height: auto;">
+    </ul>
+
+    <h2 id="limites">🔒 Límites Operativos</h2>
+    <ul>
+      <li>Máximo por transacción: 15.000 reales</li>
+      <li>Acumulado por día: 20.000 reales</li>
+      <li>Máximo de 20 transacciones por día</li>
+      <li>No se pueden modificar individualmente → usar otro medio de pago</li>
+      <h2>Pantallas de Error</h2>
+      <img src="../imagenes/imagen316.webp" alt="316" style="width: 800px; height: auto;">
+    </ul>
+
+    <h2 id="extrato">💱 Visualización en Extracto</h2>
+    <ul>
+      <li>Conversión de reales a dólares por procesadora en Brasil</li>
+      <li>Conversión de dólares a guaraníes según tipo de cambio del BCP</li>
+      <li>Comisión: 2.2% sobre monto total en guaraníes</li>
+      <li>Identificación de operaciones reversadas via Bancard</li>
+      <img src="../imagenes/imagen317.webp" alt="317" style="width: 200px; height: auto;">}
+      <p><strong>¿Cómo identificar las transacciones con PIX Reverse en Bancard?</strong></p>
+      <img src="../imagenes/imagen318.webp" alt="318" style="width: 400px; height: auto;">
+    </ul>
+
+    <h2 id="devolucion">↩️ Devoluciones</h2>
+    <h3>Pasos</h3>
+    <ul>
+      <li>Cliente solicita al comercio la devolución dentro de los 90 días</li>
+      <li>Recibe comprobante por mail registrado</li>
+      <li>Devoluciones se procesan semanalmente</li>
+      <li>Visualización en extracto</li>
+    </ul>
+
+    <h3>Tipos</h3>
+    <ul>
+      <li><strong>Parcial:</strong> Producto alternativo de menor valor</li>
+      <li><strong>Total:</strong> Cancelación completa de compra</li>
+      <p></p>
+      <img src="../imagenes/imagen319.webp" alt="319" style="width: 300px; height: auto;">
+    </ul>
+
+    <h3>Acreditación</h3>
+    <ul>
+      <li>Se acredita el monto correspondiente y la comisión + IVA del valor devuelto</li>
+    </ul>
+
+    <div class="alert">
+      <strong>Speech sugerido – Solicitud de devolución:</strong><br>
+      “Sr./Sra. X, debe contactar al comercio donde realizó la compra dentro de los 90 días posteriores. Una vez iniciada la solicitud, recibirá una confirmación por correo. La devolución puede tardar hasta 10 días, y luego verá una nota de crédito por la comisión en su correo y perfil de SET.”
+    </div>
+
+    <div class="alert">
+      <strong>Speech sugerido – Solicitud en proceso:</strong><br>
+      “Sr./Sra. X, la notificación recibida confirma que la solicitud está en proceso. El correo incluye detalles del monto, fecha y plazo estimado de acreditación. Ante dudas, estamos a disposición.”
+    </div>
+
+    <h2 id="fraude">🚨 Desconocimiento / Posible Fraude</h2>
+    <ul>
+      <li>Reportar en BPM: Desconocimiento de transacción / Posible Fraude – Agencias v2</li>
+      <li>Adjuntar:
+        <ul>
+          <li>Extracto con el monto no reconocido</li>
+          <li>Evidencia de contacto con el comercio</li>
+        </ul>
+        <img src="../imagenes/imagen320.webp" alt="320" style="width: 400px; height: auto;">
+      </li>
+      <li>Dictamen de Prevención de Fraudes dentro de 15 días hábiles</li>
+    </ul>
+
+    <div class="alert">
+      <strong>Speech sugerido:</strong><br>
+      “Sr./Sra. X, para avanzar necesitamos que envíe al correo <strong>PREVENCIONDEFRAUDES@itau.com.py</strong> una imagen del extracto con el monto y evidencia del reclamo al comercio. Recibirá un dictamen en 15 días hábiles.”
+    </div>
+
+    <h2 id="disputas">⚖️ Disputas</h2>
+    <ul>
+      <li>Categoría: Contracargo TD – E-commerce</li>
+      <li>Reportar en BPM</li>
+      <li>Adjuntar:
+        <ul>
+          <li>Evidencia de monto duplicado en movimientos</li>
+          <li>Evidencia de contacto con comercio</li>
+        </ul>
+      </li>
+      <li>Tiempo máximo para reportar: 110 días</li>
+       <li>Evaluación hasta <strong>180 días hábiles</strong>, dependiendo del análisis del comercio</li>
+    </ul>
+        <h2 id="disputas">⚖️ Disputas</h2>
+    <ul>
+      <li>Tipo de caso: Contracargo TD – E-commerce</li>
+      <li>Reportar vía BPM</li>
+      <li>Documentación necesaria:
+        <ul>
+          <li>Evidencia del pago duplicado</li>
+          <li>Evidencia de contacto con el comercio solicitando devolución</li>
+        </ul>
+      </li>
+      <li>El cliente tiene hasta <strong>110 días</strong> desde la compra para reportar</li>
+      <li>Evaluación puede tardar hasta <strong>180 días</strong>, sujeta al análisis del comercio</li>
+    </ul>
+
+    <div class="alert">
+      <strong>Speech – Pago duplicado:</strong><br>
+      “Sr./Sra. X, debe contactar al comercio dentro de los 90 días. Al recibir su solicitud, se enviará una confirmación al correo registrado y se gestionará en hasta 10 días. Al concretarse la devolución, se emitirá una nota de crédito por la comisión.”
+    </div>
+
+    <div class="alert">
+      <strong>Speech – Cliente no recibe devolución:</strong><br>
+      “Sr./Sra. X, para seguir con la gestión necesitamos que nos envíe al correo <strong>contracargo.doc@itau.com.py</strong> una imagen del movimiento duplicado y evidencia del reclamo al comercio. La evaluación puede tardar hasta 180 días.”
+    </div>
+
+    <h2 id="resumen">✅ Resumen Final</h2>
+    <div class="info-box">
+      <p>QR PIX brinda una nueva solución segura, moderna y simple para compras en Brasil desde la app Itaú PY. Sus principales beneficios son:</p>
+      <ul>
+        <li>Accesibilidad digital con controles por PIN</li>
+        <li>Seguridad en cada transacción</li>
+        <li>Protocolo para devoluciones, fraude y disputas</li>
+        <li>Límites operativos definidos</li>
+        <li>Comisiones claras y trazabilidad desde el extracto</li>
+      </ul>
+      <p>Es fundamental brindar acompañamiento claro a los clientes, guiarlos en caso de errores o disconformidades, y registrar correctamente cada solicitud.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../iXpert.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago TC</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px; /* Ancho fijo */
+            height: 200px; /* Alto fijo */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+        .boton-centro {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            }
+
+        .boton-centro button {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            }
+        .boton-centro button:hover {
+                background: #ff6600;
+                transform: scale(1.05); /* un azul un poco más claro al pasar el mouse */
+        }
+        .button-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #004080;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 50%;
+            font-size: 20px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .button-top.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Formulario TC</h1>
+    </header>
+    <nav>
+        <a href="#herramientas"></a>
+        <a href="#contacto"></a>
+    </nav>
+    <section id="herramientas">
+        <<section id="form" style="max-width: 600px; margin: auto; font-family: Arial, sans-serif;">
+            <h2>Comentario de la Actividad</h2>
+            <p>Completa el campo <strong>"Comentario de la actividad"</strong> siguiendo el formato indicado.</p>
+            
+            <form id="formComentario" style="background: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); margin-top: 20px; display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr);">
+                <label for="nombre">📌 Nombre Completo:</label><input type="text" id="nombre" required>
+                <label for="tc">💳 TC:</label><input type="text" id="tc" required>
+                <label for="cta">📝 Nro. Cta. TC:</label><input type="tect" id="cta" required>
+                <label for="telefono">📞 Tel:</label><input type="text" id="telefono" required>
+                <label for="seguridad">⚠️ Responde Preguntas de seguridad:</label>
+                    <select id="seguridad">
+                        <option value="">Seleccione una opción</option>
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                        <option value="no_aplica">No aplica</option>
+                    </select>
+                <button type="button" onclick="generarComentario()" style="grid-column: span 2;">✅ Generar Formato</button>
+            </form>
+        
+            <h3>📋 Comentario Generado:</h3>
+            <textarea id="resultado" rows="8" readonly></textarea>
+        </section>
+        <style>
+            label { font-weight: bold; display: block; }
+            input, textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+            textarea { height: 60px; resize: none; }
+            button { background-color: #007BFF; color: white; border: none; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+            button:hover { background-color: #0056b3; }
+            #resultado { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: #eef; color: #333; height: 80px; }
+        </style>
+        
+        <script>
+            function generarComentario() {
+                const campos = ['nombre', 'tc', 'cta', 'telefono', 'seguridad'];
+                let resultado = '';
+                campos.forEach(id => {
+                    let valor = document.getElementById(id).value || "NA";
+                    let label = document.querySelector(`label[for="${id}"]`).innerText.replace(/[^a-zA-Z0-9\s]/g, "").trim();
+                    resultado += `${label}: ${valor}\n`;  // Se agrega ": " después del label
+                 });
+                resultado += "\n*********************************************************";
+                document.getElementById('resultado').value = resultado;
+            }
+        </script>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../saccom.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itaú Xpert</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #ff6600, #ff9500);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 4em;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-bar {
+            margin-top: 10px;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            margin-left: -40px;
+            background: #004080;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .search-bar button:hover {
+            background: #333;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            background-color: #004080;
+            padding: 15px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a, .dropdown-toggle {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        nav a:hover, .dropdown-toggle:hover {
+            background-color: #ff6600;
+            color: #fff;
+        }
+
+        main {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            width: 300px;
+            border-radius: 10px;
+            border: 1px solid #ff6600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card h3 {
+            color: #004080;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #333;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 15px;
+            background: #ff6600;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        footer {
+            background: #004080;
+            color: #fff;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 20px;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 10px 0;
+            width: 300px;
+            border-radius: 5px;
+        }
+
+        .dropdown.open .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-menu a {
+            padding: 2px 5px;
+            text-decoration: none;
+            color: #000;
+            display: block;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #ff6600;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Itaú Xpert</h1>
+        <p>Todo lo que necesitas saber en un solo lugar</p>
+        <div class="search-bar">
+            <form action="#" method="get">
+                <input type="text" placeholder="Buscar..." id="searchInput">
+                <button type="submit" id="searchButton">🔍</button>
+            </form>
+        </div>
+    </header>
+    <nav>
+        <a href="tuto4.html">Activar PIN & iToken</a>
+        <a href="tuto5.html">Devolución Online</a>
+        <a href="phishing.html">Phishing</a>
+        <a href="tuto8.html">Contracargo</a>
+        <a href="tuto9.html">Cuentas Bancarias</a>
+        <div class="dropdown" id="menuDropdown">
+            <button class="dropdown-toggle">More [+]<span class="arrow">▼</span></button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="alias.html">Alias Itaú</a>
+                <a href="tuto6.html">Pago Duplicado TC</a>
+                <a href="tuto7.html" target="_blank">Tracking Entregas</a>
+                <a href="herramientas.html">Herramientas y Plataformas</a>
+                <a href="depositarcheque.html">Depositar Cheques en la APP</a>
+                <a href="tipificaciones.html">Registros SAC.COM</a>
+            </div>
+        </div>
+        <a href="SIHB.html">SIHB</a>
+        <a href="Nucleo.html">Núcleo</a>
+    </nav>
+    <main>
+    <div id="results" style="padding: 20px;"></div>
+        <div class="card-container">
+            <div class="card">
+                <h3>CNBs Habilitados</h3>
+                <p>Ingresa y conoce los CNBs habilitados en todo el país.</p>
+                <a href="varios/cnb.html" class="button">Ver más</a>
+            </div>
+            <div class="card">
+                <h3>Tipificaciones</h3>
+                <p>Para verificar las tipificaciones disponibles en SAC.COM.</p>
+                <a href="tipificaciones.html" class="button">Ver más</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Obtener el valor actual del contador desde localStorage, o iniciar en 0
+        let contador = localStorage.getItem('contadorVisitas') || 0;
+        contador++;
+        localStorage.setItem('contadorVisitas', contador);
+
+        // Crear y mostrar el mensaje con estilo gris
+        const contadorDiv = document.createElement('div');
+        contadorDiv.style.textAlign = 'center';
+        contadorDiv.style.marginTop = '30px';
+        contadorDiv.style.color = '#888';
+        contadorDiv.style.fontWeight = 'normal';
+        contadorDiv.innerHTML = `<span>${contador} views</span>`;
+
+        // Insertar antes del footer
+        document.body.insertBefore(contadorDiv, document.querySelector('footer'));
+    </script>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <script>
+        const toggleBtn = document.querySelector(".dropdown-toggle");
+        const dropdown = document.getElementById("menuDropdown");
+
+        toggleBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle("open");
+        });
+
+        window.addEventListener("click", function () {
+            dropdown.classList.remove("open");
+        });
+    </script>
+    <script src="busqueda.js"></script>
+
+</body>
+</html>

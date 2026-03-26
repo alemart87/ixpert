@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAC.COM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width:1500px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        img {
+            width: 100%;
+            max-width: 1200px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1500;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+
+        /* Estilos adicionales para la sección visual */
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Siempre 4 columnas */
+            gap: 20px;
+        }
+
+        .funcion-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            height: 100%; /* Asegura que todos los items se estiren a la misma altura */
+            min-height: 220px; /* Garantiza que haya una altura mínima */
+            box-sizing: border-box; /* Asegura que el padding no afecte el tamaño */
+        }
+
+        .funcion-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .funcion-icon {
+            font-size: 1.8rem;
+        }
+
+        .funcion-text h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #004080;
+        }
+
+        .funcion-text p {
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SAC.COM</h1>
+    </header>
+    <nav>
+        <a href="#motivo"> </a>
+        <a href="#funcionamiento"> </a>
+        <a href="#reclamo"> </a>
+        <a href="#importante"> </a>
+    </nav>
+
+    <section id="motivo">
+        <h2>Principales</h2>
+        <div class="funciones-grid">
+            <div class="funcion-item">
+                <div class="funcion-icon">👤</div>
+                <div class="funcion-text">
+                    <h3>Ficha del cliente</h3>
+                    <p>Consulta completa de los datos del cliente.</p>
+                </div>
+            </div>
+            <a href="tipificaciones.html" class="funcion-item-link"style="text-decoration: none; color; inherit;">
+            <div class="funcion-item">
+                <div class="funcion-icon">📝</div>
+                <div class="funcion-text">
+                    <h3>Registro de contactos</h3>
+                    <p>Registra y gestiona cada interacción con el cliente.</p>
+                </div>
+            </div>
+            </a>
+            <a href="saccom/regrabacion.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                <div class="funcion-item">
+                    <div class="funcion-icon">💳</div>
+                    <div class="funcion-text">
+                        <h3>Regrabación de TC</h3>
+                        <p>Gestiona la regrabación de TC del Cliente.</p>
+                    </div>
+                </div>
+            </a>
+
+            <div class="funcion-item">
+                <div class="funcion-icon">🚚</div>
+                <div class="funcion-text">
+                    <h3>Reubicación de productos</h3>
+                    <p>Coordina el traslado de productos por motivos logísticos.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">↩️</div>
+                <div class="funcion-text">
+                    <h3>Contracargo</h3>
+                    <p>Gestiona reclamos por transacciones no reconocidas.</p>
+                </div>
+            </div>
+            <a href="saccom/viaje.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                <div class="funcion-item">
+                    <div class="funcion-icon">✈️</div>
+                    <div class="funcion-text">
+                        <h3>Aviso de viaje TC</h3>
+                        <p>Notifica salidas del país para habilitar transacciones internacionales.</p>
+                    </div>
+                </div>
+            </a>
+            <div class="funcion-item">
+                <div class="funcion-icon">❌</div>
+                <div class="funcion-text">
+                    <h3>Anulación de cheques</h3>
+                    <p>Solicita la cancelación de cheques emitidos.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">🏦</div>
+                <div class="funcion-text">
+                    <h3>Débito en cuenta no solicitado</h3>
+                    <p>Revisa y gestiona débitos automáticos no autorizados.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">🔁</div>
+                <div class="funcion-text">
+                    <h3>Líneas rotativas</h3>
+                    <p>Consulta y administra líneas de crédito adicionales.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">🔓</div>
+                <div class="funcion-text">
+                    <h3>Liberación de saldo protegido</h3>
+                    <p>Gestiona el desbloqueo de montos retenidos.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">📄</div>
+                <div class="funcion-text">
+                    <h3>Consulta Intervale / Intercheque</h3>
+                    <p>Accede a información detallada de productos financieros.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">📊</div>
+                <div class="funcion-text">
+                    <h3>Movimientos de cuenta</h3>
+                    <p>Visualiza los movimientos recientes en las cuentas del cliente.</p>
+                </div>
+            </div>
+            
+            <div class="funcion-item">
+                <div class="funcion-icon">🔑</div>
+                <div class="funcion-text">
+                    <h3>Pines de acceso y transacción</h3>
+                    <p>Administra claves de acceso y seguridad del cliente.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">🔄</div>
+                <div class="funcion-text">
+                    <h3>Actualización de datos</h3>
+                    <p>Modifica y actualiza la información personal del cliente.</p>
+                </div>
+            </div>
+
+        </div>
+        <h2>Canales y Servicios Digitales</h2>
+            <div class="funciones-grid">
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">📱</div>
+                    <div class="funcion-text">
+                        <h3>Click Banking</h3>
+                        <p>Activación del servicio cuando el cliente no lo tiene activo. Se actualiza la frecuencia de notificación.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">🔓</div>
+                    <div class="funcion-text">
+                        <h3>Activación / desbloqueo de PIN</h3>
+                        <p>Filtrado y derivación de activaciones de PIN de transacción. SAC registra para gestión posterior.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">🏠</div>
+                    <div class="funcion-text">
+                        <h3>Actualización de dirección</h3>
+                        <p>Actualización de dirección laboral o particular. Si no tiene laboral, se replica la particular.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">📧</div>
+                    <div class="funcion-text">
+                        <h3>Suscripción a resumen vía email</h3>
+                        <p>Habilita o deshabilita el envío de resúmenes si el cliente tiene correo catastrado.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">📩</div>
+                    <div class="funcion-text">
+                        <h3>Reenvío de resumen</h3>
+                        <p>Reenvío del resumen en caso de que el cliente indique no haberlo recibido.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <h2>Gestión de Tarjetas de Débito y Crédito</h2>
+            <div class="funciones-grid">
+                <a href="saccom/desbloqueotc.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">💳</div>
+                        <div class="funcion-text">
+                            <h3>Desbloqueo de Tarjeta de Débito</h3>
+                            <p>Se desbloquea por errores de PIN o del mes. Si no figura en SAC.COM, se gestiona por BPM.</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="saccom/Bloqueoregrabacion.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🔒</div>
+                        <div class="funcion-text">
+                            <h3>Bloqueo y regrabación de TC</h3>
+                            <p>Procesamiento en SAC.COM por robo, extravío o solicitud del cliente. Se bloquea y se regraba automáticamente.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/desbloqueotc.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🔓</div>
+                        <div class="funcion-text">
+                            <h3>Desbloqueo de TC por pines inválidos</h3>
+                            <p>Se gestiona en SAC o BPM en horario extendido si el desbloqueo no se puede hacer online.</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="saccom/viaje.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🌍</div>
+                        <div class="funcion-text">
+                            <h3>Aviso de viaje (TC)</h3>
+                            <p>Registro en SAC.COM con impacto directo en el sistema Dangers. Se instruye sobre uso web/app si es digital.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/pagotc.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">💰</div>
+                        <div class="funcion-text">
+                            <h3>Pago de tarjeta de crédito</h3>
+                            <p>Se procesa el pago en SAC según el tipo de cliente (PM, DT, monto específico).</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/debitotc.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">⚙️</div>
+                        <div class="funcion-text">
+                            <h3>Cancelación débito automático (TC)</h3>
+                            <p>Cancelación del pago automático de la TC en SAC.COM, solo si el cliente no es PGS S.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/debitotccta.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🔄</div>
+                        <div class="funcion-text">
+                            <h3>Débito de TC en cuenta (sin solicitud)</h3>
+                            <p>Ingreso en SAC.COM. Se modifica para el próximo cierre y se debita desde caja de ahorro o cta. cte.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/noexpendio.html" class="funcion-item-link"style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">❌🏧</div>
+                        <div class="funcion-text">
+                            <h3>No expendio de dinero en ATM de TC (Contracargo)</h3>
+                            <p>Es una restricción que indica que la tarjeta de crédito no permite avances de efectivo en cajeros automáticos.</p>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+        <h2>Cuentas y Cheques</h2>
+            <div class="funciones-grid">
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">📄</div>
+                    <div class="funcion-text">
+                        <h3>Movimiento de cuenta</h3>
+                        <p>Consulta de movimientos y saldos. También disponible en canales digitales.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">🏦</div>
+                    <div class="funcion-text">
+                        <h3>Registrar cuenta domiciliada</h3>
+                        <p>Marca de domiciliación. Se informa sobre la pérdida del beneficio si no hay transferencias por 90 días.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">🏠</div>
+                    <div class="funcion-text">
+                        <h3>Domiciliación</h3>
+                        <p>Se registra solicitud por SAC.COM y se informa al cliente que debe recibir una transferencia SIPAP mensual.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">❌</div>
+                    <div class="funcion-text">
+                        <h3>Anulación temporal de cheques</h3>
+                        <p>Prevención por 48hs por robo/extravío. Requiere denuncia y presentación física posterior.</p>
+                    </div>
+                </div>
+
+                <div class="funcion-item">
+                    <div class="funcion-icon">🔄</div>
+                    <div class="funcion-text">
+                        <h3>Traslado de cheque devuelto</h3>
+                        <p>El operador remite datos al back office para coordinar traslado con la agencia correspondiente.</p>
+                    </div>
+                </div>
+
+            </div>
+        <h2>Préstamos y Ahorros</h2>
+            <div class="funciones-grid">
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📆</div>
+                    <div class="funcion-text">
+                        <h3>Ahorro programado - Alta</h3>
+                        <p>Se abre excepcionalmente vía SAC.COM con aprobación de Canales Banca de Consumo.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">🛑</div>
+                    <div class="funcion-text">
+                        <h3>Cancelación de ahorro programado</h3>
+                        <p>Se gestiona de forma excepcional. Puede aplicar penalización según el caso.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">⏰</div>
+                    <div class="funcion-text">
+                        <h3>Modificación de fecha de débito (AP)</h3>
+                        <p>Se realiza solo en casos autorizados, ya que el cliente puede autogestionarlo online.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📊</div>
+                    <div class="funcion-text">
+                        <h3>Préstamo único</h3>
+                        <p>El operador calcula el monto aproximado de devolución que tendrá el cliente.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">💻</div>
+                    <div class="funcion-text">
+                        <h3>Préstamo electrónico</h3>
+                        <p>Información sobre cuotas pendientes, préstamos activos, y condiciones para la acreditación del PE.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">❌</div>
+                    <div class="funcion-text">
+                        <h3>Cancelación de oferta de préstamo electrónico</h3>
+                        <p>Se ingresa bajo flujo predefinido en SAC.COM con los datos del cliente.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">🧮</div>
+                    <div class="funcion-text">
+                        <h3>Cálculo de interés</h3>
+                        <p>El operador remite los datos al back office para que realicen el cálculo y lo comuniquen al cliente.</p>
+                    </div>
+                </div>
+            
+            </div>
+        <h2>Beneficios y Puntos</h2>
+            <div class="funciones-grid">
+                <a href="saccom/benificiosypuntos.html" class="funcion-item-link" style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🎫</div>
+                        <div class="funcion-text">
+                            <h3>Canje de puntos</h3>
+                            <p>El operador gestiona el canje de puntos en comercios adheridos. También se puede realizar directamente a través de POS o tienda Naranja.</p>
+                        </div>
+                    </div>
+                </a>
+            
+                <a href="saccom/benificiosypuntos.html" class="funcion-item-link" style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🔄</div>
+                        <div class="funcion-text">
+                            <h3>Extorno de puntos</h3>
+                            <p>El operador realiza el extorno de puntos ya canjeados si no se entregó el voucher, enviando los datos al back office.</p>
+                        </div>
+                    </div>
+                </a>
+            
+                <a href="saccom/benificiosypuntos.html" class="funcion-item-link" style="text-decoration: none; color: inherit;">
+                    <div class="funcion-item">
+                        <div class="funcion-icon">🌍</div>
+                        <div class="funcion-text">
+                            <h3>Aviso de transacción en el exterior</h3>
+                            <p>El operador procesa el aviso para la transacción que el cliente desea realizar en el exterior.</p>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="saccom/puntos.html" class="funcion-item-link" style="text-decoration: none; color: inherit;">
+                        <div class="funcion-item">
+                            <div class="funcion-icon">📈</div>
+                            <div class="funcion-text">
+                                <h3>Extracto de puntos detallado</h3>
+                                <p>El operador informa sobre los puntos acumulados y su actualización, según el cierre de cada ciclo. Para millas, se verifica con la aerolínea.</p>
+                            </div>
+                        </div>
+                </a>
+            </div>
+                
+        <h2>Gestiones Especiales y Back Office</h2>
+            <div class="funciones-grid">
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">🔧</div>
+                    <div class="funcion-text">
+                        <h3>Traslado de Kits</h3>
+                        <p>El operador ingresa el pedido bajo el flujo predefinido en SAC.COM para gestionar el traslado del kit del cliente.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">🚚</div>
+                    <div class="funcion-text">
+                        <h3>Entrega de productos al exterior</h3>
+                        <p>El operador remite los datos del cliente al back office, quienes gestionan el presupuesto y seguimiento del envío del producto al exterior.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">🔍</div>
+                    <div class="funcion-text">
+                        <h3>Verificación in situ</h3>
+                        <p>El operador ingresa la solicitud para la verificación in situ vía SAC.COM con los datos completos del cliente.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📦</div>
+                    <div class="funcion-text">
+                        <h3>Traslado de cheque devuelto</h3>
+                        <p>El operador remite los datos al back office a través del team de gestión para coordinar el traslado del cheque devuelto.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📤</div>
+                    <div class="funcion-text">
+                        <h3>Habilitación de servicio 24 horas en Internet</h3>
+                        <p>El operador deriva la solicitud solo cuando el cliente no puede gestionar su PIN a través de los canales habilitados.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📝</div>
+                    <div class="funcion-text">
+                        <h3>Cancelación de oferta de préstamo electrónico</h3>
+                        <p>El operador ingresa la solicitud en SAC.COM, registrando los datos necesarios para la cancelación del servicio.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">💼</div>
+                    <div class="funcion-text">
+                        <h3>Reserva de efectivo</h3>
+                        <p>El operador ingresa la solicitud bajo el flujo predefinido, aclarando los plazos detallados para evitar futuros reclamos.</p>
+                    </div>
+                </div>
+            
+            </div>
+        <h2>Soporte y Consultas Generales</h2>
+            <div class="funciones-grid">
+                                
+                <div class="funcion-item">
+                    <div class="funcion-icon">📧</div>
+                    <div class="funcion-text">
+                        <h3>Suscripción y desuscripción de resúmenes por email</h3>
+                        <p>El operador puede habilitar o deshabilitar el servicio de resúmenes vía correo electrónico según lo solicite el cliente.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📬</div>
+                    <div class="funcion-text">
+                        <h3>Reenvío de resúmenes por email</h3>
+                        <p>Si el cliente no ha recibido su resumen, el operador puede reenviarlo por correo electrónico a su dirección registrada.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">❓</div>
+                    <div class="funcion-text">
+                        <h3>Consulta de movimientos y saldo</h3>
+                        <p>El operador proporciona información sobre los movimientos recientes de la cuenta, incluyendo saldos y detalles de transacciones.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">📞</div>
+                    <div class="funcion-text">
+                        <h3>Consulta de PINs y desbloqueo</h3>
+                        <p>El operador puede gestionar consultas relacionadas con PINs de acceso y transacción, y realizar desbloqueos en caso necesario.</p>
+                    </div>
+                </div>
+            
+                <div class="funcion-item">
+                    <div class="funcion-icon">⚙️</div>
+                    <div class="funcion-text">
+                        <h3>Actualización de datos personales</h3>
+                        <p>El operador actualiza la dirección particular/laboral del cliente en el sistema. Si no hay dirección laboral, se replica la particular.</p>
+                    </div>
+                </div>
+            
+            </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+
+    <a href="herramientas.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

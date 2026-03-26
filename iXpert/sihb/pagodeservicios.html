@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago de Servicios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pago de Servicios (Pagos Electrónicos)</h1>
+    </header>
+    <nav>
+        <a href="#1"></a>
+        <a href="#2">Acceso Pago Proveedores</a>
+        <a href="#3">Pago de Servicios - Menú Principal</a>
+        <a href="#4">Públicos y Privados</a>
+        <a href="#5">Autorizar Pagos</a>
+        <a href="#6">Anular Pagos</a>
+        <a href="#7">Pago por fecha</a>
+        <a href="#8">Consultas</a>
+        <a href="#8">Comprobantes</a>
+    </nav>
+    <section id="1">
+        <h2>¿En que consiste el pago de servicio?</h2>
+        <p>Los débitos comandados permitirán a su empresa contar con una solución eficiente a la gestión de cobros, con mayor comodidad y seguridad dando la posibilidad de abarcar una amplia cartera de clientes.</p>
+        <p><b>Con este servicio,</b> se podrán reducir los tiempos y costos operativos de su empresa. Los débitos serán realizados automáticamente de las cuentas de clientes que nos sea detallado, y los montos serán acreditados a la cuenta de su empresa el mismo día.</p>
+        <p><b>Ventajas del Servicio:</b></p>
+        <ul>
+            <li>1️⃣ Seguridad y rapidez.</li>
+            <li>2️⃣ Mayor comodidad, ya que podes realizar operaciones bancarias para tu empresa desde donde estés.</li>
+            <li>3️⃣ Disponibilidad de comprobantes de pagos en línea.</li>
+        </ul>
+        <img src="../imagenes/imagen0.jpg"  alt="Pantalla Bancard" style="width: 1000px; height: 120px;">
+    </section>
+    <section id="2">
+        <h2>Pago a Proveedores (Acceso)</h2>
+        <p>Para acceder a la opción <b>Pago de servicios</b> , se debe ingresar a la plataforma de Pagos Electrónicos desde la página https://www.itau.com.py/</p>
+        <p>Ingresando el número de RUC de la empresa con el guion, el número de documento y la contraseña operador.</p>
+        <p>Una vez que se haya ingresado, se podrá visualizar la opcion pago de servicios en el menú.</p>
+        <img src="../imagenes/imagen153.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 500px;">
+    </section>
+    <section id="3">
+        <h2>Pago de servicios Opciones del menú principal</h2>
+        <ul>
+            <li><b>Cargar pagos:</b> permite cargar instrucción de los servicios a pagar de manera individual.</li>
+            <li><b>Autorizar pagos:</b> permite autorizar los pagos cargados de manera individual por los usuarios con permisos para autorizar.</li>
+            <li><b>Anular pagos:</b> se podrán anular los pagos ya cargados que se encuentren pendientes de autorización.</li>
+            <li><b>Datos de pagos por fecha:</b> permite poder sacar reportes con detalle de los pagos realizados.</li>
+            <li><b>Comprobantes:</b> permite poder sacar los comprobantes con detalle de los pagos realizados.</li>
+        </ul>
+        <img src="../imagenes/imagen154.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 350px;">
+    </section>
+        <section id="4">
+        <h2>Pago de Servicios Publicos y Privados</h2>
+        <ul>
+            <li><b>Cargar Pagos:</b> Seleccione el rubro del servicio a abonar, o utilice el buscador para ingresar al servicio requerido</li>
+            <li><b>Ejemplo:</b> Al seleccionar Servicios Públicos, le despliega todos los servicios públicos habilitados para el pago</li>
+        </ul>
+        <img src="../imagenes/imagen155.jpg"  alt="Pantalla Bancard" style="width: 700px; height: 350px;">
+        <h3>Filtros</h3>
+        <p>Encontrará varias categorías que podrá desplegar y también cuenta con un <b>buscador</b> para buscar el servicio de su preferencia.</p>
+        <img src="../imagenes/imagen156.jpg"  alt="Pantalla Bancard" style="width: 600px; height: 300px;">
+        <h3>Cargar Pagos de Servicios Públicos o Privados</h3>
+        <ul>
+            <li>Ingrese los datos requeridos en el formulario electrónico.</li>
+            <li>Seleccione la cuenta de debito.</li>
+            <li>Click en el botón siguiente.</li>
+        </ul>
+        <img src="../imagenes/imagen157.jpg"  alt="Pantalla Bancard" style="width: 600px; height: 400px;">
+        <ul>
+            <li>Seleccione o ingrese los datos requeridos según el servicio a abonar.</li>
+            <li>Click en el botón "Siguiente"</li>
+        </ul>
+        <img src="../imagenes/imagen158.jpg"  alt="Pantalla Bancard" style="width: 600px; height: 400px;">
+        <ul>
+            <li>Confirme la solicitud de Carga</li>
+        </ul>
+        <img src="../imagenes/imagen159.jpg"  alt="Pantalla Bancard" style="width: 600px; height: 400px;">
+        <p>Visualice el mensaje de confirmación de la Carga.</p>
+        <p>El pago registrado queda Pendiente de autorización por los usuarios con el permiso correspondiente para liberar el pagos.</p>
+        <img src="../imagenes/imagen160.jpg"  alt="Pantalla Bancard" style="width: 600px; height: 400px;">
+    </section>
+    </section>
+        <section id="5">
+        <h2>Pago de Servicios - Autorizar Pagos</h2>
+        <p>Se deberá seleccionar los servicios que desea autorizar e ingresar el <b>pin operador</b>.</p>
+        <img src="../imagenes/imagen161.jpg"  alt="Pantalla Bancard" style="width: 350px; height: 200px;">
+        <p> </p>
+        <img src="../imagenes/imagen162.jpg"  alt="Pantalla Bancard" style="width: 700px; height: 350px;">
+    </section>
+    </section>
+        <section id="6">
+        <h2>Pago de Servicios - Anular Pagos</h2>
+        <p>Permite anular las operaciones de débitos cargados.</p>
+        <p>Para anular se debe seleccionar los archivos e ingresar el pin operador a modo que la operación quede en estado <b>"Anulado"</b></p>
+        <img src="../imagenes/imagen163.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 350px;">
+    </section>
+    </section>
+        <section id="7">
+        <h2>Pago de Servicios - Pago por Fecha</h2>
+        <ul>
+            <li><b>Datos de pagos por rango de fecha:</b> para consultar el histórico de pagos con sus estados.</li>
+            <li>Se cuenta con la opción para descargar en formato excel.</li>
+        </ul>
+        <p>Permite anular las operaciones de débitos cargados.</p>
+        <p><i><b>Ver:</b> Le permite visualizar el detalle de auditoria de la operación, es decir, fecha y hora de la carga y/o autorizaciones con el detalle de los operadores.</i></p>
+        <img src="../imagenes/imagen164.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 450px;">
+    </section>
+    </section>
+        <section id="8">
+        <h2>Consultas</h2>
+        <p><b>(*)Auditoria de la operación:</b> detalles de visualización.</p>
+        <p>(*) Nueva opción disponible.</p>
+        <p><b>OBS:</b> El detalle de la carga, se visualizará para todas las operaciones registradas desde el 19/04.</p>
+        <p>Las operaciones anteriores a esta fecha, se mostrará únicamente el detalle de las autorizaciones</p>
+        <img src="../imagenes/imagen165.jpg"  alt="Pantalla Bancard" style="width: 700px; height: 250px;">
+    </section>
+    </section>
+        <section id="9">
+        <h2>Comprobantes</h2>
+        <p>Pantalla de consultas de comprobantes por rango de fechas.</p>
+        <p>Histórico de comprobantes disponible hasta 1 año atrás.</p>
+        <img src="../imagenes/imagen166.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 400px;">
+        <p> </p>
+        <img src="../imagenes/imagen167.jpg"  alt="Pantalla Bancard" style="width: 800px; height: 500px;">
+    </section>
+
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

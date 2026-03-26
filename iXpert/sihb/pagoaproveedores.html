@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            image-rendering: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pago a Proveedores</h1>
+    </header>
+    <nav>
+        <a href="#1"></a>
+        <a href="#2"></a>
+        <a href="#3"></a>
+        <a href="#4"></a>
+        <a href="#5"></a>
+        <a href="#6"></a>
+        <a href="#7"></a>
+        <a href="#8"></a>
+        <a href="#8"></a>
+    </nav>
+    <section id="1">
+        <h2>Beneficios para la Empresa</h2>
+        <ul>
+            <li>1️⃣ Autoprogramación de pagos: desde tu casa u oficina podés programar o reprogramar las fechas de pago.</li>
+            <li>2️⃣ Generamos comprobantes de pago con cuenta en Itaú para casos de crédito.</li>
+            <li>3️⃣ Pagos a proveedores no clientes del Banco a través de cheques administrativos.</li>
+            <li>4️⃣ Sistema ágil y seguro, el proveedor recibirá su pago en la fecha indicada.</li>
+        </ul>
+        <h2>Beneficios para el Proveedor</h2>
+        <ul>
+            <li>1️⃣ Posibilidad de apertura de cuenta y acceso a todos los productos y/o servicios del Banco.</li>
+            <li>2️⃣ Al recibir créditos en cuenta en un periodo determinado, se exonera saldo promedio.</li>
+            <li>3️⃣ Cobro seguro y en fecha, disponibilidad inmediata de las acreditaciones.</li>
+            <li>4️⃣ Máxima cobertura, con una extensa red de sucursales y cajeros automáticos.</li>
+        </ul>
+    </section>
+    <section id="2">
+        <h2>Acceso</h2>
+        <p>Para acceder a la opción Pago a proveedores , se debe ingresar a la plataforma de Pagos Electrónicos desde la página https://www.itau.com.py/</p>
+        <p>Ingresando el número de RUC de la empresa con el guion, el número de documento y la contraseña operador.</p>
+        <p>Una vez que se haya ingresado, se podrá visualizar la opcion pago a proveedores en el menú.</p>
+        <img src="../imagenes/imagen251.jpg"  alt="IMG">
+    </section>
+    <section id="3">
+        <h2>Opciones del Menú Principal</h2>
+        <ul>
+            <li>Transmitir archivos de Débitos</li>
+            <li>Cargar Debito Individual</li>
+            <li>Plantillas</li>
+            <li>Autorizar pagos por archivo</li>
+            <li>Autorizar pagos individuales</li>
+            <li>Anular pagos por archivo</li>
+            <li>Anular pagos individuales</li>
+            <li>Modificar pagos</li>
+            <li>Datos de pagos</li>
+        </ul>
+        <img src="../imagenes/imagen252.jpg"  alt="a">
+        <h3>Detalle de las opciones</h3>
+        <ul>
+            <li><b>Transmite archivos de pago:</b> permite subir archivos de pagos masivos</li>
+            <li><b>Cargar pago Individual:</b> permite cargar los pagos de manera individual</li>
+            <li><b>Autorizar pagos por archivo:</b> permite autorizar los archivos transmitidos por los usuarios con permisos para autorizar</li>
+            <li><b>Autorizar pagos individuales:</b> permite autorizar los archivos cargados individual por los usuarios con permisos para autorizar</li>
+            <li><b>Anular pagos por archivo:</b> Los pagos que se encuentren pendientes de aprobación, con observación o errores pueden ser anulados en esta opción</li>
+            <li><b>Anular pagos individuales:</b> Podrán ser anulados los pagos cargados individualmente y que se encuentran pendiente 1era. O con observación o error</li>
+            <li><b>Modificar pago:</b> el cliente tiene la posibilidad de modificar los pagos con error u observación</li>
+            <li><b>Datos de Pagos:</b> Se visualizan los pagos con sus detalles de autorización</li>
+        </ul>
+    </section>
+        <section id="4">
+        <h2>Transmisión de archivo de Pagos</h2>
+        <p>Para Transmitir pagos adjunte el archivo a transferir, agregue una referencia (campo opcional) y luego click en <b>Enviar archivo</b></p>
+        <p>Los pagos con errores quedaran pendiente en la grilla de autorizaciones hasta que el operador lo modifique o anule.</p>
+        <p><b>Recuerde:</b>Tiene la posibilidad de descargar el Excel (ejemplo) y el formato txt en esta opción de ayuda.</p>
+        <img src="../imagenes/imagen253.jpg"  alt="IMG">
+        <h3>Validaciones</h3>
+        <p>En el caso de que se adjunte un archivo que no sea del formato permitido aparecerá el siguiente mensaje.</p>
+        <p><i>El archivo seleccionado no es permitido, solo permitidos archivos XLS y TXT</i></p>
+        <img src="../imagenes/imagen254.jpg"  alt="IMG">
+        <h3>Errores</h3>
+        <p>Si el archivo transmitido cuenta con errores en la estructura de los datos se mostrara el siguiente mensaje:</p>
+        <p>Tienes, pagos con error, se habilita el botón <b>“Ver Errores”</b> para verificar los pagos ingresados con error.</p>
+        <p>Favor realizar la modificación para transmitir el archivo completo.</p>
+        <img src="../imagenes/imagen255.jpg"  alt="IMG">
+    </section>
+    </section>
+        <section id="5">
+        <h2>Carga Individual</h2>
+        <h3>Paso 1</h3>
+        <p>Para realizar una Carga individual:</p>
+        <ul>
+            <li>Ingrese a la opción del menú Carga de pagos en forma individual.</li>
+            <li>Luego deberá Ingresar los campos obligatorios y/o campos adicionales resaltados con el asterisco.</li>
+        </ul>
+        <img src="../imagenes/imagen256.jpg"  alt="a">
+        <h3>Paso 2</h3>
+        <p>Para este paso todos los campos son opcionales</p>
+        <ul>
+            <li>Para recibir un aviso de del pago selecciones la opción del medio deseado, y será remitido de forma automática luego de concretarse la gestión.</li>
+            <li>En caso de necesitar envió de copia del pago a un tercero, detalle el correo del autorizado.</li>
+            <li>Quiero guardar este pago como una plantilla permitirá guardar los pagos de modo a poder reutilizarlos en ocasiones futuras.</li>
+        </ul>
+        <img src="../imagenes/imagen257.jpg"  alt="a">
+        <h3>Paso 3 y 4</h3>
+        <p>Luego de finalizar la carga de datos, se podrá visualizar en pantalla el resumen del pago y el mensaje de confirmación.</p>
+        <img src="../imagenes/imagen258.jpg"  alt="a">
+        <h3>Acceso rápido para autorizar</h3>
+        <p>En caso de tener los permisos de autorización, aparecerá un acceso directo que le llevara a autorizar el pago.</p>
+        <img src="../imagenes/imagen259.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="6">
+        <h2>Notificaciones para autorizar</h2>
+        <p>Disponible para los usuarios que tengan el permiso de Autorizar pagos.</p>
+        <p>El operador vera el nro de transacciones a autorizar.</p>
+        <img src="../imagenes/imagen260.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="7">
+        <h2>Autorizar pagos por Archivos</h2>
+        <p>Se podrá visualizar el Resumen total de archivos transmitidos.</p>
+        <p><b>Ej.</b> Monto total y cantidad de pagos contenidos en el lote.</p>
+        <p><b>Ver mas</b></p>
+        <p>Si selecciona esta opcion le desplegará los pagos que contiene el lote.</p>
+        <img src="../imagenes/imagen261.jpg"  alt="IMG">
+    </section>
+    </section>
+        <section id="8">
+        <h2>Autorizar pagos individuales</h2>
+        <p>Visualiza el detalle de cada de unos de los registros transmitidos en el lote.</p>
+        <p>Contará con la Opción de <b>Ordenar los registros</b> pendientes por Cta. Debito, Cta. Crédito, Monto pago y Beneficiario.</p>
+        <p>Solo debe posicionar el cursor sobre el titulo de la columna a ordenar.</p>
+        <p>El ordenamiento se realiza por paginas al seleccionar el selector para (Marcar/desmarcar): permite seleccionar todos los registros pendientes de autorización.</p>
+        <img src="../imagenes/imagen262.jpg"  alt="IMG">
+    </section>
+    </section>
+        <section id="9">
+        <h2>Anular pagos por Archivos</h2>
+        <p>Permite anular los registros / pagos individuales completos de pagos que <b>aún no fueron procesados.</b></p>
+        <p>Para proceder a la anulación de algún archivo, se deberá seleccionar el mismo de modo a avanzar con la confirmación de dicha gestión.</p>
+        <img src="../imagenes/imagen263.jpg"  alt="IMG">
+    </section>
+    </section>
+        <section id="10">
+        <h2>Anular pagos individuales</h2>
+        <p>Permite anular los lores completos de pagos que <b>aún no fueron procesados.</b></p>
+        <p>Para proceder a la anulación de algún archivo, se deberá seleccionar el mismo de modo a avanzar con la confirmación de dicha gestión.</p>
+        <img src="../imagenes/imagen264.jpg"  alt="a">
+        <h3>Filtros</h3>
+        <p>Sepodrá utilizar la opción de filtros, donde podrá filtrar por:</p>
+        <ul>
+            <li><b>Pagos pendientes:</b> pagos que aun no hayan sido confirmados</li>
+            <li><b>Pagos autorizados:</b> visualiza los registros autorizados, a procesarse en fecha futura, los mismos pueden ser anulados hasta 1dia antes de la fecha de pagos.</li>
+            <li><b>Pagos con errores:</b> pagos con observaciones que no pueden ser procesados por algún motivo ó error, el motivo puede verificar en la columna “Observación”.</li>
+        </ul>
+        <img src="../imagenes/imagen265.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="11">
+        <h2>Modificar Pagos</h2>
+        <p>Permite modificar las instrucciones de <b>pagos pendientes de autorización.</b></p>
+        <p>Las modificaciones ingresadas requerirán nuevamente la autorización de los operadores con permisos.</p>
+        <p>Seleccione un filtro de búsqueda, ya sea por fecha, por estados, por rango de fecha.</p>
+        <p>Click en el botón <b>Consultar</b></p>
+        <p>Vea la pantalla de resultado con el detalle de los pagos.</p>
+        <p>Seleccione el pago que desee modificar haciendo click sobre la imagen del lápiz, luego presionar el botón <b>"Guardar".</b></p>
+        <img src="../imagenes/imagen266.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="12">
+        <h2>Datos de Pago</h2>
+        <p>Para conciliaciones, histórico y estados de sus pagos ingresados</p>
+        <p>Podrá Seleccionar las opciones de filtros de búsqueda, por fecha de carga, por rango, por estado, Click en el botón <b>CONSULTAR</b></p>
+        <p>Seleccione un filtro de búsqueda, ya sea por fecha, por estados, por rango de fecha.</p>
+        <p>Las operaciones consultadas pueden ser exportadas en Excel y PDF</p>
+        <img src="../imagenes/imagen267.jpg"  alt="a">
+        <p> </p>
+        <img src="../imagenes/imagen268.jpg"  alt="a">
+        <p>Podrá realizar verificación de datos para conciliaciones, histórico y estados de sus pagos ingresados.</p>
+        <p>Visualizará el log de auditoria de pagos desde el botón <b>VER</b></p>
+        <p>En la columna <b>Observación:</b> Visualizará el motivo de rechazo u error de su registro de pago.</p>
+        <img src="../imagenes/imagen269.jpg"  alt="a">
+        <p><b>(*)Auditoria de la operación:</b> detalles de visualización.</p>
+        <p>(*)Nueva opción disponible.</p>
+        <p><b>OBS: El detalle de la carga, se visualizará para todas las operaciones registradas</b></p>
+        <img src="../imagenes/imagen270.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="13">
+        <h2>Consideraciones del servicio</h2>
+        <ul>
+            <li>Actualmente el servicio es para pagos en moneda GS y USD.</li>
+            <li>Plazo Máximo de programación de pagos: 180 Días.</li>
+            <li>Habilitado para pagos a cuentas de Itau</li>
+            <li>Habilitado para crédito en cuenta y emisión de cheque administrativo</li>
+            <li>Los pagos se realizan en cuenta itau</li>
+            <li>Con el PIN Administrador, se deben otorgar permisos a las personas/usuarios que tendrán acceso a la web para carga y/o autorización de archivos.</li>
+        </ul>
+    </section>
+    </section>
+        <section id="14">
+        <h2>Atención a Pago a Proveedores:</h2>
+        <p>Se indica a cliente si existen pagos a su nombre y en qué estado, ingresando desde SAC.com a la ficha de la empresa que le paga.</p>
+        <p>Cliente consulta estado de pago a proveedores, se debe consultar que entidad (empresa) paga y a nombre de quien emite el pago (beneficiario, puede ser PF o PJ)</p>
+        <h3>Paso 1 – Ingreso a SAC.com</h3>
+        <ul>
+            <li>Dentro de SAC.COM</li>
+            <img src="../imagenes/imagen360.webp" alt="360" style="width: 800px; height: auto;">
+            <li>Indicar el nombre de la entidad (empresa) que realiza el pago.</li>
+            <img src="../imagenes/imagen359.webp" alt="359" style="width: 800px; height: auto;">
+            <li>Filtrar por nombre del proveedor y revisar los estados disponibles:</li>
+            <img src="../imagenes/imagen361.webp" alt="361" style="width: 800px; height: auto;">
+            <ul>
+                <li>Pendiente 1ra.</li>
+                <li>Pendiente 2da.</li>
+                <li>Pendiente 3ra.</li>
+                <li>Autorizado</li>
+                <li>Pagado (acreditación en Cta. o TC prepaga)</li>
+                <li>Ch. Impreso (cheques disponibles)</li>
+                <li>Ch. Entregado (cheques entregados)</li>
+            </ul>
+        </ul>
+        <h3>Paso 2 – Interpretación del estado</h3>
+        <p>Identificar si se trata de acreditación en Cta. por Crédito o Contado.</p>
+        <p>Buscar en estado Autorizado:</p>
+        <ul>
+            <li><b>Autorizado – Crédito-Crédito:</b> requiere entrega de recibo o factura para desembolso.</li>
+            <img src="../imagenes/imagen362.webp" alt="362" style="width: 800px; height: auto;">
+            <li><b>Autorizado – Crédito-Contado:</b> pago directo.</li>
+            <img src="../imagenes/imagen363.webp" alt="363" style="width: 800px; height: auto;">
+            <li><b>Cheque-Crédito:</b> el beneficiario debe acercarse a la agencia con recibo o factura para retirar.</li>
+            <img src="../imagenes/imagen364.webp" alt="364" style="width: 800px; height: auto;">
+            <li><b>Cheque-Contado:</b> retiro en agencias. En caso de PF, solo el titular puede retirar.</li>
+            <img src="../imagenes/imagen365.webp" alt="365" style="width: 800px; height: auto;">
+        </ul>
+        <h3>Paso 3 – Lugares de retiro o acreditación</h3>
+        <ul>
+            <li><b>CE Casa Matriz (L–V 09:00 a 16:00):</b> todas las empresas pagadoras.</li>
+            <li><b>CE Villa Morra (L–S 08:30 a 16:00):</b> solo pagos de PNUD (no hay acreditaciones en cuenta los sábados).</li>
+            <li><b>Torre Itaú (L–V 08:30 a 13:30):</b> solo cheques del BCP.</li>
+        </ul>
+        <p><b>Importante:</b> No gestionamos traslado de cheques a sucursales. El cliente debe confirmar directamente con la entidad pagadora.</p>
+    </section>
+
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

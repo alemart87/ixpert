@@ -1,0 +1,214 @@
+<!-- HTML completo con contenido completo de la guía PIN activación -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guía Atención - Activación de PIN</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+    h3 {
+      margin-top: 25px;
+      color: #222;
+    }
+    ul {
+      margin-left: 20px;
+      padding-left: 10px;
+    }
+    .info-box {
+      background-color: #eef5ff;
+      padding: 15px;
+      border-left: 6px solid #004080;
+      margin-bottom: 25px;
+    }
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛡️ Guía Atención - Activación de PIN de Transacción</h1>
+  </header>
+
+  <nav>
+    <a href="#full">Cuenta Full</a>
+    <a href="#basica">Cuenta Básica</a>
+    <a href="#on">Cuenta ON</a>
+    <a href="#tc">Solo TC</a>
+    <a href="#validaciones">Validaciones</a>
+    <a href="#speechs">Speechs</a>
+    <a href="#errores">Errores / Capturas</a>
+  </nav>
+
+  <section>
+    <h2 id="full">🔷 Cuenta Full</h2>
+    <div class="info-box">
+      <ul>
+        <li>Generar PIN en la app: Seguridad → Solicitar PIN</li>
+        <li>Canales de activación inmediata: SMS, ATM, datos TD</li>
+        <li>Activación por SAC solo si el cliente no acepta otros medios o tiene inconvenientes</li>
+        <li>Si canal falla: solicitar captura de error (SMS / PIN PAD)</li>
+        <li>No sugerir ATM si el PIN está bloqueado</li>
+      </ul>
+    </div>
+
+    <h2 id="basica">🔷 Cuenta Básica</h2>
+    <div class="info-box">
+      <ul>
+        <li>Generar PIN desde app → Seguridad</li>
+        <li>Activar por: SMS, ATM, agencias, Itaú Express</li>
+        <li>Por SAC solo si cliente no acepta autogestión</li>
+      </ul>
+    </div>
+
+    <h2 id="on">🟢 Cuenta ON</h2>
+    <div class="info-box">
+      <ul>
+        <li>Debe pasar al menos 2 filtros</li>
+        <li>Obligatorio: marca y modelo del dispositivo</li>
+        <li>Si falla: derivar a agencia</li>
+      </ul>
+    </div>
+
+    <h2 id="tc">💳 Cliente con Solo Tarjeta de Crédito</h2>
+    <div class="info-box">
+      <ul>
+        <li>Genera PIN en app</li>
+        <li>Activa vía OTP (SMS) o agencia</li>
+        <li>⚠️ No se activa por SAC</li>
+      </ul>
+    </div>
+
+    <h2 id="validaciones">🧠 Validaciones en SAC</h2>
+    <div class="info-box">
+      <h3>Cuenta Full / Básica</h3>
+      <ul>
+        <li>Marca y modelo del dispositivo</li>
+        <li>Pregunta falsa (compra ficticia)</li>
+        <li>Número de teléfono catastrado → debe tener vigencia mínima 3 meses</li>
+        <li>✅ Si número no pasa en SAC pero figura válido en Catastro o actualizado por vuelco → pasa</li>
+        <li>❌ Si número no está en estado válido → no pasa → indicar activación en agencia</li>
+      </ul>
+
+      <h3>Cuenta ON</h3>
+      <ul>
+        <li>Marca y modelo del dispositivo → obligatorio</li>
+        <li>Número de solicitud (puede derivarse si no responde)</li>
+        <li>Pregunta falsa (opcional)</li>
+      </ul>
+    </div>
+
+    <h2 id="speechs">🗣️ Speechs sugeridos</h2>
+
+    <div class="alert">
+      <strong>Inicio de atención:</strong><br>
+      “Gracias por aguardar Sr./Sra. XX, verifico que ya generó su PIN. Tenemos canales automáticos como SMS, ATM o por datos de la tarjeta. ¿Cuál de ellos visualizó?”
+    </div>
+
+    <div class="alert">
+      <strong>Cliente insiste en activar vía SAC:</strong><br>
+      “Sr. XX, derivar la activación por este medio requiere un proceso de verificación que demora hasta 24hs. Si desea una activación inmediata puede generar un nuevo PIN y seleccionar alguno de los siguientes canales: [SMS / ATM / TD].”
+    </div>
+
+    <div class="alert">
+      <strong>Cliente pasa todos los filtros:</strong><br>
+      “Perfecto Sr. XX, su solicitud fue derivada con éxito. En un plazo de 24hs recibirá un SMS confirmando la activación. Si no lo recibe, le sugerimos realizar un nuevo intento o volver a contactarse.”
+    </div>
+
+    <div class="alert">
+      <strong>Cliente NO pasa filtros:</strong><br>
+      “Sr. XX, para proceder por este canal necesitamos validar ciertos datos. Actualmente no es posible derivar su solicitud. Le sugerimos activar su PIN desde la app, por cajero automático, o en una agencia.”
+    </div>
+
+    <h2 id="errores">⚠️ Errores técnicos y capturas</h2>
+    <div class="info-box">
+      <h3>SMS / PIN PAD</h3>
+      <ul>
+        <li>Solicitar captura al cliente si el canal falla</li>
+        <li>Derivar a soporte para validar funcionamiento</li>
+      </ul>
+
+      <h3>ATM</h3>
+      <ul>
+        <li>No se solicita captura</li>
+        <li>Verificar en Bancard si realizó consulta/extracción</li>
+        <li>Si aparece como “Personalizada” → recibió SMS y aceptó</li>
+        <li>Si no activó luego de eso → derivar reclamo</li>
+      </ul>
+
+      <h3>PIN bloqueado</h3>
+      <ul>
+        <li>No recomendar ATM → no borra intentos inválidos</li>
+        <li>Indicar activación en agencia</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../iXpert.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>
+
+

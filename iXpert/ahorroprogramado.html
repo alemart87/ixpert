@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorro Programado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Incluir Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        h3 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 1000px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💡 Ahorro Programado</h1>
+    </header>
+    <nav>
+        <a href="#paso1">¿Qué es?</a>
+        <a href="#paso2">¿Cómo funciona?</a>
+        <a href="#paso3">Debito de la Cuota</a>
+        <a href="#paso4">Canales habilitados</a>
+        <a href="#paso5">Ejemplos</a>
+        <a href="#paso6">Preguntas Frecuentes</a>
+    </nav>
+    <section id="paso1">
+        <h2>🧾 ¿Qué es?</h2>
+        <p>El Ahorro Programado es un producto de inversión que permite ahorrar de forma automática, con débitos mensuales fijos, durante un período establecido. Ideal para cumplir metas a mediano o largo plazo.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    <section id="paso2">
+        <h2>🛠️ ¿Cómo funciona?</h2>
+        <ul>
+            <li>Elegís el monto mensual que querés ahorrar.</li>
+            <li>Seleccionás el plazo de tu ahorro.</li>
+            <li>Indicás la cuenta de origen desde donde se realizará el débito.</li>
+            <li>Podés realizar Depósitos Extra o Refuerzos voluntarios en cualquier momento.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    <section id="paso3">
+        <h2>💳 Débito de la Cuota – Reglas Importantes</h2>
+
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+            <thead style="background-color: #f0f0f0;">
+              <tr>
+                <th style="width: 30%;">Escenario</th>
+                <th>¿Qué sucede?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>❌ Sin saldo en cuenta</td>
+                <td>
+                  <b>Largo Plazo:</b> el sistema seguirá intentando cada día hasta que haya saldo disponible.<br>
+                  <b>Corto Plazo:</b> el sistema <u>NO</u> volverá a intentar el débito.
+                </td>
+              </tr>
+              <tr>
+                <td>💸 Deudas crediticias</td>
+                <td>Se prioriza el débito de deudas antes que el ahorro programado.</td>
+              </tr>
+              <tr>
+                <td>⚠️ Disponible sin IVale</td>
+                <td>El IVale no se considera parte del saldo disponible para debitar el ahorro.</td>
+              </tr>
+              <tr>
+                <td>🧮 Sin débitos parciales</td>
+                <td>No se realiza débito parcial. Si no hay saldo suficiente para la cuota completa, no se ejecuta.</td>
+              </tr>
+              <tr>
+                <td>🔒 Saldo protegido (APRO)</td>
+                <td>El Ahorro Programado no se debita del saldo protegido.</td>
+              </tr>
+            </tbody>
+          </table>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    <section id="paso4">
+        <h2>📲 Canales para Controlar y Solicitar</h2>
+        <p>Podés gestionar y consultar tu Ahorro Programado por:</p>
+        <ul>
+            <li>🌐 24hs en Internet: con tu pin de acceso y transacción.</li>
+            <li>☎️ 24hs por teléfono: llamando al 617 1000.</li>
+            <li>🏢 Agencias: asistencia personalizada en cualquier sucursal.</li>
+        </ul>
+        <h3>📋 Comparativo de características: Corto Plazo vs. Largo Plazo</h3>
+
+            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: center;">
+            <thead style="background-color: #f0f0f0;">
+                <tr>
+                <th style="text-align: left;">Características</th>
+                <th>Corto Plazo</th>
+                <th>Largo Plazo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td style="text-align: left;">Plazos disponibles</td>
+                <td>3, 6, 9, 12, 15, 18, 21 meses</td>
+                <td>24, 36, 48, 60 meses</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Disponible para Cliente PF (persona física)</td>
+                <td>✅ Sí</td>
+                <td>✅ Sí</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Débito automático</td>
+                <td>✅ Sí</td>
+                <td>✅ Sí</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Moneda</td>
+                <td>Guaraníes / USD</td>
+                <td>Guaraníes / USD</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Monto mínimo</td>
+                <td>Gs. 100.000 / USD 5</td>
+                <td>Gs. 100.000 / USD 5</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Exoneración de comisión</td>
+                <td>A partir de Gs. 100.000 / USD 20</td>
+                <td>A partir de Gs. 100.000 / USD 20</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Penalidad por cancelación</td>
+                <td>Gs. 55.000</td>
+                <td>2,2% del capital acumulado o mínimo Gs. 55.000</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">¿Permite refuerzos?</td>
+                <td>✅ Sí</td>
+                <td>✅ Sí</td>
+                </tr>
+            </tbody>
+            </table>
+
+            <h3>📈 Tasas según plazo y moneda</h3>
+
+                <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: center;">
+                <thead style="background-color: #f0f0f0;">
+                    <tr>
+                    <th>⏳ Plazo</th>
+                    <th>💴 En Guaraníes (Gs.)</th>
+                    <th>💵 En Dólares (US$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>3 a 9 meses</td>
+                    <td>3%</td>
+                    <td>0,50%</td>
+                    </tr>
+                    <tr>
+                    <td>12 a 21 meses</td>
+                    <td>4%</td>
+                    <td>0,75%</td>
+                    </tr>
+                    <tr>
+                    <td>24 meses</td>
+                    <td>4,5%</td>
+                    <td>0,75%</td>
+                    </tr>
+                    <tr>
+                    <td>36 meses</td>
+                    <td>7%</td>
+                    <td>2%</td>
+                    </tr>
+                    <tr>
+                    <td>48 meses</td>
+                    <td>7,5%</td>
+                    <td>2,5%</td>
+                    </tr>
+                    <tr>
+                    <td>60 meses</td>
+                    <td>8%</td>
+                    <td>3%</td>
+                    </tr>
+                </tbody>
+                </table>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    <section id="paso5">
+        <h2>🎯 Ejemplos de Ahorro Programado</h2>
+        <p>✈️ <b>Ahorro para Viaje</b></p>
+        <ul>
+            <li><b>Meta:</b>Vacaciones familiares en el exterior</li>
+            <li><strong>Monto mensual:</strong> Gs. 1.000.000</li>
+            <li><strong>Plazo:</strong> 12 meses</li>
+            <li><strong>Total acumulado:</strong> Gs. 12.000.000 + intereses</li>
+            <li><strong>Cuenta de débito:</strong> Caja de Ahorro en guaraníes</li>
+          </ul>
+          <p>📝 <i>También puede hacer depósitos extras luego del aguinaldo o ingresos adicionales.</i></p>
+          <p>🚗 <b>Ahorro para Compra de Vehículo</b></p>
+          <ul>
+              <li><b>Meta:</b>Dar la entrada para un auto</li>
+              <li><strong>Monto mensual:</strong> Gs. 1.500.000</li>
+              <li><strong>Plazo:</strong> 24 meses</li>
+              <li><strong>Total acumulado:</strong> Gs. 36.000.000 + intereses</li>
+              <li><strong>Cuenta de débito:</strong> Cuenta corriente o caja de ahorro</li>
+            </ul>
+            <p>🚘 <i>Podés reforzar el ahorro con algún ingreso extra durante el año.</i></p>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    <section id="paso6">
+        <h2>❓ Preguntas Frecuentes - Ahorro Programado</h2>
+        <p><b>¿Ahorro Programado exonera el promedio de forma automática? ¿O se debe hacer gestión manual adicional?</b></p>
+        <ul>
+            <li><b>✅ Es automático,</b>siempre que el cliente tenga cuotas mensuales de Gs. 100.000 o USD 50, o un sumatorio equivalente desde la misma cuenta.</li>
+            <li><strong>📌 Ejemplo:</strong> Si un cliente tiene dos APRO de Gs. 50.000 cada uno, debitados desde la misma cuenta, se exonera la comisión.</li>
+            <li><strong>⚠ Condición:</strong>  Las cuotas deben debitarse todos los meses para aplicar el beneficio.</li>
+          </ul>
+          <p><b>¿Al finalizar el plazo del ahorro programado, el dinero vuelve a la cuenta de débito?</b></p>
+          <ul>
+              <li>✅ Sí. El monto acumulado se transfiere a la cuenta de débito de cuotas, 30 días después del cobro de la última cuota.</li>
+            </ul>
+            <p><b>¿Puede cambiarse la cuenta de débito del ahorro programado a nombre de un tercero?</b></p>
+            <p>📅 Depende del periodo de débito elegido y del momento de apertura:</p>
+            <ul>
+                <li><b>Caso A:</b> Cliente abre el APRO el 16/sep y elige Periodo 2 (del 11 al 20)</li>
+                <ul>
+                    <li>🔁 <b>Resultado:</b> Primer débito será al mes siguiente.</li>
+                </ul>
+                <li><b>Caso B:</b> Cliente abre el APRO el 16/sep y elige Periodo 3 (del 21 al fin de mes)</li>
+                <ul>
+                    <li>🔁 <b>Resultado:</b> Primer débito será ese mismo mes.</li>
+                </ul>
+                <li>🔢<i><b> Dato útil: El cliente puede tener hasta 20 ahorros programados activos.</b></i></li>
+              </ul>
+              <p>📅 <b>Periodos de Débito Disponibles</b></p>
+
+                <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: left;">
+                    <thead style="background-color: #f0f0f0;">
+                    <tr>
+                        <th>📌 Periodo</th>
+                        <th>📅 Fechas</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Periodo 1</td>
+                        <td>del 01 al 10 de cada mes</td>
+                    </tr>
+                    <tr>
+                        <td>Periodo 2</td>
+                        <td>del 11 al 20 de cada mes</td>
+                    </tr>
+                    <tr>
+                        <td>Periodo 3</td>
+                        <td>del 21 al último día del mes</td>
+                    </tr>
+                    </tbody>
+                </table>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="tuto9.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

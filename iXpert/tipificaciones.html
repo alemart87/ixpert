@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+  <style>
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #005792;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #003f5c;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0 20px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffa600;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #005792;
+    }
+
+    input[type="text"] {
+      padding: 12px 15px;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-size: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h4 {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+
+    .card p {
+      margin-top: 10px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      background: #f1f1f1;
+      color: #666;
+      padding: 20px;
+      font-size: 14px;
+      margin-top: 40px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 14px 22px;
+      background: #005792;
+      color: white;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ffa600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Registros SAC.COM</h1>
+  </header>
+
+  <nav>
+    <a href="#2"></a>
+  </nav>
+
+  <section id="2">
+    <h2>Listado de Tipificaciones</h2>
+    <input type="text" id="buscador" placeholder="Buscar por producto, tipo, proceso o motivo...">
+    <div id="contenedor-tips"></div>
+  </section>
+
+  <script>
+    const datos = [
+      {
+        "producto": "Cuenta",
+        "tipo": "Solicitud",
+        "proceso": "Intervale",
+        "motivo": "Activación",
+        "descripcion": "Flujo habilitado para solicitudes de activación/baja de Intervale"
+      },
+      {
+        "producto": "Cuenta",
+        "tipo": "Solicitud",
+        "proceso": "Intervale",
+        "motivo": "Desactivación",
+        "descripcion": "Flujo habilitado para solicitudes de activación/baja de Intervale"
+      },
+      {
+        "producto": "Cuenta",
+        "tipo": "Solicitud",
+        "proceso": "Intervale",
+        "motivo": "Cancelación",
+        "descripcion": "Flujo habilitado para solicitudes de activación/baja de Intervale"
+      },
+      {
+        "producto": "Cuenta",
+        "tipo": "Solicitud",
+        "proceso": "Intercheque",
+        "motivo": "Alta Oferta",
+        "descripcion": "Flujo habilitado para solicitudes de activación/baja de Intercheque"
+      },
+      {
+        "producto": "Cuenta",
+        "tipo": "Solicitud",
+        "proceso": "Intercheque",
+        "motivo": "Baja Oferta",
+        "descripcion": "Flujo habilitado para solicitudes de activación/baja de Intercheque"
+      },
+      {
+        "producto": "Cuenta",
+        "tipo": "Registro",
+        "proceso": "Bloqueo TD",
+        "motivo": "No amerita",
+        "descripcion": "Flujo habilitado para registro de solicitudes de activación de pin"
+      },
+      {
+        "producto": "Canales Digitales",
+        "tipo": "Solicitudes",
+        "proceso": "Activación de pin de transacción",
+        "motivo": "No amerita",
+        "descripcion": "Flujo habilitado para registro de solicitudes de activación de pin"
+      },
+      //aAslaksakslaklskalskasalk
+      
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Solicitudes",
+            "proceso": "Activación de pin de acceso",
+            "motivo": "Call back activaciones de pines",
+            "descripcion": "Flujo habilitado para registro de solicitudes de activación de pin. Obs.: El motivo de creación aplica para las solicitudes que corresponden a llamadas salientes realizadas."
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Registro",
+            "proceso": "Bloqueo de Canales Digitales",
+            "motivo": "No amerita",
+            "descripcion": "Flujo habilitado para registro de bloqueos de IHB realizados vía 24 Hs. Admin."
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Registro",
+            "proceso": "Contacto no concluido",
+            "motivo": "No finaliza motivo de contacto",
+            "descripcion": "Se identificó el motivo de contacto y durante la verificación, el contacto se interrumpió. Ej. Cliente consulta horario de agencia y durante la verificación, se corta la interacción."
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Registro",
+            "proceso": "Contacto no concluido",
+            "motivo": "Sin motivo de contacto",
+            "descripcion": "No se logra identificar el motivo de contacto antes de la interrupción (puede o no haber interacción con el cliente) Ej. Cliente escribe, saluda, se indica speech de saludo y luego se corta."
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Registro",
+            "proceso": "Contacto no concluido",
+            "motivo": "Sin interacción del cliente",
+            "descripcion": "No se logra conversar con el cliente. Ej. Cliente se conecta o llama, se indica speech de saludo y no se obtiene retorno del mismo."
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Retiro Parcial o Nulo",
+            "descripcion": "Flujo habilitado para registro de consultas con relación a transacciones con RPN"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Disponibilidad de Billetes en USD",
+            "descripcion": "Flujo habilitado para registro de consultas de disponibilidad de billetes dólares en ATM "
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Dirección de ATM",
+            "descripcion": "Flujo habilitado para registro de consultas de direcciones de ATM"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Disponibilidad de Billetes de 20.000",
+            "descripcion": "Flujo habilitado para registro de consultas de disponibilidad de billetes de Gs. 20.000 en ATM "
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Asistencia para utilizar ATM Reciclador",
+            "descripcion": "Flujo habilitado para registro de consulta de paso a paso para uso de ATM Reciclador"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Asistencia para utilizar ADC",
+            "descripcion": "Flujo habilitado para registro de consulta de paso a paso para uso de ADC"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Estado de ATM",
+            "descripcion": "Flujo habilitado para registro de consulta de estado del ATM (si funciona, si está habilitado, etc)"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Estado de reversión de No Expendio en Nuestros Cajeros",
+            "descripcion": "Flujo habilitado para registro de consulta de estado de reclamo realizado"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Estado de reversión de No Expendio en otros cajeros Infonet",
+            "descripcion": "Flujo habilitado para registro de consulta de estado de reclamo realizado"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Estado de reversión de Contracargo - No expendio",
+            "descripcion": "Flujo habilitado para registro de consulta de estado de reclamo realizado"
+        },
+        {
+            "producto": "24 Horas en Caj. Autom.",
+            "tipo": "Consulta",
+            "proceso": "Consultas varias - ATM",
+            "motivo": "Estado de reversión de No expendio RPN",
+            "descripcion": "Flujo habilitado para registro de consulta de estado de reclamo realizado"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Cliente interesado en préstamo",
+            "descripcion": "Flujo habilitado para los contactos fuera del horario establecido sobre la campaña Itau Sin Vuelta"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Número de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre número de préstamo vigent"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Cuotas Pagadas de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre cuotas pagadas de préstamo vigente"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Cuotas a Vencer de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre cuotas pendientes de préstamo vigente"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Plazo de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre plazo de préstamo vigente"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Interés de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre interés de préstamo vigente"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Tipo de financiación de Préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre tipo de financiación de préstamo vigente (francés/alemán/etc)"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Estado de solicitud de préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre estado de solicitud de préstamo"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Monto de cancelación anticipada",
+            "descripcion": "Flujo habilitado para consultas sobre cálculo para cancelación anticipada"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Estado de cancelación anticipada",
+            "descripcion": "Flujo habilitado para consultas sobre estado de solicitud de cancelación anticipada"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Estado de solicitud de pagarés cancelados",
+            "descripcion": "Flujo habilitado para consultas sobre estado de solicitud de pagarés cancelados"
+        },
+        {
+            "producto": "Préstamo",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Préstamo",
+            "motivo": "Extracto de préstamo",
+            "descripcion": "Flujo habilitado para consultas sobre extracto de préstamo (descriptiva)"
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Consulta",
+            "proceso": "Dudas sobre campañas",
+            "motivo": "Itaú Sin Vueltas",
+            "descripcion": "Para consultas relacionadas a bases y condiciones de la campaña Itaú Sin Vueltas"
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Consulta",
+            "proceso": "Dudas sobre campañas",
+            "motivo": "Tu Primer Pago de Servicio",
+            "descripcion": "Para consultas relacionadas a bases y condiciones de la campaña Tu primer pago de servicio"
+        },
+        {
+            "producto": "Otros",
+            "tipo": "Consulta",
+            "proceso": "Dudas sobre campañas",
+            "motivo": "Teletón",
+            "descripcion": "Para consultas relacionadas a Teletón"
+        },
+        {
+            "producto": "Tarjeta de crédito",
+            "tipo": "Registro",
+            "proceso": "Donación Teletón",
+            "motivo": "NaN",
+            "descripcion": "Para registro de donaciones realizadas con TC vía SAC"
+        },
+        {
+            "producto": "Cuenta",
+            "tipo": "Registro",
+            "proceso": "Donación Teletón",
+            "motivo": "NaN",
+            "descripcion": "Para registro de donaciones realizadas con cuenta vía SAC"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Solicitudes",
+            "proceso": "Desbloqueo de pin",
+            "motivo": "Pin de acceso",
+            "descripcion": "Registro para solicitudes de desbloqueo de pines de acceso derivadas"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Solicitudes",
+            "proceso": "Desbloqueo de pin",
+            "motivo": "Pin de transacción",
+            "descripcion": "Registro para solicitudes de desbloqueo de pines de transacción derivadas"
+        },
+        {
+            "producto": "Back Office",
+            "tipo": "Consulta",
+            "proceso": "Casos remitidos",
+            "motivo": "NaN",
+            "descripcion": "Registro para consultas derivadas al back office"
+        },
+        {
+            "producto": "Back Office",
+            "tipo": "Solicitudes",
+            "proceso": "Casos remitidos",
+            "motivo": "NaN",
+            "descripcion": "Registro para solicitudes derivadas al back office"
+        },
+        {
+            "producto": "Back Office",
+            "tipo": "Reclamo",
+            "proceso": "Casos remitidos",
+            "motivo": "NaN",
+            "descripcion": "Registro para reclamos derivados al back office"
+        },
+        {
+            "producto": "Back Office",
+            "tipo": "Registro",
+            "proceso": "Casos gestionados",
+            "motivo": "NaN",
+            "descripcion": "Registro para el back office de casos gestionados"
+        },
+        {
+            "producto": "Back Office",
+            "tipo": "Registro",
+            "proceso": "Casos denegados",
+            "motivo": "NaN",
+            "descripcion": "Registro para el back office de casos denegados"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Generación de pin (acceso/transacción)",
+            "descripcion": "Registro de asistencia en generación de pines (autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para activar Itoken",
+            "descripcion": "Registro de asistencia en instalación y activación de iToken"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para configurar Itoken",
+            "descripcion": "Registro de asistencia en configuración de iToken (zona horaria, errores, etc)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para realizar transferencias locales",
+            "descripcion": "Registro de asistencia para realizar transferencias internas, spi y sipap desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para realizar transferencias al exterior",
+            "descripcion": "Registro de asistencia para realizar transferencias al exterior desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para realizar pagos de servicios",
+            "descripcion": "Registro de asistencia para realizar pagos de servicios y operaciones aduanera desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para descargar comprobantes de pagos de servicios",
+            "descripcion": "Registro de asistencia para descargar comprobantes de pagos de servicios y operaciones aduaneras desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para descargar comprobantes de transferencias",
+            "descripcion": "Registro de asistencia para descargar comprobantes de transferencias locales y al exterior desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre detalles de extracto TC",
+            "descripcion": "Registro de asistencia sobre detalles en relación al extracto que visualiza en la web/app: Disponible, deuda, movimientos, fechas, etc (Siempre que el cliente consulte o se lo aborde a la autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre detalles de extracto Cuenta",
+            "descripcion": "Registro de asistencia sobre detalles en relación al extracto que visualiza en la web/app: Disponible, movimientos, fechas, etc (Siempre que el cliente consulte o se lo aborde a la autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para descargar extracto TC",
+            "descripcion": "Registro de asistencia para descargar extractos de TC desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para descargar extracto Cuenta",
+            "descripcion": "Registro de asistencia para descargar extractos de TC desde la web"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre canje de puntos",
+            "descripcion": "Registro de asistencia sobre simulador de canje o canje en TN"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para acceder a canales digitales",
+            "descripcion": "Registro de asistencia sobre cómo acceder al canal digital (primera vez)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para alta de alias Itaú",
+            "descripcion": "Registro de asistencia brindada sobre alta alias desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para baja de alias Itaú",
+            "descripcion": "Registro de asistencia brindada sobre baja alias desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para configuración de ClickBanking",
+            "descripcion": "Registro de asistencia en la configuración del servicio click banking desde la web (mensajes del 4828)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para solicitar chequeras",
+            "descripcion": "Registro de asistencia para solicitar chequeras vía web"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para depositar cheques",
+            "descripcion": "Registro de asistencia para depósito de cheques, dudas sobre el servicio"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para cambio de pin de tarjetas",
+            "descripcion": "Registro de asistencia para realizar el cambio de pin de tarjetas desde la app"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para realizar aviso de viajes al exterior",
+            "descripcion": "Registro de asistencia para realizar avisos de viajes desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para autorizar 3D Secure",
+            "descripcion": "Registro de asistencia para autorizar transacciones mediante 3D Secure (autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para solicitar reversión de transferencias",
+            "descripcion": "Registro de asistencia para solicitar reversión de transferencia SPI desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para devolver transferencias",
+            "descripcion": "Registro de asistencia para solicitar devolver o autorizar una reversión de transferencia SPI desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para pago de tarjetas propias y terceros",
+            "descripcion": "Registro de asistencia para realizar pagos de tarjetas de crédito propias y de terceros (itau) desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre extracto de préstamo",
+            "descripcion": "Registro de asistencia sobre extracto de préstamo desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre estado de transferencia",
+            "descripcion": "Registro de asistencia para visualizar estado de transferencias locales (internas/spi/sipap) desde los canales digitales (autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia sobre estado de pago de servicio",
+            "descripcion": "Registro de asistencia para visualizar estado de pagos de servicios desde los canales digitales (autogestión)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Estado de transferencia local",
+            "descripcion": "Registro de consulta sobre estado de transferencia local (cuando el cliente no se puede autogestionar)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Estado de pago de servicio",
+            "descripcion": "Registro de consulta sobre estado de pago de servicio (cuando el cliente no se puede autogestionar)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Estado de pin de acceso",
+            "descripcion": "Registro de consulta sobre estado de pin de acceso"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Estado de pin de transacción",
+            "descripcion": "Registro de consulta sobre estado de pin de transacción"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Motivo de rechazo de transferencia local",
+            "descripcion": "Registro de consulta sobre motivo de rechazo de transferencia local (cuando no se puede autogestionar, si se autogestiona va en el registro de \"asistencia estado de transferencias \")"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Motivo de rechazo de pago de servicio",
+            "descripcion": "Registro de consulta sobre motivo de rechazo de pago de servicio (cuando no se puede autogestionar, si se autogestiona va en el registro de \"asistencia estado de pago\") OJO: Si no se logra identificar, se sigue cargando el ID de consulta a SIHB"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Motivo de rechazo de transferencia al exterior",
+            "descripcion": "Registro de consulta sobre detalles del motivo de rechazo que visualiza en los canales digitales (ejemplo: No tiene correo catastrado, no tiene fondos, LOA, etc)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para ABM ahorro programado",
+            "descripcion": "Registro de asistencia para dar de alta, baja o modificar ahorros programados"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para ver beneficios",
+            "descripcion": "Registro de asistencia para ver beneficios y promociones desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para Google Pay / Apple Pay",
+            "descripcion": "Registro de asistencia para catastrar tarjetas en billeteras digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para giros/billeteras",
+            "descripcion": "Registro de asistencia para realizar giros y cargas de billeteras desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Inconveniente con acceso resuelto",
+            "descripcion": "Registro de asistencia brindada sobre el acceso siempre que el inconveniente haya sido resuelto y el cliente haya podido acceder. (Ejemplo: pone mal el codigo captcha, la cuenta, pin, etc) "
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para actualización de datos",
+            "descripcion": "Registro de asistencia brindada para actualizar sus datos desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para configuración de uso de TC",
+            "descripcion": "Registro de asistencia brindada para configurar el uso de la tarjeta de crédito (Card informer)"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para aumento de línea de TC",
+            "descripcion": "Registro de asistencia brindada para realizar aumento de línea de crédito, horarios de corte, et"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para bloqueo de TC",
+            "descripcion": "Registro de asistencia brindada para realizar bloqueo de tarjetas desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para desbloqueo de TC",
+            "descripcion": "Registro de asistencia brindada para realizar desbloqueo de tarjetas desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para pago con QR",
+            "descripcion": "Registro de asistencia brindada para realizar pago por QR"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para extracción con QR",
+            "descripcion": "Registro de asistencia brindada para realizar extracción mediante QR"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para ver Tarjeta Virtual",
+            "descripcion": "Registro de asistencia brindada para poder visualizar los datos de la tarjeta desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para seguimiento de entregas",
+            "descripcion": "Registro de asistencia brindada para poder coordinar y visualizar el producto pendiente de entrega"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para pago de préstamo",
+            "descripcion": "Registro de asistencia brindada para realizar pagos de sus préstamos desde los canales digitales, también cuando consultan sobre el cálculo del monto"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para habilitar cuenta para pago de servicios",
+            "descripcion": "Registro de asistencia brindada para habilitar la cuenta para débito de pagos de servicios"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para descarga de facturas impositivas",
+            "descripcion": "Registro de asistencia brindada para descargar facturas impositivas desde la web"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para acceder a tarjeta preaprobada",
+            "descripcion": "Registro de asistencia brindada para aceptar tarjeta preaprobada desde los canales digitales"
+        },
+        {
+            "producto": "Canales Digitales",
+            "tipo": "Consulta",
+            "proceso": "Consultas Varias - Canales Digitales",
+            "motivo": "Asistencia para acceder a tarjeta preaprobada",
+            "descripcion": "Registro de asistencia brindada para aceptar tarjeta preaprobada desde los canales digitales"
+        }
+    ];
+
+    const contenedor = document.getElementById("contenedor-tips");
+    const buscador = document.getElementById("buscador");
+
+    function mostrarDatos(datos) {
+      contenedor.innerHTML = "";
+      if (datos.length === 0) {
+        contenedor.innerHTML = "<p>No se encontraron coincidencias.</p>";
+        return;
+      }
+      datos.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <h4><strong>Producto:</strong> ${item.producto}</h4>
+          <h4><strong>Tipo:</strong> ${item.tipo}</h4>
+          <h4><strong>Proceso:</strong> ${item.proceso}</h4>
+          <h4><strong>Motivo:</strong> ${item.motivo}</h4>
+          <p><strong>Descripción:</strong> ${item.descripcion}</p>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    mostrarDatos(datos);
+
+    buscador.addEventListener("input", () => {
+      const valor = buscador.value.toLowerCase();
+      const resultados = datos.filter(item =>
+        item.producto.toLowerCase().includes(valor) ||
+        item.tipo.toLowerCase().includes(valor) ||
+        item.proceso.toLowerCase().includes(valor) ||
+        item.motivo.toLowerCase().includes(valor)
+      );
+      mostrarDatos(resultados);
+    });
+  </script>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

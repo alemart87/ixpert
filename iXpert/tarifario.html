@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorro Programado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Incluir Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        h3 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 1000px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Resumen Tarifario</h1>
+    </header>
+    <nav>
+        <a href="#paso1"></a>
+        <a href="#paso2"></a>
+        <a href="#paso3"></a>
+        <a href="#paso4"></a>
+        <a href="#paso5"></a>
+        <a href="#paso6"></a>
+    </nav>
+    <section id="paso1">
+        <h2>📑 Resumen del Tarifario</h2>
+
+            <style>
+              .accordion {
+                width: 100%;
+                border-radius: 8px;
+                overflow: hidden;
+                font-family: sans-serif;
+              }
+            
+              .accordion details {
+                border: 1px solid #ccc;
+                margin-bottom: 6px;
+                border-radius: 6px;
+                padding: 8px;
+                background-color: #f9f9f9;
+              }
+            
+              .accordion summary {
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 16px;
+                list-style: none;
+              }
+            
+              .accordion summary::marker {
+                display: none;
+              }
+            
+              .accordion summary::before {
+                content: "▶️";
+                display: inline-block;
+                margin-right: 8px;
+                transition: transform 0.2s;
+              }
+            
+              .accordion details[open] summary::before {
+                transform: rotate(90deg);
+              }
+            
+              .accordion table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 8px;
+              }
+            
+              .accordion th, .accordion td {
+                padding: 8px;
+                border: 1px solid #ccc;
+                text-align: center;
+              }
+            
+              .accordion th {
+                background-color: #f0f0f0;
+              }
+            
+              .accordion p {
+                margin: 8px 0 0 24px;
+              }
+            </style>
+            
+            <div class="accordion">
+              <details>
+                <summary>💰 Cuentas - Depósitos Iniciales y Comisiones</summary>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>📌 Concepto</th>
+                      <th>💰 Monto</th>
+                      <th>💸 Comisión</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Cuenta Ahorro Gs. PF</td>
+                      <td>Gs. 2.000.000</td>
+                      <td>Gs. 99.000</td>
+                    </tr>
+                    <tr>
+                      <td>Cuenta Corriente Gs. PF</td>
+                      <td>Gs. 4.000.000</td>
+                      <td>Gs. 220.000</td>
+                    </tr>
+                    <tr>
+                      <td>Cuenta Ahorro USD PF</td>
+                      <td>USD 2.500</td>
+                      <td>USD 44</td>
+                    </tr>
+                    <tr>
+                      <td>Cuenta Corriente USD PF</td>
+                      <td>USD 6.000</td>
+                      <td>USD 77</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            
+              <details>
+                <summary>🏧 Extracciones y Depósitos</summary>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>📌 Concepto</th>
+                      <th>💰 Monto</th>
+                      <th>💸 Comisión</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Extracción Ahorro Ventanilla</td>
+                      <td>Gs. 11.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Extracción Básica (desde 3.ª)</td>
+                      <td>Gs. 5.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Depósito Cuenta USD</td>
+                      <td>2% + IVA</td>
+                      <td>Desde USD 1</td>
+                    </tr>
+                    <tr>
+                      <td>Re depósito de Cheques</td>
+                      <td>Gs. 22.000</td>
+                      <td>—</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            
+              <details>
+                <summary>🧾 Cheques</summary>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>📌 Concepto</th>
+                      <th>💰 Monto</th>
+                      <th>💸 Comisión</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Emisión Cheque Administrativo</td>
+                      <td>Gs. 66.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Multa Insuficiencia de Fondos (Ley 3711/09)</td>
+                      <td>2% del importe</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Devolución por Insuficiencia</td>
+                      <td>Gs. 550.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Chequeras a la Vista</td>
+                      <td>Gs. 2.640 por hoja</td>
+                      <td>Gs. 66.000</td>
+                    </tr>
+                    <tr>
+                      <td>Chequeras Pago Diferido</td>
+                      <td>Gs. 4.400 por hoja</td>
+                      <td>Gs. 110.000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            
+              <details>
+                <summary>🔁 Transferencias</summary>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>📌 Concepto</th>
+                      <th>💰 Monto</th>
+                      <th>💸 Comisión</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>A Cuentas Itaú en Agencia</td>
+                      <td>Gs. 33.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>A Otros Bancos en Agencia</td>
+                      <td>Gs. 165.000</td>
+                      <td>—</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            
+              <details>
+                <summary>📄 Otros Servicios</summary>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>📌 Concepto</th>
+                      <th>💰 Monto</th>
+                      <th>💸 Comisión</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Referencia Comercial (hasta 48 hs)</td>
+                      <td>Gs. 176.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Regrabación Tarjeta Débito</td>
+                      <td>Gs. 55.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Renovación Tarjeta Débito</td>
+                      <td>Gs. 38.500</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Cancelación de Cuenta</td>
+                      <td>Gs. 11.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Llamada de Cobranzas</td>
+                      <td>Gs. 27.000</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Carta de Reclamo de Cobranzas</td>
+                      <td>Gs. 40.700</td>
+                      <td>—</td>
+                    </tr>
+                    <tr>
+                      <td>Pago de TC en Ventanilla</td>
+                      <td>Gs. 27.500</td>
+                      <td>—</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </details>
+            </div>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="tuto9.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

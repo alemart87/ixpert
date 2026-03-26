@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Devolución Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 800px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+        .button-fixed:hover {
+            background: #ff6600; /* Naranja */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tutorial: Devolución Online</h1>
+    </header>
+    <nav>
+        <a href="#motivo">Inicio</a>
+        <a href="#identificar">SAC.COM</a>
+        <a href="#paso2">Confirmación</a>
+        <a href="#confirmacion">Confirmación</a>
+    </nav>
+    <section id="introduccion">
+        <h2>Definición</h2>
+        <p>El proceso de identificación de una devolución online consiste en verificar que una transacción haya sido acreditada correctamente como un reembolso al cliente.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="identificar">
+        <h2>Verificar en SAC.COM</h2>
+        <p>Para identificar una devolución online, verificamos en SAC.COM que aparezca como un crédito con la descripción "Venta en POS".</p>
+        <p>1. Accede a <b>SAC.COM</b> y busca la transacción.</p>
+        <p>2. La operación debe figurar como un crédito con la descripción <b>"Venta en POS"</b>.</p>
+        <p>3. Ejemplo de registro:</p>
+        <img src="imagenes/imagen13.jpg" alt="Pantalla verificacion SAC.COM">
+    </section>
+    <section id="paso2">
+        <h2>Paso 2: Confirmación</h2>
+        <p>Para confirmar que la devolución corresponde al comercio indicado por el cliente, buscamos el número de comprobante en Bancard Infonet utilizando el filtro y la función Ctrl + F.</p>
+        <p>1. Ingresa a <b>Bancard Infonet.</b></p>
+        <p>2. Filtra la búsqueda utilizando el <b>número de comprobante</b>.</p>
+        <p>3. Usa la función <b>Ctrl + F</b> para localizar la transacción más rápido.</p>
+        <img src="imagenes/imagen14.jpg" alt="Pantalla Bancard">
+        <p>4. Clic en la transacción seleccionada y nos arroja el detalle.</p>
+        <img src="imagenes/imagen15.jpg" alt="Pantalla Bancard Check">
+        <p>5. El siguiente paso es verificar en <b>Datos Internacionales (si aplica)</b>.</p>
+        <p>6. Se mostrará el <b>nombre de la página o comercio</b> asociado a la transacción..</p>
+        <img src="imagenes/imagen16.jpg" alt="Pantalla Bancard Check">
+    </section>
+    <section id="confirmacion">
+        <h2>Confirmación</h2>
+        <p><i>"Hemos verificado la información y confirmado los detalles de la transacción. Si requiere alguna otra consulta o necesita asistencia adicional, con gusto le ayudaré. Agradecemos su tiempo y confianza. Le deseo un excelente día."</i></p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla de confirmación final">
+    </section>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas Bancarias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 250px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            text-align: left;
+        }
+
+        .dropdown-content a {
+            color: #000000;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ff6600;
+            color: white;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown > a::after {
+            content: " ▼";
+            font-size: 0.7em;
+        }
+
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2, h3 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cuentas Bancarias</h1>
+    </header>
+    <nav>
+        <a href="#motivo">Cta. Personal</a>
+        <a href="#Paso1">Cta. PGS</a>
+        <a href="#Paso2">Cta. Acreditación Comercios</a>
+        <a href="#Paso3">Cta. Empresas</a>
+        <a href="#Paso4">Cta. Básica</a>
+        <a href="#Paso5">Requisitos de Apertura y Mantenimiento</a>
+        <a href="#Paso6">Nro. Cta en TD</a>
+
+        <!-- Menú desplegable -->
+        <div class="dropdown">
+            <a href="#Paso6">Servicios Ligados a las Cuentas</a>
+            <div class="dropdown-content">
+                <a href="intervale.html" target="_blank">Intervale</a>
+                <a href="ahorroprogramado.html" target="_blank">Ahorro Programado</a>
+                <a href="tarifario.html" target="_blank">Resumen Tarifario</a>
+                <a href="prestamo.html" target="_blank">Préstamos</a>
+                <!-- Agrega más si necesitas -->
+            </div>
+        </div>
+    </nav>
+    <section id="motivo">
+        <h2>Cuentas Personales</h2>
+        <p>💰 <b>Cuenta de Ahorro:</b> Depósitos con intereses trimestrales (requiere saldo mínimo). No emite cheques.</p>
+        <p>✍ <b>Cuenta Corriente:</b> Depósitos con posibilidad de emitir cheques y acceder a líneas de sobregiro.</p>
+        <p>📌 <b>Clasificación de Cuentas Personales</b></p>
+        <ul>
+            <li>🔄 <b>Indistinta:</b> Operada por dos o más personas de manera independiente.</li>
+            <li>🔗 <b>Conjunta:</b> Requiere la firma de todos los titulares para cualquier transacción.</li>
+            <li>👤 <b>Individual:</b> Solo el titular puede realizar operaciones.</li>
+        </ul>
+        <h3>💡 Beneficios por Tipo de Cuenta</h3>
+        <p>✅ <b>Cuentas de Ahorro</b></p>
+        <ul>
+            <li>✔ Tarjeta de débito</li>
+            <li>✔ Acceso a banca online 24/7</li>
+            <li>✔ Uso de ATM recolector</li>
+            <li>✔ Banca telefónica</li>
+        </ul>
+        <p>✅ <b>Cuentas Corrientes</b></p>
+        <ul>
+            <li>✔ Chequera a domicilio y en mostrador</li>
+            <li>✔ Pago diferido</li>
+            <li>✔ Línea de sobregiro</li>
+            <li>✔ Tarjeta de débito (excepto cuentas conjuntas)</li>
+            <li>✔ Uso de ATM recolector.</li>
+        </ul>
+        <p><b>(Cuentas Conjuntas):</b>⚠ No tienen tarjeta de débito ni acceso a banca telefónica.</p>
+        <h3>🎯 Conclusión</h3>
+        <p>Las cuentas bancarias están diseñadas para diferentes necesidades financieras. Desde opciones personales hasta empresariales, cada una ofrece beneficios específicos para facilitar la administración de su dinero.</p> 
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="Paso1">
+        <h2>Cuentas PGS (Pago de Salario)</h2>
+        <p>🏢 Cuentas especiales para la acreditación de sueldos, habilitadas por la empresa del titular.</p>
+        <p>👤 <b>Cuenta de Ahorro Individual (PGS)</b></p>
+        <ul>
+            <li>✔ Diseñada para personas físicas que reciben su salario directamente en esta cuenta.</li>
+            <ul>
+                <li><p>👤 <b>Beneficios:</b></p></li>
+                <ul>
+                    <li>✅ Es una cuenta individual</li>
+                    <li>✅ Incluye tarjeta de débito (TD)</li>
+                    <li>✅ Acceso al beneficio de Intervale</li>
+                    <li>✅ Uso completo de servicios alternativos del banco (banca online, telefónica, ATM, etc.)</li>
+                </ul>
+            </ul>
+        </ul>
+        <p>📝 <b>Cuenta Corriente (PGS)</b></p>
+        <ul>
+            <li>✔ Diseñada para personas físicas con posibilidad de emitir cheques.</li>
+            <ul>
+                <li><p>Beneficios:</p></li>
+                <ul>
+                    <li>✅ Es una cuenta individual</li>
+                    <li>✅ Incluye tarjeta de débito (TD)</li>
+                    <li>✅ Servicio de chequera en casa</li>
+                    <li>✅ Línea de Intercheque</li>
+                    <li>✅ Acceso total a los servicios alternativos del banco</li>
+                </ul>
+            </ul>
+        </ul>
+        <p>📌 <b>Observación:</b> Si la cuenta PGS deja de recibir acreditaciones salariales por más de 3 meses, pasa a clasificarse como una Cuenta Personal.</b></p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="Paso2">
+        <h2>Cuentas para Acreditación en Comercios</h2>
+        <p>🛍 Diseñadas para recibir ingresos por ventas realizadas mediante POS (tarjetas de crédito o débito).</p>
+        <p>💳 <b>Cuenta de Ahorro para Comercios</b></p>
+        <ul>
+            <li>✔ Recibe acreditaciones por ventas con POS.</li>
+            <li>✔ Gana intereses trimestrales si se mantiene un saldo promedio mínimo.</li>
+            <li><b>Beneficios:</b></li>
+            <ul>
+                <li>✅ Cuenta garantizada</li>
+                <li>✅ Tarjeta de débito (P.F.)</li>
+                <li>✅ Acceso 24/7 a: banca por internet, banca telefónica, ATM recolector</li>
+                <li>✅ Banca corporativa exclusiva (P.J.): 6171018</li>
+                <li>✅ Acceso desde el celular</li>
+            </ul>
+        </ul>
+        <p><b>Cuenta Garantizada</b></p>
+        <p>Es un beneficio exclusivo para comercios que realizan ventas frecuentes con tarjetas de crédito y reciben sus pagos en cuentas administradas en Itaú.</p>
+        <ul>
+            <li><b>Ventajas:</b></li>
+            <ul>
+                <li>🔒 Línea de crédito variable basada en el promedio de ventas con TC de los últimos 3 meses.</li>
+                <li>📊 Equivale a servicios como <i>Intervale o Intercheque</i>, pero adaptado a clientes con actividad comercial.</li>
+                <li>🧩 La gestión se realiza vía 24hs en Internet o Tauser Net desde las sucursales.</li>
+            </ul>
+        </ul>
+        <p>🏦 <b>Cuenta Corriente para Comercios</b></p>
+        <p>📝 También puede utilizarse para la acreditación de ventas.</p>
+        <ul>
+            <li><b>Beneficios adicionales:</b></li>
+            <ul>
+                <li>✅ Servicio de chequera en casa</li>
+                <li>✅ Línea de sobregiro o <i>Intercheque</i></li>
+                <li>✅ Cuenta garantizada</li>
+                <li>✅ Tarjeta de débito (P.F.)</li>
+                <li>✅ Acceso 24/7 a: banca por internet, Tauser, banca telefónica (P.F.)</li>
+                <li>✅ Banca corporativa (P.J.)</li>
+                <li>✅ Acceso desde el celular</li>
+            </ul>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="Paso3">
+        <h2>Cuentas para Empresas</h2>
+        <p>🏭 Adaptadas a las necesidades de empresas y corporaciones.</p>
+        <p>🏢 <b>Cuenta de Ahorro a la Vista (Empresas)</b></p>
+        <ul>
+            <li>✔ Servicio por el cual una empresa (persona jurídica) deposita fondos y recibe intereses según el promedio de la cuenta.</li>
+            <li>❌ No permite sobregiros.</li>
+            <ul>
+                <li><b>Beneficios principales:</b></li>
+                <ul>
+                    <li>✅ Banca telefónica corporativa</li>
+                    <li>✅ Acceso 24/7 en Internet</li>
+                    <li>✅ Uso de ATM recolector</li>
+                    <li>✅ Servicios de pago electrónico</li>
+                </ul>
+            </ul>
+        </ul>
+        <p>🏢 <b>Cuenta Corriente (Empresas)</b></p>
+        <ul>
+            <li>✔ Permite a la empresa manejar sus fondos con cheques.</li>
+            <ul>
+                <li><b>Beneficios principales:</b></li>
+                <ul>
+                    <li>✅ Línea de sobregiro</li>
+                    <li>✅ Banca telefónica corporativa</li>
+                    <li>✅ Acceso 24/7 en Internet</li>
+                    <li>✅ Uso de ATM recolector</li>
+                    <li>✅ Servicios de pago electrónico</li>
+                </ul>
+            </ul>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="Paso4">
+        <h2>Cuenta Básica</h2>
+        <p>📱 Una opción simple, rápida y sin complicaciones para iniciar en el sistema bancario.</p>
+        <ul style="list-style: none; padding-left: 1em;">
+            <li style="margin-bottom: 0.5em;">
+                🧾 <b>Descripción</b>
+                <ul style="list-style: none; padding-left: 1em; margin-top: 0.5em;">
+                    <li style="margin-bottom: 0.4em;">✔ Es una caja de ahorro de fácil acceso, que puede solicitarse sin necesidad de acudir al banco.</li>
+                    <li style="margin-bottom: 0.4em;">✔ No requiere tarjeta de débito para operar.</li>
+                    <li style="margin-bottom: 0.4em;">✔ Las extracciones se realizan mediante la opción de operaciones sin tarjeta en cajeros automáticos.</li>
+                </ul>
+            </li>
+            <li style="margin-bottom: 0.7em;">📌 <b>Importante:</b> El total de acreditaciones no debe superar 3 salarios mínimos, según normativa vigente de la SEPRELAD.</li>
+            <li style="margin-bottom: 0.7em;">❌ El ATM recolector no está habilitado para depósitos.</li>
+        </ul>
+        <ul style="list-style: none; padding-left: 1em;">
+            <li style="margin-bottom: 0.5em;">
+                🧰 <b>Servicios Disponibles</b> (sin documentación adicional y dentro del límite permitido):
+                <ul style="list-style: none; padding-left: 1em; margin-top: 0.5em;">
+                    <li style="margin-bottom: 0.4em;">✅ Ahorro programado</li>
+                    <li style="margin-bottom: 0.4em;">✅ Débitos automáticos en cuenta</li>
+                    <li style="margin-bottom: 0.4em;">✅ Débito de tarjeta de crédito</li>
+                    <li style="margin-bottom: 0.4em;">✅ Transferencias y pagos de servicios web</li>
+                </ul>
+            </li>
+            <li style="margin-bottom: 0.7em;">📌 <b>Observación:</b> No tiene acceso a servicios pre-aprobados ni se puede utilizar para pagos de salario.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="Paso5">
+        <h2>📋 Requisitos y Condiciones para Apertura de Cuentas</h2>
+        <p>A continuación se detallan los requisitos generales y condiciones mínimas para la apertura y mantenimiento de las distintas cuentas bancarias.</p>
+        <p>💰 <b>Deposito Inicial y promedio a mantener en cada cuenta:</b></p>
+        <h3>👤 Persona Física</h3>
+
+        <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: left;">
+          <thead style="background-color: #f0f0f0;">
+            <tr>
+              <th>💼 Tipo de Cuenta</th>
+              <th>💴 Guaraníes (PYG)</th>
+              <th>💵 Dólares (USD)</th>
+              <th>💶 Euros (EUR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cuenta Corriente</td>
+              <td>4.000.000</td>
+              <td>6.000</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>Caja de Ahorro</td>
+              <td>2.000.000</td>
+              <td>2.500</td>
+              <td>5.000</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>🏢 Persona Jurídica</h3>
+
+            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: left;">
+            <thead style="background-color: #f0f0f0;">
+                <tr>
+                <th>💼 Tipo de Cuenta</th>
+                <th>💴 Guaraníes (PYG)</th>
+                <th>💵 Dólares (USD)</th>
+                <th>💶 Euros (EUR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td>Cuenta Corriente</td>
+                <td>6.000.000</td>
+                <td>6.000</td>
+                <td>—</td>
+                </tr>
+                <tr>
+                <td>Caja de Ahorro</td>
+                <td>6.000.000</td>
+                <td>2.500</td>
+                <td>5.000</td>
+                </tr>
+            </tbody>
+            </table>
+            <h3>📉 Comisión por saldo promedio mensual inferior al mínimo</h3>
+
+            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: center;">
+            <thead style="background-color: #e0e0e0;">
+                <tr>
+                    <th>💼 Tipo de Cuenta</th>
+                    <th>💴 Guaraníes (PYG)</th>
+                    <th>💵 Dólares (USD)</th>
+                    <th>💶 Euros (EUR)</th>
+                <th>🔄Periodicidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td style="text-align: left;">Cuenta Corriente</td>
+                <td>220.000</td>
+                <td>77</td>
+                <td>–</td>
+                <td>Por evento</td>
+                </tr>
+                <tr>
+                <td style="text-align: left;">Caja de Ahorro</td>
+                <td>99.000</td>
+                <td>44</td>
+                <td>33</td>
+                <td>Por evento</td>
+                </tr>
+            </tbody>
+            </table>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+    <section id="#Paso6">
+        <h2>¿Dónde esta el número de mi cuenta?</h2>
+        <p>El número de cuenta de una tarjeta de débito Itaú está formado por 9 dígitos. Puedes encontrarlo en la tarjeta. </p>
+        <img src="imagenes/imagen38.jpg" alt="Pantalla Bancard" style="width: 800px; height: 450px;">
+        <img src="imagenes/imagen41.jpg" alt="Debito" style="width: 500;height: 400;">
+        <p><b>Número de cuenta en Cheques:</b>También puede encontrar su número de cuenta en su chequera, como se indica en la imagen de abajo:</p>
+        <img src="imagenes/imagen42.jpg" alt="Debito" style="width: 500;height: 400;">
+    </section>
+    <section>
+        <p><b>¿Cómo saber mi numero de Tarjeta de Crédito Visa y MasterCard</b></p>
+        <p>Los números de tarjetas de crédito VISA y MasterCard están compuestos por 16 dígitos, de los cuales todos deben ser ingresados.</p>
+        <img src="imagenes/imagen43.jpg" alt="Debito" style="width: 500;height: 400;">
+        <p><b>American Express®:</b> El número de las tarjetas de crédito AMERICAN EXPRESS® está compuesto por 15 dígitos, de los cuales todos deben ser ingresados.</p>
+        <img src="imagenes/imagen44.jpg" alt="Debito" style="width: 500;height: 300;">
+    </section>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

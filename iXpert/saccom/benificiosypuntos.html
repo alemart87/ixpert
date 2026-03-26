@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beneficios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Beneficios y Puntos</h1>
+    </header>
+    <nav>
+        <a href="#1">Canje de Puntos</a>
+        <a href="#2">Extorno de Puntos</a>
+        <a href="#3">Extracto de Puntos Detallado</a>
+        <a href="#3">Aviso de transacción en el exterior</a>
+    </nav>
+    <section id="1">
+        <h2>Canje de Puntos</h2>
+        <p><b>Requisitos:</b></p>
+        <ul>
+            <li>Contar con una TC que acumule puntos para el programa de recompensas por ej: Interventajas, Mermership rewards, Puntos tigo.</li>
+            <li>Una vez canjeados los puntos, el cliente se debe acercar a una agencia para retirar el voucher correspondiente.</li>
+        </ul>
+        <p><b>Plazo: Inmediato</b></p>
+        <p><b>Pasos a seguir:</b></p>
+        <ul>
+            <li> Se ingresa la solicitud de canje vía SAC.COM en la opción:</li>
+        </ul>
+        <img src="../imagenes/imagen130.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Seleccionar la TC correspondiente:</li>
+        </ul>
+        <img src="../imagenes/imagen131.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Especificar los puntos a canjear: Dependiendo del monto, cantidad de puntos o comercio solicitado:</li>
+        </ul>
+        <img src="../imagenes/imagen132.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="2">
+        <h2>Extorno de Puntos</h2>
+        <p><b>Requisitos:</b></p>
+        <p>El voucher no debió ser entregado aún.</p>
+        <p><b>Pasos a seguir:</b></p>
+        <ul>
+            <li>Dejar registro de la solicitud:</li>
+        </ul>
+        <img src="../imagenes/imagen133.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="4">
+        <h2>Aviso de Transacción en el exterior Tarjeta de Crédito</h2>
+        <p><b>Requisitos:</b></p>
+        <ul>
+            <li>Se debe solicitar: Monto de la transacción, moneda, país, motivo, fecha, N° de tarjeta.</li>
+        </ul>
+        <p><b>Plazo: Inmediato</b></p>
+        <p><b>Pasos a seguir:</b></p>
+        <ul>
+            <li>Ingresar con los datos del cliente en SAC.com</li>
+            <li>Ir hasta la opción de Tarjeta – Aviso de Transacción en el exterior</li>
+        </ul>
+        <img src="../imagenes/imagen134.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Seleccionar la TC e ir completando los campos según el ejemplo.</li>
+        </ul>
+        <img src="../imagenes/imagen135.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../saccom.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

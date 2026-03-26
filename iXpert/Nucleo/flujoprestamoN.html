@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Préstamos Dinámicos</title>
+  <style>
+    /* Estilos heredados del QR PIX */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      color: #222;
+      margin-top: 25px;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Préstamos Dinámicos</h1>
+  </header>
+
+  <nav>
+    <a href="#solicitud">Solicitud</a>
+    <a href="#registro">Registro</a>
+    <a href="#mesa">Mesa de Control</a>
+    <a href="#activacion">Activación</a>
+    <a href="#toolbox">Toolbox</a>
+    <a href="#legitimacion">Legitimación</a>
+    <a href="#mejora">Mejora de Tasa</a>
+    <a href="#exclusiones">Exclusiones</a>
+  </nav>
+  <section>
+    <h2>Flujo del Proceso de Préstamos</h2>
+    <img src="../imagenes/nucleo/imgnucleo1.webp" alt="1" style="width: 1200px; height: auto;">
+  </section>
+
+  <section>
+    <h2 id="solicitud">📝 Solicitud en Agencias.com</h2>
+    <ul>
+      <li>Ingresar en ficha de cliente → Productos a Ofrecer</li>
+      <img src="../imagenes/nucleo/imgnucleo2.webp" alt="2" style="width: 600px; height: auto;">
+      <li>Seleccionar Cuota, Monto Solicitado ≤ pre aprobado</li>
+      <li>Fecha de vencimiento: entre 20 y 48 días</li>
+      <li>Confirmar → se genera ID de referencia y n° de transacción</li>
+      <img src="../imagenes/nucleo/imgnucleo3.webp" alt="3" style="width: 600px; height: auto;">
+      <p> </p>
+      <img src="../imagenes/nucleo/imgnucleo4.webp" alt="4" style="width: 300px; height: auto;">
+    </ul>
+    <p>Si no se puede copiar el número, consultar en:</p>
+    <ul>
+      <li>Menú de opciones → Consulta de transacciones</li>
+      <img src="../imagenes/nucleo/imgnucleo5.webp" alt="5" style="width: 400px; height: auto;">
+      <img src="../imagenes/nucleo/imgnucleo6.webp" alt="6" style="width: 400px; height: auto;">
+      <li>Filtrar por fecha desde/hasta</li>
+      <img src="../imagenes/nucleo/imgnucleo7.webp" alt="7" style="width: 600px; height: auto;">
+    </ul>
+
+    <h2 id="registro">📋 Registro de Solicitud</h2>
+    <p>Tipo de proceso: <strong>Solicitudes - Producto Préstamos</strong></p>
+    <img src="../imagenes/nucleo/imgnucleo8.webp" alt="8" style="width: 600px; height: auto;">
+    <div class="info-box">
+      <p><strong>Formato:</strong> Cliente autoriza la acreditación del importe de (monto) en un plazo de (meses). Fecha de Primer Vto: ( ) – Celular: ( ) – Responde preguntas de seguridad – (Asesor) (Área) (Interno)</p>
+      <img src="../imagenes/nucleo/imgnucleo9.webp" alt="9" style="width: 600px; height: auto;">
+    </div>
+    <p>Completar el check 📝 de la solicitud del préstamo.</p>
+
+    <h2 id="mesa"> Validación por Mesa de Control</h2>
+    <ul>
+      <li>Depositar el check en carpeta compartida</li>
+      <img src="../imagenes/nucleo/imgnucleo10.webp" alt="10" style="width: 600px; height: auto;">
+      <li>Mesa escucha la llamada y valida datos</li>
+      <li>Si no cumple, rechaza vía mail</li>
+      <li>Si cumple, compila en planilla y remite al supervisor</li>
+      <li>Pedidos de prioridad se validan y se remiten por correo</li>
+
+    </ul>
+
+    <h2 id="activacion">🔓 Activación de Cuenta</h2>
+    <ul>
+      <li>Cuenta inmovilizada se activa en 24 hs (días hábiles)</li>
+      <li>Para uso inmediato, solicitar activación por mail</li>
+      <li>Verificar agencia en AS400 → Opción O04 → tecla 3 → ingresar cuenta</li>
+      <img src="../imagenes/nucleo/imgnucleo11.webp" alt="11" style="width: 600px; height: auto;">
+      <p> </p>
+      <img src="../imagenes/nucleo/imgnucleo12.webp" alt="12" style="width: 600px; height: auto;">
+      <p> </p>
+      <img src="../imagenes/nucleo/imgnucleo13.webp" alt="13" style="width: 600px; height: auto;">
+      <p> </p>
+      <img src="../imagenes/nucleo/imgnucleo14.webp" alt="14" style="width: 600px; height: auto;">
+      <p></p>
+      <li>📧 Muestra de correo para solicitud de activación – Antes de remitirlo, confirmar previamente con Mesa de Control.</li>
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo15.webp" alt="15" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo16.webp" alt="16" style="width: 600px; height: auto;">
+    </ul>
+
+    <h2 id="toolbox">📦 Préstamo Dinámico con/sin Papel</h2>
+    <p>🛠️ Proceso de Toolbox – Todos los correos de aceptación deben incluir en copia al supervisor del área y al supervisor designado por el Banco.</p>
+    <ul>
+      <li>Correo catastrado ≥ 6 meses → válido</li>
+      <li>Correo reciente → derivar a proceso con firma</li>
+      <li>Documentos en carpeta “FORMULARIO PARA PRÉSTAMOS CON ENVÍO”</li>
+      <li>Descarga de pagaré: <a href="https://appsprd.itau.com.py/pagares/servlet/pagares.hwwpttmpa" target="_blank">Ir al link</a></li>
+    </ul>
+    <p>Se desplegará la siguiente pantalla, ingresar con user y pass del Amazon</p>
+    <img src="../imagenes/nucleo/imgnucleo17.webp" alt="17" style="width: 600px; height: auto;">
+    <P>Opción: PT Temporal Pagaré</P>
+    <img src="../imagenes/nucleo/imgnucleo18.webp" alt="18" style="width: 600px; height: auto;">
+    <p>Insertar el númer de cliente y clic en buscar. Seleccionar el pagaré que corresponda.</p>
+    <img src="../imagenes/nucleo/imgnucleo19.webp" alt="19" style="width: 600px; height: auto;">
+
+    <h2 id="legitimacion">✅ Legitimación y Desembolso</h2>
+    <ul>
+      <li>Área de legitimación aprueba → desembolso</li>
+      <li>Documentos originales → Gestión Documental en ≤ 48 hs</li>
+      <li>Si cuenta está inmovilizada, activar antes de acreditar</li>
+    </ul>
+    <section class="help-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto;">
+      <h2 style="color: #0056a3; border-bottom: 2px solid #eee; padding-bottom: 6px;">Registro de Préstamo Dinámico</h2>
+
+      <h3 style="margin-top: 20px; color: #444;">Paso 1 – Registro inicial en Agencias.com</h3>
+      <p>Los asesores deben registrar la operación en <strong>Agencias.com</strong>, seleccionando:</p>
+      <ul style="margin-left: 20px;">
+        <li><strong>Tipo de proceso:</strong> Registro</li>
+        <li><strong>Producto:</strong> Préstamos</li>
+        <li><strong>Nombre:</strong> Promotor de Préstamo</li>
+      </ul>
+
+      <p>En este registro deben detallarse los siguientes datos:</p>
+      <ul style="margin-left: 20px;">
+        <li>Monto solicitado</li>
+        <li>Plazo del préstamo</li>
+        <li>N° de cuenta</li>
+        <li>Fecha de vencimiento</li>
+        <li>N° de interno donde se confirmó con el cliente</li>
+        <li>N° de teléfono del cliente utilizado en la llamada</li>
+      </ul>
+
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0; font-family: monospace;">
+        Cliente autoriza la acreditación del importe de (monto) en un plazo de (meses).<br>
+        Fecha del primer vencimiento: ( )<br>
+        Celular del cliente: ( )<br>
+        Responde preguntas de seguridad – (Asesor) (Área) (Interno)
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo20.png" alt="20" style="width: 600px; height: auto;">
+
+      <h3 style="margin-top: 20px; color: #444;">Paso 2 – Registro del número de operación</h3>
+      <p>Una vez obtenido el <strong>número de operación</strong>, se debe volver a registrar en <em>Promotor de Préstamos</em> con el siguiente formato:</p>
+
+      <div style="background: #f1f7ff; border-left: 4px solid #3399ff; padding: 12px; margin: 15px 0; font-family: monospace;">
+        Usuario – N° de Operación
+      </div>
+
+      <p>De esta forma, la información quedará disponible en el <strong>reporte de producción diaria (INFOPROD)</strong>.</p>
+
+      <h3 style="margin-top: 20px; color: #444;">Paso 3 – Verificación del número de operación</h3>
+      <p>El número de operación se puede verificar en <strong>Productos Vigentes</strong> dentro de Agencias.com:</p>
+      <ul style="margin-left: 20px;">
+        <li>Si el préstamo es <strong>dinámico</strong>, el número aparece el mismo día.</li>
+        <li>Si el préstamo es <strong>electrónico</strong>, el número aparece dentro de las <strong>24 hs hábiles posteriores a la acreditación</strong>.</li>
+      </ul>
+
+      <h3 style="margin-top: 20px; color: #444;">Ejemplos</h3>
+      <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h4 style="margin-top: 0; color: #0056a3;">Ejemplo – N° de operación</h4>
+          <p style="font-family: monospace; background: #f9f9f9; padding: 8px;"><img src="../imagenes/nucleo/imgnucleo21.png" alt="21" style="width: 400px; height: auto;"></p>
+        </div>
+        <div style="flex: 1; min-width: 250px; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <h4 style="margin-top: 0; color: #0056a3;">Ejemplo – Registro en sistema</h4>
+          <p style="font-family: monospace; background: #f9f9f9; padding: 8px;"><img src="../imagenes/nucleo/imgnucleo22.png" alt="22" style="width: 400px; height: auto;"></p>
+        </div>
+      </div>
+    </section>
+
+    <!----->
+    <section class="help-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; margin-top: 40px;">
+      <h2 style="color: #0056a3; border-bottom: 2px solid #eee; padding-bottom: 6px;">Proceso de Carga de Préstamo Dinámico</h2>
+
+      <p><strong>Tener en cuenta:</strong> el préstamo se vuelve dinámico en los siguientes casos:</p>
+      <ul style="margin-left: 20px;">
+        <li>Mejora de tasa</li>
+        <li>Suma de línea rotativa de tarjeta de crédito</li>
+        <li>CCT</li>
+      </ul>
+
+      <h3 style="margin-top: 20px; color: #444;">Flujo de carga en Catastro</h3>
+
+      <!-- Paso 1 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 1:</strong> Ingresar al flujo de carga en Catastro.  
+        <div style="margin-top: 6px; font-size: 0.9em; color: #555;">Haz clic en <em>Siguiente</em> para avanzar.</div>
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo23.webp" alt="23" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo24.webp" alt="24" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo25.webp" alt="25" style="width: 600px; height: auto;">
+
+      <!-- Paso 2 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 2:</strong> En la sección de selección de producto:  
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li>Marcar <strong>PGS Itaú</strong> si el cliente cobra en el banco.</li>
+          <li>Si no es PGS, marcar <strong>Pre-aprobado</strong>.</li>
+          <li>Si es sin CCT y solicita que se marque para avanzar el flujo, seleccionar la opción <strong>Certificado de no ser contribuyente</strong>.</li>
+        </ul>
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo26.png" alt="26" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo27.png" alt="27" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo28.png" alt="28" style="width: 600px; height: auto;">
+
+      <!-- Paso 3 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 3:</strong> Selección de tipo de préstamo:  
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li><strong>SP Préstamo Personal</strong>: si es sin papel (toolbox).</li>
+          <li><strong>Crédito Dinámico</strong>: si es con firma (pre aprobado sin Capstone o con CCT).</li>
+          <li><strong>Préstamo Personal Pago de Salario</strong>: si es PGS por Capstone.</li>
+        </ul>
+        <img src="../imagenes/nucleo/imgnucleo29.png" alt="29" style="width: 600px; height: auto;">
+        <p style="margin-top: 8px;">En <strong>Zona geográfica</strong> colocar:</p>
+        <ul style="margin-left: 20px;">
+          <li>Si es <strong>con firma</strong>: la localidad (departamento) donde el cliente firmará.</li>
+          <li>Si es <strong>sin firma</strong> (toolbox): la localidad donde vive el cliente (según catastro).</li>
+        </ul>
+      </div>
+
+      <!-- Paso 4 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 4:</strong> En <strong>Comisión por desembolso</strong>, ingresar el valor que aparece en la <em>calculadora dinámica</em>, sección <strong>Formación de Carpeta</strong>.  
+        <div style="margin-top: 6px; font-size: 0.9em; color: #555;">⚠️ Ingresar sin puntos ni comas.</div>
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo30.png" alt="30" style="width: 600px; height: auto;">
+      <p></p>
+      <img src="../imagenes/nucleo/imgnucleo31.png" alt="31" style="width: 600px; height: auto;">
+
+      <!-- Paso 5 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 5:</strong> En caso de ser préstamo <em>sin papel</em> (toolbox):  
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li>Se envía la solicitud al cliente.</li>
+          <li>Una vez que el cliente responde, se sube en <strong>Axentria</strong> el OK del cliente.</li>
+          <li>Si hay mejora de tasa, también se sube el OK de <strong>Priscila</strong>.</li>
+          <li>Luego ingresar en <strong>Catastro → Solicitud de Préstamo</strong>.</li>
+        </ul>
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo32.png" alt="32" style="width: 600px; height: auto;">
+     
+      <!-- Paso 6 -->
+      <div style="background: #f9f9f9; border-left: 4px solid #0056a3; padding: 12px; margin: 15px 0;">
+        <strong>Paso 6:</strong> En la opción <em>Solicitud de préstamo</em>:  
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li>Ingresar la CI del cliente.</li>
+          <li>Seleccionar <strong>Reparar solicitud</strong>.</li>
+          <li>El trámite pasa a <strong>Legitimación</strong> para el proceso de aprobación y desembolso.</li>
+        </ul>
+      </div>
+      <img src="../imagenes/nucleo/imgnucleo33.png" alt="33" style="width: 600px; height: auto;">
+      <img src="../imagenes/nucleo/imgnucleo34.png" alt="34" style="width: 600px; height: auto;">
+    </section>
+
+
+
+    <h2 id="mejora">📈 Mejora de Tasa</h2>
+    <ul>
+      <li>Monto mínimo: 10 millones</li>
+      <li>Solo préstamos dinámicos – CCT</li>
+      <li>Faja cross: B, B2, Ba2, B4, GH1</li>
+      <li>Mejora posible: 2 o 3 puntos</li>
+    </ul>
+    <div class="alert">
+      <strong>Ejemplo mejora 2 puntos:</strong><br>
+      Verificar en carpeta “TLMK ATC NUCLEO VOI” y adjuntar captura del correo catastrado (si es sin papel).
+    </div>
+    <img src="../imagenes/nucleo/imgnucleo35.png" alt="35" style="width: 600px; height: auto;">
+    <img src="../imagenes/nucleo/imgnucleo36.webp" alt="36" style="width: 600px; height: auto;">
+    <div class="alert">
+      <strong>Ejemplo mejora 3 puntos:</strong><br>
+      Adjuntar capturas de Agencias, productos vigentes, monto aprobado y datos de ingresos desde AS400.
+    </div>
+    <img src="../imagenes/nucleo/imgnucleo37.png" alt="37" style="width: 600px; height: auto;">
+
+    <!----->
+    <section class="help-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; margin-top: 40px;">
+      <h2 style="color: #0056a3; border-bottom: 2px solid #eee; padding-bottom: 6px;">Proceso de Carga – Cliente No Carterizado</h2>
+
+      <img src="../imagenes/nucleo/imgnucleo38.png" alt="38" style="width: 600px; height: auto;">
+      <p>En este caso, a diferencia del flujo estándar, se deben incluir <strong>capturas adicionales</strong> como parte de la solicitud.</p>
+
+      <h3 style="margin-top: 20px; color: #444;">Detalles a agregar</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Captura de Agencias:</strong> Productos vigentes del cliente.</li>
+        <li><strong>Captura de AS400:</strong> comprobando que el cliente dispone de un monto aprobado hasta <em>Gs. 46.200.000</em>.</li>
+        <li><strong>Datos de ingresos de AS400:</strong> ejemplo: <em>Gs. 3.712.000</em>.</li>
+      </ul>
+
+      <div style="background: #f1f7ff; border-left: 4px solid #3399ff; padding: 12px; margin: 15px 0; font-size: 0.95em;">
+        Todas las capturas se deben agregar en un <strong>formato adjunto en correo</strong>, dirigido a <em>Controler</em>, 
+        para el posterior envío al <strong>Gerente Regional</strong> y su aprobación final.
+      </div>
+
+      <h3 style="margin-top: 20px; color: #444;">Ejemplo de adjuntos en correo</h3>
+      <div style="background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-top: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <ul style="margin-left: 20px; margin-top: 8px;">
+          <li>📎 Captura de Agencias – Productos vigentes</li>
+          <img src="../imagenes/nucleo/imgnucleo39.png" alt="39" style="width: 600px; height: auto;">
+          <li>📎 Captura de AS400 – Monto aprobado</li>
+          <img src="../imagenes/nucleo/imgnucleo40.png" alt="40" style="width: 600px; height: auto;">
+          <li>📎 Captura de AS400 – Datos de ingresos</li>
+          <img src="../imagenes/nucleo/imgnucleo41.png" alt="41" style="width: 600px; height: auto;">
+        </ul>
+      </div>
+    </section>
+
+    <!----->
+    <section class="help-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; margin-top: 40px;">
+      <h2 style="color: #0056a3; border-bottom: 2px solid #eee; padding-bottom: 6px;">¡Informaciones Importantes de Préstamos!</h2>
+
+      <!-- Exclusiones -->
+      <h3 style="margin-top: 20px; color: #444;">Exclusiones en Agencias.com</h3>
+      <ul style="margin-left: 20px; margin-top: 10px;">
+        <li><strong>Oferta ya tomada en el día:</strong> Gestionar por Capstone a partir de 10 millones (estado activo).</li>
+        <li><strong>Empresa excluida:</strong> Derivar a Agencias.</li>
+        <li><strong>Sin línea pre aprobada:</strong> aplica cuando el cliente tiene:
+          <ul style="margin-left: 20px; margin-top: 6px; list-style-type: circle;">
+            <li>Faja mayor a K</li>
+            <li>Recuperación y consumo</li>
+            <li>CRC mayor a 1</li>
+            <li>Demanda</li>
+            <li>Cluster 6</li>
+          </ul>
+          <div style="margin-top: 4px; font-size: 0.9em; color: #555;">👉 Aplica el <strong>Speech de Impedidos</strong>.</div>
+        </li>
+        <li><strong>Exclusión PMC:</strong> Derivar a PMC por correo (verificar antes la faja).  
+          <ul style="margin-left: 20px; margin-top: 6px; list-style-type: circle;">
+            <li>Si dispone de <strong>faja mayor a K</strong> o <strong>demanda</strong>, <u>no derivar</u>, aplica Speech de Impedidos.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- A tener en cuenta -->
+      <h3 style="margin-top: 30px; color: #444;">¡A modo de tener en cuenta!</h3>
+      <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>Los <strong>préstamos dinámicos con papel/CCT</strong>, una vez acreditados, se derivan al área de <em>garantías</em>.</li>
+        <li>Disponemos de <strong>dos calculadoras de préstamos</strong>: Electrónico y Dinámico.</li>
+        <li>Sumar entre <strong>Gs. 20.000 a 30.000</strong> a la cuota, siempre que no sea mejora de tasa (aplica en ambas calculadoras).</li>
+        <li>Si el usuario solicita un préstamo desde la <strong>App</strong>, registrar: <em>Usuario – N° de Préstamo – App</em>.  
+          <div style="margin-top: 4px; font-size: 0.9em; color: #555;">👉 Aplica también si el operador gestionó inicialmente con el cliente y realizó el filtro de seguridad.</div>
+        </li>
+        <li>Todos los préstamos se debitan por <strong>débito automático</strong> de la cuenta (no modificable).</li>
+        <li>La <strong>primera cuota</strong> no puede superar los 48 días ni ser menor a 20 días.</li>
+        <li>Préstamo dinámico vendido un <strong>sábado</strong> → se acredita el <strong>lunes</strong>.</li>
+        <li>Préstamos <strong>electrónicos</strong> → se acreditan el mismo día, incluso sábados.</li>
+        <li>Antes de cargar un préstamo dinámico (con/sin papel o CCT) → verificar en el <strong>Buscador de Precios</strong> la tasa original.</li>
+        <li>Para <strong>cancelación anticipada</strong> de un préstamo:  
+          <ul style="margin-left: 20px; margin-top: 6px; list-style-type: circle;">
+            <li>El cliente debe haber abonado al menos la <strong>mitad de la cuota vigente</strong>.</li>
+            <li>Una vez acreditado el nuevo préstamo, enviar correo a <em>Mesa</em> para procesar la cancelación.</li>
+          </ul>
+        </li>
+        <li>Si se vende un préstamo a un <strong>cliente con cuenta inmovilizada</strong>:  
+          <ul style="margin-left: 20px; margin-top: 6px; list-style-type: circle;">
+            <li>Verificar que no disponga de <strong>comisiones pendientes</strong> en Catastro.</li>
+            <li>En caso de que existan, solicitar <strong>exoneración</strong> con el formato correspondiente por correo.</li>
+            <li>Revisar el flujo en la carpeta compartida.</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../Nucleo.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+
+

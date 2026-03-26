@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pago de Salarios</h1>
+    </header>
+    <nav>
+        <a href="#1"></a>
+        <a href="#2"></a>
+        <a href="#3"></a>
+        <a href="#4"></a>
+        <a href="#5"></a>
+        <a href="#6"></a>
+        <a href="#7"></a>
+        <a href="#8"></a>
+        <a href="#8"></a>
+    </nav>
+    <section id="1">
+        <h2>Módulo Pago de Salarios</h2>
+        <p>Al acceder al operador de servicios para pagos electrónicos nos posicionamos sobre la opción “Pago de Salarios”</p>
+        <img src="../imagenes/imagen177.jpg"  alt="a">
+    </section>
+    <section id="2">
+        <h2>Cargar Empleado</h2>
+        <p>Al acceder a la opción PGS verificamos todas las opciones que tenemos disponibles para realizar desde la web.</p>
+        <p>En la primera opción encontramos la función “cargar empleado” a través del mismo se pueden realizar dos acciones:</p>
+        <ul>
+            <li> Generar una cuenta nueva y por ende el Kit para pago de salarios</li>
+            <li>Vinculación de cuenta en forma inmediata para visualizar al colaborador dentro de la nómina de pagos de la empresa (Cabe destacar que esta opción es para la carga de alta en forma individual)</li>
+        </ul>
+        <img src="../imagenes/imagen178.jpg"  alt="a">
+        <p>Al acceder al la opción “cargar empleado” se visualiza una ficha en blanco y en el encabezado encontramos la opción <b>Registrar empleado y solicitar alta de cuenta</b> que debe quedar de esa manera en caso que se quiera solicitar el alta o vincular la cuenta del colaborador en forma inmediata</p>
+        <img src="../imagenes/imagen179.jpg"  alt="a">
+        <p>En caso de ingresar los datos del colaborador y aún no se va a solicitar el alta del mismo (caso de funcionarios que aún no pasan el periodo de prueba) se puede registrar el empleado y al pasar el periodo de prueba solicitar el alta correspondiente para la generación del kit de salario</p>
+        <img src="../imagenes/imagen180.jpg"  alt="a">
+        <p>El cliente a través de la plataforma tiene la opción de solicitar una cuenta nueva para un colaborador que aún no posee cuenta con el Banco o vincular la cuenta existente en caso que el mismo ya posea una cuenta previa verificación de que la misma siga activa Luego más abajo debe ir cargando los datos personales del colaborador para ambos casos (Apertura de cuenta nueva o cuenta existente) Los campos con asterisco anaranjado son los campos obligatorios y los que no son opcionales</p>
+        <img src="../imagenes/imagen181.jpg"  alt="a">
+        <img src="../imagenes/imagen182.jpg"  alt="a">
+        <p>En caso que el colaborador no cuente con número de casa se puede colocar un numero de forma genérica ej 123 111 etc y con relación a la calle principal si no posee nombre la calle del domicilio se puede colocar el nombre de la calle principal más próxima como referencia</p>
+        <img src="../imagenes/imagen183.jpg"  alt="a">
+        <p>Contamos con clientes PF que no poseen numero de línea baja en la opción de teléfono laboral, por lo que sería ideal colocar la opción de celular en dicha opción, los clientes que no cuentan con línea baja normalmente ponen números genéricos como por ejemplo (021 111 111 entre otros)</p>
+        <img src="../imagenes/imagen184.jpg"  alt="a">
+        <p>En la opción de productos se debe seleccionar la opción cuenta, ya que también existe la opción pre paga que si se selecciona no genera todos los productos del kit de salario ( Seguros entre otros). En caso que el cliente esté cargando una reasignación debe seleccionar la agencia en la que el funcionario desea operar de manera a vincularlo a la misma, no se generará un kit nuevo para éste colaborador</p>
+        <img src="../imagenes/imagen185.jpg"  alt="a">
+        <p><b>Cuando se confirma el alta de la cuenta para los casos de “apertura de nueva cuenta” lo recomendable es que el aviso contenga la información de que el alta será informada en el transcurso de 72 horas hábiles desde el momento de la carga.</b></p>
+    </section>
+    <section id="3">
+        <h2>Cargar Lote de Empleados</h2>
+        <p>Existe la posibilidad de cargar lotes de empleados que a diferencia de la opción “cargar empleados” con ésta alternativa el operador del servicio puede carga varios colaboradores de una sola vez, más abajo la explicación</p>
+        <img src="../imagenes/imagen186.jpg"  alt="a">
+        <p>Al ingresar a la opción el operador debe descargar la planilla modelo en formato Excel indicada en la imagen, en donde puede realizar todas las cargas de altas que posea el cliente de una sola vez, en la misma planilla puede solicitar tanto aperturas de cuenta como vinculaciones.</p>
+        <img src="../imagenes/imagen187.jpg"  alt="a">
+        <p>Para evitar que la plataforma rechace la planilla los datos ingresados no deben ser copiados desde otra planilla ya que esto causa que la misma pierda el formato y no pueda ser procesada, por lo que se recomienda que la misma sea completada en forma manual y respetando el aviso que esta determinado en la parte superior de la planilla.</p>
+        <p>Existen campos como el marcado en la imagen que poseen datos predeterminados, los cuales si pueden ser copiados son los mismos para todos los colaboradores cargados. Ejemplo (Tipo de documento, documento País etc.)</p>
+        <img src="../imagenes/imagen188.jpg"  alt="a">
+        <p>Una vez completa la planilla se debe guardar en alguna carpeta de fácil acceso por el operador y seleccionar el mismo como se visualiza en la opción 1 y luego seleccionar la opción “registrar y generar solicitud” de manera a ingresar la solicitud del cliente</p>
+        <img src="../imagenes/imagen189.jpg"  alt="a">
+    </section>
+        <section id="4">
+        <h2>Generar solicitudes de altas o bajas</h2>
+        <p>Con la opción de “Generar solicitudes de altas o bajas” se logra dar de baja o alta las cuentas seleccionadas sin eliminar las mismas de la nómina de salarios, por ejemplo si tenemos un caso de resposo por embarazo, se puede utilizar ésta opción mientras dure el proceso de reposo.</p>
+        <img src="../imagenes/imagen190.jpg"  alt="a">
+        <p>Al acceder a la opción figura la opción “altas” entendiendo que todos los funcionarios de la nómina se encuentran en alta, en caso que se quiera dar de baja un funcionario se selecciona la opción “baja”, escribir obligatoriamente la observación abajo y se selecciona el o los funcionarios que se desean cesar momentáneamente.</p>
+        <img src="../imagenes/imagen191.jpg"  alt="a">
+        <p>Una vez que el o los funcionarios cesados tengan que volver a la nómina se accede a la opción de generar solicitudes de altas o bajas y aparecen en el listado inicial, por lo que se les selecciona y se vuelve a colocar la observación para que vuelvan a figurar en la nómina</p>
+        <img src="../imagenes/imagen192.jpg"  alt="a">
+        <p><b>Cabe destacar que con esta opción el funcionario no es eliminado de la nómina ni tampoco es desvinculado de la cuenta madre de la empresa, sólo es ocultado de la nómina de pagos</b></p>
+    </section>
+    </section>
+        <section id="5">
+        <h2>Administrar Empleados</h2>
+        <p>Dentro de la opción de administrar empleados propiamente dicho si tenemos la opción de eliminar empleados de la nómina, de ésta manera borrando el registro del mismo de la base de la empresa y desvinculándolo de la cuenta madre, en caso de eliminarlo y querer reingresarlo se accede a la opción de “cargar empleado” y seleccionando la opción “vincular cuenta”.</p>
+        <img src="../imagenes/imagen193.jpg"  alt="a">
+        <p>Al ingresar a “Administrar empleados” vemos exactamente la imagen presentada más abajo, se pueden buscar al funcionario a través del nombre o el número de documento, como vemos marcado más abajo se pueden seleccionar dos opciones:</p>
+        <ul>
+            <li>Editar: que sirve solamente para observar los datos del colaborador.</li>
+            <li>Eliminar: Que sirve para eliminar del registro de la empresa al empleado en caso de renuncia o despido.</li>
+        </ul>
+        <img src="../imagenes/imagen194.jpg"  alt="a">
+        <p><b>Es importante que se vea la posibilidad de solucionar la opción editar empleado, ya que hasta el momento solo sirve para consultar datos de los colaboradores y no permite modificar los datos del mismo, lo cual el cliente entiende al observar la opción</b></p>
+    </section>
+    </section>
+        <section id="6">
+        <h2>Transmitir Archivos para Pagos</h2>
+        <p>La opción de transmitir archivos para pagos en el servicio de pago de salarios, hasta la fecha de puede realizar de dos maneras:</p>
+        <ul>
+            <li>Sistema Osiris.</li>
+            <li>Sistema Propio.</li>
+        </ul>
+        <p>Éste último es posible a través del sistema propio que posea la empresa, desde el banco le facilitamos el formato que debe poseer la estructura del archivo txt para que pueda levantar a la plataforma y pueda crear el archivo a ser autorizado.</p>
+        <img src="../imagenes/imagen195.jpg"  alt="a">
+        <p>Podemos observar en la imagen que al querer seleccionar el concepto tenemos la opción de acreditación normal mensual y la opción de orden de pago que normalmente la empresa puede solicitar la autorización si no es la fecha habitual de pago de aguinaldo.</p>
+        <p>Se selecciona el mes al cual corresponde la acreditación.</p>
+        <p>Luego se carga el archivo generado por los sistemas mencionados anteriormente y por último se puede completar en forma opcional la referencia del pago o acreditación a ser realizado.</p>
+        <img src="../imagenes/imagen196.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="7">
+        <h2>Cargar Pago Individual</h2>
+        <p>La opción de carga de pago individual se utiliza normalmente para cargas específicas para colaboradores que solicitan adelanto de salarios, pago de viáticos o comisiones, en donde se realiza la carga que visualizamos la carga</p>
+        <img src="../imagenes/imagen197.jpg"  alt="a">
+        <p>Al acceder podemos visualizar la ficha de modo a cargar los datos para la carga del pago, en donde los campos con los asteriscos anaranjados a lado, indican los campos obligatorios de carga, al completar todos éstos datos al final se pueden escribir los comentarios y referencias de la operación de pago individual</p>
+        <img src="../imagenes/imagen198.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="8">
+        <h2>Modificar Pago</h2>
+        <p>Dentro de las opciones encontramos la opción para modificar pagos, a través de ésta opción se puede modificar un archivo para pago ya sea individual o por lote, sola y únicamente antes de realizar la autorización de éstos pagos</p>
+        <img src="../imagenes/imagen199.jpg"  alt="a">
+        <p>Para buscar el pago cargado (en caso de que sean varios) existen múltiples formas detalladas más abajo.</p>
+        <p>Se puede buscar a través de las fechas de carga, un rango de fecha conocido, los rangos de fechas de procesos del banco, el colaborador especifico al que se le quiera realizar la modificación, entre otros.</p>
+        <p>Al seleccionar la opción específica presionamos el botón de “consultar”</p>
+        <img src="../imagenes/imagen200.jpg"  alt="a">
+        <p>Al encontrar el o los pagos podemos observar un pequeño lápiz que una vez presionado habilita la opción para modificar todo lo relacionado al pago del o los colaboradores seleccionados, principalmente el monto y la fecha a acreditar.</p>
+        <img src="../imagenes/imagen201.jpg"  alt="a">
+        <p>Una vez que se hayan modificado los datos verificamos en la imagen dos opciones el primero es la opción para guardar y modificar y la segunda para cancelar lo editado.</p>
+        <p>A través de esto se pueden modificar los pagos en caso de haber un error el la primera carga.</p>
+        <p>Se pueden realizar en 2 situaciones.</p>
+        <ul>
+            <li>El operador de carga o autorizante antes de realizar la primera aprobación.</li>
+            <li>El segundo autorizante antes de aprobar puede modificarlo nuevamente y luego autorizar.</li>
+        </ul>
+        <img src="../imagenes/imagen202.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="9">
+        <h2>Cargar pagos a Empleados</h2>
+        <p>La opción de cargar pagos a empleados es la función principal y más utilizada dentro de la plataforma, a través de la misma se puede realizar la carga de pago por lotes de empleados. Veamos en las siguientes diapositivas los pasos a tener en cuenta para la carga.</p>
+        <img src="../imagenes/imagen203.jpg"  alt="a">
+        <p>Normalmente aparece el aviso de saldo protegido anterior a éste paso que sería ideal que se visualice cuando la opción de Orden de pago esté habilitada.</p>
+        <p>Al seleccionar estoy de acuerdo y presionar aceptar pasa a la visualización observada más abajo en donde en el primer encabezado debemos seleccionar el concepto general que pueden ser:</p>
+        <ul>
+            <li>Acreditación (Pago de salarios habitual)</li>
+            <li>Orden de pago (Aguinaldo)</li>
+        </ul>
+        <p>En la esquina superior izquierda se observa la opción de utilizar plantilla, que al presionarla nos lleva al listado de plantillas guardadas que estaremos mostrando más adelante.</p>
+        <p>Luego seleccionamos los funcionarios que estarán percibiendo acreditación y se puede realizar de dos maneras:</p>
+        <ul>
+            <li>Presionando el cuadro pequeño debajo de la palabra seleccionar, selecciona la totalidad de la nómina de funcionarios.</li>
+            <li>Seleccionando cada cuadro a lado del nombre del funcionario filtra la individualmente y pasa al siguiente estado para editar los montos de los pagos.</li>
+        </ul>
+        <img src="../imagenes/imagen204.jpg"  alt="a">
+        <p><b>En ésta parte del proceso la mayoría de los clientes desean ordenar los colaboradores en forma alfabética de manera a filtrar a los que no percibirán acreditación, a la fecha no se puede realizar ésta acción</b></p>
+    </section>
+    </section>
+        <section id="9">
+        <h2>Cargar pagos a Empleados</h2>
+        <p>La opción de cargar pagos a empleados es la función principal y más utilizada dentro de la plataforma, a través de la misma se puede realizar la carga de pago por lotes de empleados. Veamos en las siguientes diapositivas los pasos a tener en cuenta para la carga.</p>
+        <img src="../imagenes/imagen203.jpg"  alt="a">
+        <p>Normalmente aparece el aviso de saldo protegido anterior a éste paso que sería ideal que se visualice cuando la opción de Orden de pago esté habilitada.</p>
+        <p>Al seleccionar estoy de acuerdo y presionar aceptar pasa a la visualización observada más abajo en donde en el primer encabezado debemos seleccionar el concepto general que pueden ser:</p>
+        <ul>
+            <li>Acreditación (Pago de salarios habitual)</li>
+            <li>Orden de pago (Aguinaldo)</li>
+        </ul>
+        <p>En la esquina superior izquierda se observa la opción de utilizar plantilla, que al presionarla nos lleva al listado de plantillas guardadas que estaremos mostrando más adelante.</p>
+        <p>Luego seleccionamos los funcionarios que estarán percibiendo acreditación y se puede realizar de dos maneras:</p>
+        <ul>
+            <li>Presionando el cuadro pequeño debajo de la palabra seleccionar, selecciona la totalidad de la nómina de funcionarios.</li>
+            <li>Seleccionando cada cuadro a lado del nombre del funcionario filtra la individualmente y pasa al siguiente estado para editar los montos de los pagos.</li>
+        </ul>
+        <img src="../imagenes/imagen204.jpg"  alt="a">
+        <p><b>En ésta parte del proceso la mayoría de los clientes desean ordenar los colaboradores en forma alfabética de manera a filtrar a los que no percibirán acreditación, a la fecha no se puede realizar ésta acción</b></p>
+        <p>Una vez seleccionados los funcionarios y presionado la opción siguiente, pasa a la imagen visualizada más abajo en donde básicamente se puede cargar el monto de los pagos realizando un doble click sobre el monto del pago, también se puede modificar la fecha de acreditación, de ésta manera por ejemplo cargamos el pago el 12/09/2020 y programamos el pago para el 15/09/2020 y por más que se realicen las autorizaciones recién se estará acreditando salarios en la fecha programada a las 00:15 hs. Amaneciendo el funcionario con el importe en su cuenta.</p>
+        <img src="../imagenes/imagen205.jpg"  alt="a">
+        <p><b>En ésta pantalla si ya se puede realizar el ordenamiento alfabético de los colaboradores pero debe ser antes de modificar el monto del pago, si se realiza éste paso primero no se podrá realizar el ordenamiento después.</b></p>
+        <p>Una vez cargado el monto de los pagos se presiona la opción guardar cambios y automáticamente se visualiza el monto total de manera a corroborar con la planilla que posee el cliente si el monto total coincide con lo cargado, si no puede presionar sobre el monto cargado incorrectamente de manera a modificarlo y verificarlo nuevamente presionando la opción guardar cambios.</p>
+        <p>En caso que todo esté correcto directamente se presiona confirmar y se genera el archivo para pagos que se debe autorizar.</p>
+        <img src="../imagenes/imagen206.jpg"  alt="a">
+        <p>En caso de querer guardar como plantilla previo a la opción guardar cambios seleccionamos el cuadro que hace referencia a “guardar como plantilla señalada en la imagen, de ésta manera nombramos la misma y presionamos la opción “guardar plantilla” de ésta manera se queda guardada la misma dentro de la plataforma.</p>
+        <p><b>Más adelante estaremos hablando acerca de la funcionalidad de la opción GUARDAR COMO PLANTILLA.</b></p>
+        <img src="../imagenes/imagen207.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="10">
+        <h2>Vincular/Desvincular Cuentas</h2>
+        <p>A través de la opción Vincular/Desvincular cuentas se pueden asociar o desvincular cuentas sin necesidad de eliminar el registro del empleado, para utilizar ésta función el colaborador debe estar cargado dentro de la nómina necesariamente.</p>
+        <img src="../imagenes/imagen208.jpg"  alt="a">
+        <p>Se puede filtrar por nombre o por número de documento. Una vez encontrado dentro del listado al colaborador, procedemos a seleccionarlo.</p>
+        <img src="../imagenes/imagen209.jpg"  alt="a">
+        <p>De acuerdo a la necesidad elegimos la opción vincular o desvincular (para ambos procesos los pasos son similares), al seleccionar la opción precisada abaja despliega el campo para cargar el número de cuenta del empleado y seleccionar la cuenta madre de la empresa a vincular, una vez cargados ambos campos se selecciona la opción confirmar y de ésta manera se procede a la vinculación o desvinculación de cuentas.</p>
+        <p>Normalmente esto se utiliza en caso que la empresa pagadora tenga más de una cuenta catastrada para el servicio PGS.</p>
+        <img src="../imagenes/imagen210.jpg"  alt="a">
+        <p><b>En caso que el colaborador ya esté vinculado la plataforma emite un mensaje informando que la vinculación ya existe o en su defecto si aún no se encuentra registrado informará sobre el error.</b></p>
+        <img src="../imagenes/imagen211.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="11">
+        <h2>Plantillas de Pagos</h2>
+        <p>La opción “Plantillas Pagos” sirve para que al momento de realizar la carga a través de la opción “Cargar pagos a empleados” el operador tenga la opción de guardar dicho pago como plantilla y reutilizarla en el caso de que los pagos a colaboradores sean constantes con relación a la misma nómina y sólo cambien los montos, de igual manera se pueden agregar o quitar colaboradores de las plantillas de pagos.</p>
+        <img src="../imagenes/imagen212.jpg"  alt="a">
+        <p>Al ingresar a la opción aparece el listado de las plantillas guardadas, cabe destacar que la plataforma puede guardar hasta 20 plantillas como máximo.</p>
+        <p>Una vez ubicada la plantilla a modificar se selecciona y se presiona la tecla siguiente, de manera a editarla y modificarla de acuerdo a la necesidad.</p>
+        <img src="../imagenes/imagen213.jpg"  alt="a">
+        <p>Una vez ingresada a la plantilla a modificar aparecen los colaboradores guardados abajo aparece la opción para agregar o modificar.</p>
+        <p>En caso de querer eliminar un colaborador de la lista, se lo selecciona y luego se presiona la opción “Eliminar Registro”. Por otra parte si se quiere agregar un colaborador directamente se presiona la opción agregar registro y aparecerá el listado de funcionarios registrados y vinculados a la cuenta de la empresa de manera a agregarlo. Una vez agregado se puede modificar el monto a acreditar y la fecha de creditación.</p>
+        <p>Finalizado el proceso de carga se presiona la opción guardar y el archivo de pago es generado para su posterior autorización.</p>
+        <img src="../imagenes/imagen214.jpg"  alt="a">
+        <p>Para ahondar en la opción de agregar registro ésta es la pantalla que aparece al ingresar, podemos buscar el registro del colaborador a través del nombre o por el número de documento, al encontrarlo más abajo lo seleccionamos, ¡Importante! Siempre seleccionar el concepto para el pago del colaborador.</p>
+        <p>Una vez realizados los pasos presionar la opción agregar registro.</p>
+        <img src="../imagenes/imagen215.jpg"  alt="a">
+        <p>Como detallamos al inicio una vez agregado el registro se modifica el monto a acreditar y seleccionamos la opción “guardar” de manera a actualizar la plantilla de pagos.</p>
+        <img src="../imagenes/imagen216.jpg"  alt="a">
+        <p><b>Confirmación de modificación de plantilla de pagos.</b></p>
+        <img src="../imagenes/imagen217.jpg"  alt="a">
+        <p>Una vez modificada la plantilla se puede acceder a la misma para realizar la confirmación del archivo para su posterior autorización anulación de acuerdo a la evaluación del operador autorizante.</p>
+        <img src="../imagenes/imagen218.jpg"  alt="a">
+        <p><b>Un dato a tener en cuenta que mencionaban los operadores es que no podían generar el archivo de pagos a través de plantillas pagos si éstos no se modificaban.</b></p>
+        <p><b>Básicamente indicaban que si o si se debía realizar alguna modificación mínima para que la misma se pueda utilizar.</b></p>
+        <p><b>También manifiestan que suele tardar mucho al momento de cargar las plantillas guardadas.</b></p>
+    </section>
+    </section>
+        <section id="12">
+        <h2>Datos de Pagos</h2>
+        <p>La opción Datos de Pagos es una herramienta muy útil para la autogestión de consultas de pagos de los operadores del servicio PGS, a través de éste se pueden consultar los estados en los que se encuentran los pagos, quien o quienes ya realizaron la autorización y utilizar como herramienta de consultas para tener en cuenta el histórico de pagos registrados de hasta 1 año atrás.</p>
+        <img src="../imagenes/imagen219.jpg"  alt="a">
+        <p><b>Esta herramienta es muy importante que podamos fomentar e impulsar para que los operadores puedan utilizar, disminuiría de manera considerable el volumen de consultas que realizan los clientes en diferentes canales de todas las áreas involucradas, PGS Adm y Com Soporte Interhome, MO y Comerciales</b></p>
+        <p>Se pueden buscar los pagos de diferentes maneras, la primera es a través de la fecha de carga, en donde el operador puede buscar por fecha de carga (que registra el histórico de todos los pagos cargados) en caso que el mismo sepa la fecha exacta en que se realizo la carga del o los pagos, y automáticamente la plataforma muestra todos los pagos y todos los estados que se registraron en ésa fecha.</p>
+        <img src="../imagenes/imagen220.jpg"  alt="a">
+        <p>En caso que el operador no sepa la fecha exacta de carga también puede buscar por rango de fecha estimativa, como dijimos anteriormente hasta 1 año quedan los pagos cargados registrados. Tener en cuenta que si se buscar por rango de fecha el espectro de búsqueda es más amplio.</p>
+        <img src="../imagenes/imagen221.jpg"  alt="a">
+        <p>En caso que el operador necesite verificar o consultar los pagos cargados a un colaborador en específico, lo puede buscar en la opción marcada en la imagen referente a “Cliente Beneficiario”.</p>
+        <img src="../imagenes/imagen222.jpg"  alt="a">
+        <p>También existe la opción de buscar por estado de pagos. Esto sería útil en caso de que el operador de carga necesite consultar en que estado se encuentran el archivo de pagos cargados, de manera a reclamar a el o los autorizantes en caso de que los pagos no hayan sido autorizados y acreditados efectivamente.</p>
+        <img src="../imagenes/imagen223.jpg"  alt="a">
+        <p>Se puede buscar por tipo de pago también, pero ésta opción sería la menos utilizada ya que dentro de la plataforma solamente se puede  realizar a través de crédito en cuenta.</p>
+        <img src="../imagenes/imagen224.jpg"  alt="a">
+        <p>Cabe destacar que también se encuentra disponible la opción de buscar a través de las observaciones, que en caso de querer agrupar todos los pagos registrados bajo una misma observación ésta es una opción valida de búsqueda.</p>
+        <img src="../imagenes/imagen225.jpg"  alt="a">
+        <p>Una vez encontrado el o los pagos se puede seleccionar la opción marcada en amarillo “Ver” y automáticamente se despliega la ventana visualizada más abajo que indica “Auditoría de la operación” en donde se detallan las acciones y los operadores encargados de las mismas, tanto de las anulaciones, autorizaciones, modificaciones y carga.</p>
+        <img src="../imagenes/imagen226.jpg"  alt="a">
+        <p>Una vez verificada la búsqueda, la plataforma posee 2 opciones para bajar éstos archivos en dos formatos que pueden ser guardados dentro de la computadora del operador como legajo respaldatorio ante consultas de los salarios acreditados para manejo interno de la empresa pagadora.</p>
+        <img src="../imagenes/imagen227.jpg"  alt="a">
+        <p><b>Visualización de formato de archivo TXT</b></p>
+        <img src="../imagenes/imagen228.jpg"  alt="a">
+        <p>Visualización de formato de archivo Excel, en donde la presentación es mucho más formal y amigable para el operador del servicio</p>
+        <img src="../imagenes/imagen229.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="13">
+        <h2>Información de Empleados</h2>
+        <p>Con la opción de información de empleados, el operador posee la opción de verificar todos los datos cargados de los colaboradores de la empresa, datos personales, laborales y número de cuenta generado.</p>
+        <img src="../imagenes/imagen230.jpg"  alt="a">
+        <p>Se puede buscar por nombre o por número de documento el colaborador especifico que se desea consultar.</p>
+        <img src="../imagenes/imagen231.jpg"  alt="a">
+        <p>En caso de buscar por número de documento posee las opciones de tipos de documento en caso que el mismo no posea o no este registrado con su CI</p>
+        <img src="../imagenes/imagen232.jpg"  alt="a">
+        <p>Se puede utilizar la opción de exportar a Excel el listado total de colaboradores que están en la nómina actualmente y guardarlos en alguna carpeta dentro de la computadora del operador.</p>
+        <img src="../imagenes/imagen233.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="14">
+        <h2>Estados de solicitudes de altas o bajas</h2>
+        <p>La opción de estados de solicitudes de altas o bajas se utiliza para consultar las solicitudes cargadas en la opción “cargar empleado” ya sea para apertura de cuenta nueva o cuenta existente, de ésta manera el operador que carga puede realizar el seguimiento del estado del alta solicitada.</p>
+        <img src="../imagenes/imagen234.jpg"  alt="a">
+        <p>Al acceder vemos las opciones disponibles de búsqueda, por nombrar tenemos la opción de buscar a través del rango de fecha de carga, alguna descripción en específica, el tipo de solicitud (Altas o Bajas) o los diferentes estados que se visualiza en la imagen más abajo.</p>
+        <img src="../imagenes/imagen235.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="15">
+        <h2>Ver Notificaciones</h2>
+        <p>Dentro de la opción de notificaciones se pueden visualizar los mensajes emitidos por la plataforma a medida que se van realizando las acciones como por ejemplo (solicitudes de altas, cargas de pagos, vinculaciones de cuentas,etc)</p>
+        <img src="../imagenes/imagen236.jpg"  alt="a">
+        <p>Ejemplo de mensajes emitidos por la plataforma, se pueden acceder a los detalles y el estado del mismo, en este caso ya fue leído.</p>
+        <img src="../imagenes/imagen237.jpg"  alt="a">
+    </section>
+    </section>
+        <section id="16">
+        <h2>Modificar contraseña</h2>
+        <p>Por último el operador tiene la opción de modificar la contraseña, en donde, al acceder a la página principal puede visualizar en la esquina superior derecha el icono de configuraciones y al acceder se visualiza la imagen detallada más abajo en donde debe ingresar la contraseña actual y la nueva dos veces</p>
+        <img src="../imagenes/imagen238.jpg"  alt="a">
+        <p><b>Un dato importante a tener en cuenta es que para crear el PIN debe cumplir con las siguiente característica:</b></p>
+        <ul>
+            <li>Poseer 6 dígitos numéricos sin consecuciones ni repeticiones consecutivas. Por ejemplo: 158271</li>
+        </ul>
+    </section>
+
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

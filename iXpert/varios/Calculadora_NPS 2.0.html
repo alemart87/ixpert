@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cálculo de NPS</title>
+  <style>
+    :root {
+      --color-principal: #ec7000;
+      --color-adecuado: #FFE699;
+      --color-mejorar: #FFD700;
+      --color-inadecuado: #FF4D4D;
+      --color-destacado: #A9D08E;
+      --color-sobresaliente: #02AC66;
+      --color-fondo: #f4f6fa;
+      --color-input-disabled: #f0f0f0;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--color-fondo);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .contenido {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .bloque_nps {
+      background: #fff;
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .bloque_nps h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: var(--color-principal);
+    }
+
+    table {
+      width: 100%;
+      border-spacing: 0 10px;
+    }
+
+    td {
+      text-align: left;
+      padding: 5px 0;
+    }
+
+    input.caja {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: white;
+      transition: border 0.3s;
+    }
+
+    input.caja:disabled {
+      background-color: var(--color-input-disabled);
+      color: #666;
+    }
+
+    input.boton {
+      margin-top: 15px;
+      background-color: var(--color-principal);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+    }
+
+    input.boton:hover {
+      background-color: #d45e00;
+    }
+
+    #estado {
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .progreso {
+      width: 100%;
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0 20px;
+    }
+
+    .barra {
+      height: 100%;
+      width: 0;
+      background-color: var(--color-principal);
+      transition: width 0.4s ease-in-out;
+    }
+
+    .motivacion {
+      font-weight: 500;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .leyenda {
+      margin-top: 25px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .leyenda div {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .color-box {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border-radius: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      background: #ececec;
+      color: #555;
+    }
+
+    @media (max-width: 500px) {
+      .bloque_nps {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+  <script>
+    const mensajes = {
+      "INADECUADO": [
+        "¡Ánimo! Cada interacción cuenta para mejorar.",
+        "Tienes el poder de transformar la experiencia del cliente.",
+        "Revisar los detalles marca la diferencia. ¡Tú puedes!"
+      ],
+      "A MEJORAR": [
+        "Vas por buen camino, sigue empujando.",
+        "Con pequeños cambios, llegarás al siguiente nivel.",
+        "¡Un paso más y lo lograrás!"
+      ],
+      "ADECUADO": [
+        "¡Buen trabajo! Estás cumpliendo con lo esperado.",
+        "Mantén este ritmo y pronto destacarás.",
+        "Tu esfuerzo ya está dando frutos. ¡Sigue así!"
+      ],
+      "DESTACADO": [
+        "¡Excelente desempeño! Ya eres referencia.",
+        "Lo estás haciendo muy bien. ¡Bravo!",
+        "Sigue con esta energía, estás muy cerca de la cima."
+      ],
+      "SOBRESALIENTE": [
+        "¡IMPRESIONANTE! Eres un ejemplo a seguir.",
+        "Tu dedicación se nota. ¡Felicidades!",
+        "Estás superando las expectativas. ¡Gracias por tu excelencia!"
+      ]
+    };
+
+    function nps_calc() {
+      const promotor = parseInt(document.getElementById("promotor").value) || 0;
+      const neutro = parseInt(document.getElementById("neutro").value) || 0;
+      const detractor = parseInt(document.getElementById("detractor").value) || 0;
+      const objetivo = parseFloat(document.getElementById("objetivo").value) || 0;
+
+      if (objetivo > 86) {
+        alert("El objetivo no puede ser mayor a 86.");
+        return;
+      }
+
+      const total = promotor + neutro + detractor;
+      if (total === 0) {
+        alert("Por favor, ingresa valores válidos.");
+        return;
+      }
+
+      const nps = ((promotor - detractor) / total) * 100;
+      const cumplimiento = (nps / objetivo) * 100;
+
+      document.getElementById("nps_res").value = nps.toFixed(2);
+      document.getElementById("cumplimiento").value = cumplimiento.toFixed(2);
+
+      const estado = document.getElementById("estado");
+      const barra = document.getElementById("barra_progreso");
+      const motivacion = document.getElementById("motivacion");
+      let siguiente_umbral = 0;
+      let estado_texto = "";
+      let color = "";
+
+      if (cumplimiento < 70) {
+        estado_texto = "INADECUADO";
+        color = "var(--color-inadecuado)";
+        siguiente_umbral = 70;
+      } else if (cumplimiento < 85) {
+        estado_texto = "A MEJORAR";
+        color = "var(--color-mejorar)";
+        siguiente_umbral = 85;
+      } else if (cumplimiento < 100) {
+        estado_texto = "ADECUADO";
+        color = "var(--color-adecuado)";
+        siguiente_umbral = 100;
+      } else if (cumplimiento < 110) {
+        estado_texto = "DESTACADO";
+        color = "var(--color-destacado)";
+        siguiente_umbral = 110;
+      } else {
+        estado_texto = "SOBRESALIENTE";
+        color = "var(--color-sobresaliente)";
+        siguiente_umbral = 110;
+        document.getElementById("promotores_necesarios").value = 0;
+      }
+
+      estado.value = estado_texto;
+      estado.style.backgroundColor = color;
+      estado.style.color = (estado_texto === "INADECUADO" || estado_texto === "SOBRESALIENTE") ? "#fff" : "#000";
+      barra.style.width = Math.min(cumplimiento, 120) + "%";
+      barra.style.backgroundColor = color;
+
+      const frases = mensajes[estado_texto];
+      motivacion.textContent = frases[Math.floor(Math.random() * frases.length)];
+
+      if (estado_texto !== "SOBRESALIENTE") {
+        let pro = 0;
+        let nuevo_nps = nps;
+        while ((nuevo_nps / objetivo) * 100 < siguiente_umbral) {
+          pro++;
+          nuevo_nps = ((promotor + pro - detractor) / (total + pro)) * 100;
+        }
+        document.getElementById("promotores_necesarios").value = pro;
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="contenido">
+    <div class="bloque_nps">
+      <h1>Cálculo de NPS</h1>
+      <form>
+        <table>
+          <tr><td>Promotores</td><td><input class="caja" type="number" id="promotor" min="0"></td></tr>
+          <tr><td>Neutros</td><td><input class="caja" type="number" id="neutro" min="0"></td></tr>
+          <tr><td>Detractores</td><td><input class="caja" type="number" id="detractor" min="0"></td></tr>
+          <tr><td>Objetivo (%)</td><td><input class="caja" type="number" id="objetivo" step="any" min="0" max="86"></td></tr>
+          <tr><td colspan="2"><input class="boton" type="button" value="Calcular" onclick="nps_calc()"></td></tr>
+          <tr><td>NPS (%)</td><td><input class="caja" type="number" id="nps_res" disabled></td></tr>
+          <tr><td>Cumplimiento (%)</td><td><input class="caja" type="number" id="cumplimiento" disabled></td></tr>
+          <tr><td>Estado</td><td><input class="caja" type="text" id="estado" disabled></td></tr>
+          <tr><td>Promotores necesarios</td><td><input class="caja" type="number" id="promotores_necesarios" disabled></td></tr>
+        </table>
+        <div class="progreso"><div id="barra_progreso" class="barra"></div></div>
+        <div id="motivacion" class="motivacion"></div>
+        <div class="leyenda">
+          <strong>LEYENDA DE ESTADOS:</strong>
+          <div><div class="color-box" style="background: var(--color-inadecuado)"></div> Inadecuado: &lt; 70%</div>
+          <div><div class="color-box" style="background: var(--color-mejorar)"></div> A Mejorar: 70% - 84%</div>
+          <div><div class="color-box" style="background: var(--color-adecuado)"></div> Adecuado: 85% - 99%</div>
+          <div><div class="color-box" style="background: var(--color-destacado)"></div> Destacado: 100% - 109%</div>
+          <div><div class="color-box" style="background: var(--color-sobresaliente)"></div> Sobresaliente: 110% o más</div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="footer">ArrowX 2025 - Todos los derechos reservados.</div>
+</body>
+</html>

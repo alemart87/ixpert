@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resumen Portal Itaú Empresas - Administrador y Operador</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #222;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .boton-centro {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .boton-centro button {
+      background-color: #004080;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .boton-centro button:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Resumen Portal Itaú Empresas</h1>
+  </header>
+
+  <nav>
+    <a href="#admin">Administrador</a>
+    <a href="#operador">Operador</a>
+    <a href="#consultas">Consultas 24hs</a>
+    <a href="#mails">Mails importantes</a>
+  </nav>
+
+  <section>
+    <h2 id="admin">⚙️ Flujos de Usuario Maestro / Administrador</h2>
+    <h3>Habilitar servicios para la empresa</h3>
+    <p><strong>Ruta:</strong> Administracion > Habilitar Servicios</p>
+    <p>El Administrador puede activar/desactivar servicios, así también los modifica para los operadores; 
+    el administrador puede modificar cada cuenta en la cual activa o desactiva cada servicio.</p>
+
+    <h3>Administrar Servicios para la empresa</h3>
+    <p><strong>Ruta:</strong> Administracion > Administrar servicios</p>
+
+    <h3>Habilitar Itoken Administrador</h3>
+    <p><strong>Ruta:</strong> Solicitudes > Itoken Administrador</p>
+    <p>El Administrador debe seleccionar una de las cuentas operador a la cual desea asignar el Itoken 
+    administrador; puede ser él mismo, pero debe contar con cuenta operador para asignárselo. Así 
+    ingresa a app Itau empresarial y desde el botón Itoken, cargando sus datos podrá visualizar el Token digital.</p>
+    </div>
+
+    <div class="contenido">
+        <h3>Habilitar Itoken a operadores</h3>
+        <p><strong>Ruta:</strong> Inicio > Asignar Itoken</p>
+        <p>El Administrador puede seleccionar un operador desde la lista desplegada, al cual habilitará 
+        el itoken para realizar transferencias y autorizaciones.</p>
+
+        <h3>Deshabilitar itokens de operador</h3>
+        <p><strong>Ruta:</strong> Administracion > Itoken operador</p>
+        <p>El Administrador puede deshabilitar el itoken del perfil de operador que desee. Visualizará 
+        los perfiles con Itoken, debe dar clic a la palabra "HABILITADO" y la misma cambiará a "DESHABILITADO".</p>
+
+        <h3>Gestionar operador</h3>
+        <p><strong>Ruta:</strong> Administracion > Gestionar operadores</p>
+        <p>El administrador podrá editar operadores, gestionar los permisos del operador, eliminar 
+        operador, así como inhabilitar un operador.</p>
+        <ul>
+            <li><strong>Editar operador:</strong> Mediante el ícono de lápiz, el Administrador puede modificar los datos 
+            personales del mismo, y modificar el pin del operador.</li>
+            <li><strong>Eliminar operador:</strong> Mediante el icono de basurero, el Administrador puede eliminar un 
+            operador.</li>
+            <li><strong>Editar servicios permitidos:</strong> Mediante el icono de check, el Administrador puede 
+            agregar/eliminar servicios para el operador seleccionado. Finalmente, el Administrador puede 
+            seleccionar el servicio a habilitar para el operador, así como también determinar si el operador 
+            puede transaccionar con el servicio: Editar, cargar, autorizar y anular los pagos.</li>
+        </ul>
+
+        <h3>Agregar operadores</h3>
+        <p><strong>Ruta:</strong> Inicio > Agregar operadores</p>
+        <p>El Administrador puede agregar operadores encargados de cargar/autorizar transacciones de 
+        pago. Este usuario contará con accesos a detalles de dichos pagos y comprobantes.</p>
+        <p>Una vez ingresado nuevo operador, también se habilitará, en la parte inferior de la pantalla, 
+        la opción de ingresar contacto autorizado y correo administrador. El operador puede ser 
+        seleccionado como contacto autorizado, así como puede contar con el permiso de mail administrador.</p>
+        <ul>
+            <li><strong>Contacto autorizado:</strong> Para autorizar operaciones desde canal pagos electrónicos o 
+            desde la app Itau Empresas.</li>
+            <li><strong>Email administrador:</strong> El email administrador sirve para recibir notificaciones de 
+            cualquier cambio o nueva alta que se realice en su empresa a través del pin administrador. 
+            Se pueden catastrar hasta 4 mails administradores.</li>
+        </ul>
+
+        <h3>Cambio de pin Administrador</h3>
+        <p><strong>Ruta:</strong> Configuracion > Cambio de PIN de acceso</p>
+
+        <h3>Alta de Email administrador</h3>
+        <p><strong>Ruta:</strong> Administracion > catastrar email administrador</p>
+
+        <h3>Desbloqueo de operadores</h3>
+        <p><strong>Ruta:</strong> Administracion > Desbloqueo de operadores</p>
+        <p>El administrador visualiza operadores con intentos inválidos, puede seleccionarlo y dar a la 
+        opción "DESBLOQUEAR OPERADOR".</p>
+
+        <h3>Registrar contacto autorizado</h3>
+        <p><strong>Ruta:</strong> Administración > Contactos autorizados</p>
+
+        <hr>
+
+        <h2 id="operador">👤 Flujos del Operador</h2>
+
+        <h3>Cargar empleados</h3>
+        <p><strong>Ruta:</strong> Pago de salarios > Cargar empleados</p>
+        <p>El operador puede cargar empleados seleccionando una cuenta ya existente o solicitar la 
+        apertura de una nueva cuenta para el mismo y cargar los datos solicitados.</p>
+
+        <h3>Consultar estado de solicitudes de cuenta</h3>
+        <p><strong>Ruta:</strong> Pago de salarios > Consultas > estado de solicitudes de altas o bajas</p>
+
+        <h3>Cargar pagos a empleados</h3>
+        <p><strong>Ruta:</strong> Pagos de salario > Cargar pagos a empleados</p>
+
+        <h3>Transferencias Locales</h3>
+        <p><strong>Ruta:</strong> Pantalla de inicio > Transferencias locales</p>
+
+        <h3>Transferencias Internacionales</h3>
+        <p><strong>Ruta:</strong> Pantalla de inicio > Transferencias Internacionales</p>
+
+        <h3>Solicitud de chequera</h3>
+        <p><strong>Ruta:</strong> Pantalla de inicio > Solicitud de chequera</p>
+
+        <hr>
+
+         <h2 id="consultas">🌐 Flujos 24hs en Internet / Ediciones</h2>
+        <h3>Cambiar/catastrar mail 24hs en internet</h3>
+        <p><strong>Ruta:</strong> Mis datos > editar > catastrar mail > confirma con pin administrador</p>
+    </div>
+
+    <h2 id="mails">✉️ Mails Importantes</h2>
+    <div class="info-box">
+      <ul>
+        <li><strong>SAC:</strong> BancaEmpresarial@sac.itau.com.py</li>
+        <li><strong>Consultas:</strong> 24horaseninternet@itau.com.py</li>
+        <li><strong>Transferencias recibidas:</strong> transferenciasrecibidasexterior@itau.com.py</li>
+        <li><strong>PGS:</strong> pgs.itau@itau.com.py</li>
+        <li><strong>Asistentes:</strong> asistentesmo@itau.com.py</li>
+      </ul>
+    </div>
+
+    <div class="boton-centro">
+      <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">Volver arriba</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

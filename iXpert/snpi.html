@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNPI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        img {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+
+        /* Estilos adicionales para la sección visual */
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .funcion-icon {
+            font-size: 1.8rem;
+        }
+        .funcion-text h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #004080;
+        }
+        .funcion-text p {
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="imagenes/imagen35.jpg" alt="Pantalla Bancard" style="width: 400px; height: 80px;">
+    </header>
+    <nav>
+        <a href="#motivo"> </a>
+        <a href="#funcionamiento"> </a>
+        <a href="#reclamo"> </a>
+        <a href="#importante"> </a>
+    </nav>
+
+    <section id="motivo">
+        <h2>💱 Funcionalidades del Sistema Nacional de Pagos</h2>
+        <div class="funciones-grid">
+            <div class="funcion-item">
+                <div class="funcion-icon">🔄</div>
+                <div class="funcion-text">
+                    <h3> Monitoreo de Transferencias</h3>
+                    <p>💸 <b>Estado de Transferencias Bancarias</b></p>
+                    <ul>
+                        <p>Visualizá en tiempo real el estado de las transferencias realizadas a través del Sistema Nacional de Pagos.</p>
+                        <p>Incluye información sobre:</p>
+                        <ul>
+                            <li>Confirmación de envío y recepción.</li>
+                            <li>Tiempos de procesamiento.</li>
+                            <li>Detalles en caso de transferencias fallidas o retenidas.</li>
+                        </ul>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+
+    <a href="herramientas.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

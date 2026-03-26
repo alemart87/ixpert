@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aumento de Línea TC APP</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      color: #222;
+      margin-top: 25px;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Aumento de Línea</h1>
+  </header>
+    <section>
+        <h2 id="aumento-linea" style="text-align: center;">🧭 Aumento de Línea - Guía Visual</h2>
+        <div class="info-box">
+            <p style="text-align: center;">Esta sección resume el proceso de aumento de línea de crédito, criterios de exclusión, tiempos de procesamiento y pantallas clave en SAC.com, AS400 y App Itaú PY.</p>
+            <ul style="text-align: left;">
+            <li>Validación de cliente y tarjeta en SAC.com</li>
+            <li>Exclusión de línea pre-aprobada en AS400</li>
+            <li>Requisitos y casos excluidos para aumento</li>
+            <li>Procesamiento en línea vs. encolado</li>
+            <li>Confirmación y éxito en App Itaú PY</li>
+            </ul>
+        </div>
+
+        <h3 style="text-align: center;">📍 Validación en SAC.com y AS400</h3>
+        <ul style="text-align: left;">
+            <li>Consulta de línea real en "Datos TC → Tarjeta"</li>
+            <li>Confirmación de exclusión en opción D01</li>
+        </ul>
+        <img src="../imagenes/imagen354.webp" alt="354" style="display: block; margin: 20px auto; width: 1000px; height: auto;">
+
+        <h3 style="text-align: center;">📋 Requisitos y Exclusiones</h3>
+        <ul style="text-align: left;">
+            <li>Cliente digital con línea pre-aprobada</li>
+            <li>Excluidos: adicionales, sin línea, corporativos, empleados</li>
+        </ul>
+        <img src="../imagenes/imagen355.webp" alt="355" style="display: block; margin: 20px auto; width: 1000px; height: auto;">
+
+        <h3 style="text-align: center;">⏱️ Tiempos de Procesamiento</h3>
+        <ul style="text-align: left;">
+            <li>Solicitudes antes de las 14:55 → aumento al instante</li>
+            <li>Solicitudes después → procesadas a las 15:00 del siguiente día hábil</li>
+        </ul>
+        <img src="../imagenes/imagen356.webp" alt="356" style="display: block; margin: 20px auto; width: 1000px; height: auto;">
+
+        <h3 style="text-align: center;">📲 Confirmación en App Itaú PY</h3>
+        <ul style="text-align: left;">
+            <li>Verificación de datos antes de confirmar</li>
+            <li>Eliminación del PIN para mayor agilidad</li>
+            <li>Mensaje exitoso en línea y encolado</li>
+        </ul>
+        <img src="../imagenes/imagen357.webp" alt="357" style="display: block; margin: 20px auto; width: 1000px; height: auto;">
+
+        <h3 style="text-align: center;">📱 Migración funcional en Android</h3>
+        <ul style="text-align: left;">
+            <li>Ingreso por “Servicios” → “Aumento de línea”</li>
+            <li>Selección de tarjeta y monto vía slider</li>
+        </ul>
+        <img src="../imagenes/imagen358.webp" alt="358" style="display: block; margin: 20px auto; width: 1000px; height: auto;">
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../iXpert.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

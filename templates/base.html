@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Itaú Xpert{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="{{ url_for('index') }}" class="logo-link"><h1>Itaú Xpert</h1></a>
+            <p>Todo lo que necesitas saber en un solo lugar</p>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Menú">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <nav id="mainNav">
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Inicio</a>
+            {% if current_user.is_authenticated %}
+                {% for cat in nav_categories %}
+                <a href="{{ url_for('view_category', slug=cat.slug) }}">{{ cat.name }}</a>
+                {% endfor %}
+                {% if current_user.is_superadmin %}
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="nav-logout">Salir</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Hamburger menu toggle
+        document.getElementById('hamburger').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('open');
+            this.classList.toggle('active');
+        });
+    </script>
+
+    {% if current_user.is_authenticated %}
+    <script src="{{ url_for('static', filename='js/tracking.js') }}"></script>
+    {% endif %}
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

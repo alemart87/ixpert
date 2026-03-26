@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAT_SIHB</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    header {
+      background-color: #ff6600;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #000000;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    section {
+      padding: 20px;
+      margin: 10px auto;
+      max-width: 1000px;
+      border-bottom: 2px solid #ff6600;
+    }
+    h2 {
+      color: #0000ff; 
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .card {
+      background-color: #f4f4f4;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.01);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .card h3 {
+      margin-top: 10px;
+      color: #004080;
+    }
+    .card p {
+      margin: 5px 0;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #333;
+    }
+    footer {
+      background-color: #000000;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+    }
+            .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+        .filtro-producto-container {
+          margin-bottom: 20px;
+          display: flex;
+          flex-direction: column;
+          max-width: 300px;
+        }
+
+        .filtro-producto-container label {
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #004080;
+        }
+
+        .filtro-producto-container select {
+          padding: 10px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          font-family: inherit;
+          background-color: #f4f4f4;
+          color: #333;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+          transition: box-shadow 0.3s ease;
+        }
+
+        .filtro-producto-container select:focus {
+          outline: none;
+          box-shadow: 0 0 5px #ff6600;
+        }
+        .filtro-producto-container {
+          margin: 20px auto;        /* Centra horizontalmente */
+          display: flex;
+          flex-direction: column;
+          align-items: center;      /* Centra el contenido dentro del contenedor */
+          max-width: 300px;
+        }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Matriz de Gestión - SIHB</h1>
+  </header>
+
+  <nav>
+    <a href="#"></a>
+    <a href="#"></a>
+    <a href="#"></a>
+  </nav>
+<div class="filtro-producto-container">
+  <label for="filtroProducto">Filtrar por producto:</label>
+  <select id="filtroProducto" onchange="filtrarPorProducto()">
+    <option value="">Todos</option>
+    <option value="24 horas Negocios / Internet">24 horas Negocios / Internet</option>
+    <option value="Productos y Servicios">Productos y Servicios</option>
+    <option value="Pago de Salarios">Pago de Salarios</option>
+    <option value="Tarjetas de crédito">Tarjetas de crédito</option>
+    <option value="Cuentas bancarias">Cuentas bancarias</option>
+    <option value="Chequera / Cheque">Chequera / Cheque</option>
+    <option value="Préstamos">Préstamos</option>
+    <option value="Transferencias Locales">Transferencias Locales</option>
+    <option value="Transferencias al Exterior">Transferencias al Exterior</option>
+    <option value="Pago de Servicios">Pago de Servicios</option>
+    <option value="Débitos Automáticos">Débitos Automáticos</option>
+    <option value="Pago a Proveedores">Pago a Proveedores</option>
+    <option value="Débitos Comandados">Débitos Comandados</option>
+    <option value="Tarjetas de Débito">Tarjetas de Débito</option>
+  </select>
+
+</div>
+  <section>
+    <h2>Buscar proceso</h2>
+    <input type="text" id="busqueda" placeholder="Buscar por cualquier campo..." onkeyup="filtrarTarjetas()" />
+
+    <div id="contenedorTarjetas">
+        <!-- Tarjeta 1 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+        <h3>Activación de Pines de acceso Administrador / 24 horas en Internet</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Informamos el estado de activación de pin administrador o Homebanking de acuerdo a la información disponible en SAC.com</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+        <h3>Activación de Pines de acceso Administrador / 24 horas en Internet</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Derivamos la prioridad de activación de pin administrador o del homebanking según necesidad del cliente. *En caso de necesidad, ingresamos el ID de pedido de acuse</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24/48hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Acuse impactado en Logística y courier / No cuenta con requisitos de seguridad</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Activaciones - Legitimación / Digitalización y Custodia</p>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+        <h3>Activación de Pines de acceso Administrador / 24 horas en Internet</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Derivamos el reclamo por la demora en activación del pin administrador o del homebanking, siempre que no existan documentos pendientes</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Acuse impactado en Logística y courier y haber transcurrido más de 48 hs hábiles tras ello. *Obs.: Si no existe acuse, se valida con el cliente la fecha/lugar de entrega.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Activaciones - Legitimación</p>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Requisitos para apertura de cuenta / Referido PJ</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Facilitamos requisitos de apertura al cliente. *Obs.: No podemos visualizar estado de apertura, solo el estado de Kit Bienvenida una vez impreso.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta 5 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Requisitos para apertura de cuenta / Referido PJ</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Si el cliente remite los requisitos o confirma en llamada, derivamos el referido al Team + Oficial de la agencia deseada. *Solo agencias con oficiales empresariales</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Requisitos solicitados a la empresa: RUC, Razón Social, Rubro, Facturación anual estimada, Contacto, Dirección, Agencia más cercana.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Comerciales de Agencias</p>
+        </div>
+
+        <!-- Tarjeta 6 -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Requisitos para apertura de cuenta / Referido PJ</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Demora en retorno de referido PJ</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Tomamos el reclamo una vez transcurrido el plazo de 72 hs hábiles</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Comerciales de Agencias</p>
+        </div>
+
+        <!-- Tarjeta: Oferta de propiedad / auspicio / promociones -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Oferta de propiedad / auspicio / promociones</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Derivamos la propuesta de auspicio/promociones/propiedades. *Obs.: Para promociones/alianzas, utilizamos el speech de Alianzas comerciales.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24/48hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Mail de propuesta</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Alianzas Comerciales / Canales Banca Minorista Proveedores / Implementación ATM</p>
+        </div>
+
+        <!-- Tarjeta: Oferta de prestación de servicios -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Oferta de prestación de servicios</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se indica que debe enviar su propuesta al correo de COMPRAS@itau.com.py</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Mail de propuesta o llamada de consulta</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Compras</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de Disco Osiris -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Regrabación de Disco Osiris (DISCONTINUADO)</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se migra a 24 horas Negocios</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Cliente debe contar con el Pin administrador</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de Disco Osiris - Cliente solicita -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Regrabación de Disco Osiris (DISCONTINUADO)</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se deriva a PGS Administración</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> *Solo 5 empresas siguen operando con el servicio</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Vinculación de cuentas para PGS - consulta -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Vinculación de cuentas para PGS</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se guía al cliente para autogestión vía web</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Debe ser el operador de la empresa con perfil y permiso de Altas</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Vinculación de cuentas para PGS - solicita -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Vinculación de cuentas para PGS</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> En caso de que la cuenta del funcionario sea indistinta, vinculación masiva o a pedido de PGS por excepción, ingresamos el pedido vía BPM</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Datos de la cuenta del funcionario y cuenta madre de la empresa. Si es cuenta indistinta no se necesita mail. Si es masiva, sí.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 72 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Soporte telefónico Sistema Osiris -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Soporte telefónico del Sistema Osiris (DISCONTINUADO)</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se realiza todo tipo de soporte osiris para con el cliente (carga de pagos, creación de operadores, instalación del sistema, etc.)</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> *Solo 5 empresas poseen el servicio actualmente</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Pago TC SAC AS400 GS -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Pago de TC vía SAC o AS400 - Moneda GS</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se realiza el pago de TC con Ok del oficial de cuentas</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> En el día</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial de cuentas. Si la cuenta no está catastrada, se procesa cuando se catastre desde GO y se paga vía AS400.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Pago TC BPM USD -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Pago de TC vía BPM - Moneda USD o Sobregiro</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa el ID de pago de TC con Ok del oficial de cuentas. *Si es en Usd, con la cotización del día</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> En el día</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial de cuentas. *Cotización de Tesorería</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Regrabación de TC Empresarial</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa el pedido de regrabación a través de SAC.com si fuera robo/extravío/fraude y a través de BPM por daño/destrucción/orden de usuario. Todas son con cambio de número.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> En el día</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial de cuentas.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Cheque | Chequera</p>
+        <h3>Anulación temporal de cheques</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se procesa anulación temporal de cheques vía SAC.com por única vez.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> <ul>
+            <li>Vía llamada para clientes minoristas: Debe llamar firmante y pasar filtros de seguridad.</li>
+            <li>Vía llamada para cliente mayorista: Debe ingresar con el pin de la banca telefónica. </li>
+            <li>Vía mail: Ok del oficial / pedido de asistentes</li>
+        </ul></p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada | Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte | Oficial de Cuentas</p>
+        </div>
+        
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de Crédito</p>
+        <h3>Bloqueo de TC por orden de usuario</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se procesa el bloqueo por orden de usuario a través de SAC.com únicamente para baja de producto o para regrabación.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online / 24 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> <ul>
+            <li>Vía llamada para EMP4: Firmante debe responder filtros de seguridad. </li>
+            <li>Todas las bancas: ingresar con el pin de la banca telefónica. </li>
+            <li>Vía mail: Ok del oficial / pedido de asistentes</li>
+        </ul></p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada | Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 24 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+        <h3>Atención a Pago a Proveedores</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se indica a cliente si existen pagos a su nombre y en qué estado, ingresando desde SAC.com a la ficha de la empresa que le paga. </p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> El nombre de la empresa que realiza el pago.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Ubicación de kits de salarios (hasta 5 por llamadas y hasta 19 kits si es por mail)</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Se indica ubicación de kit de PGS de acuerdo a la información disponible en Logística y Courier de BPM  - Hasta 5 por llamada. - Dado que brindamos hasta 5 ubicaciones por llamada, si se trata de más funcionarios damos la opción de que vuelva a contactar a la línea o bien, que nos remita directamente el listado de funcionarios hasta 20 kits vía mail para retornar en la brevedad posible. </p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online / 48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> La empresa nos debe indicar el Nro. de documento de sus funcionarios.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada | Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+        <h3>Traslado de kits de salarios (hasta 19 kits)</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Si el pedido ingresa vía llamada, solicitamos que nos remita un mail con los datos del funcionario + Agencia origen + Agencia deseada para gestionar el traslado. Tomamos hasta 20 kits. Se informa plazo de 3 a 5 días hábiles de ser traslado entre agencias urbanas y 5 a 7 días hábiles si es del interior. </p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online / 48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> La empresa nos debe indicar el Nro. de documento de sus funcionarios, la agencia origen del kit y la agencia de retiro deseada.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada | Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 72 a 168 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operativos de Agencias</p>
+        </div>
+
+        <!-- Tarjeta: Regrabación de TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Saldos de Tarjetas</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Guiamos al cliente a que se autogestione desde la web de consultas pJ o app del PF titular de la TC. En caso tenga inconvenientes podemos brindar la información visualizada en Bancard Web.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad. </p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Consulta de comisiones cobradas en el extracto -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Consulta de comisiones cobradas en el extracto</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Brindamos información disponible en SAC.com y catastro. •Reclamos por comisión cobrada, derivamos al oficial de cuentas.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Pedido de chequeras (Consulta) -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Chequera / Cheque</p>
+          <h3>Pedido, ubicación de chequeras y motivo de tardanza de chequera en casa</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Brindamos ubicación de chequera según verificado en SAC.com y/o BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Reubicación o retención de chequera -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Chequera / Cheque</p>
+          <h3>Pedido, ubicación de chequeras y motivo de tardanza de chequera en casa</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Procesamos reubicación o retención de chequera en casa, el proceso suspende el servicio.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad. Vía mail: Con OK del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Demora en entrega de chequera -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Chequera / Cheque</p>
+          <h3>Pedido, ubicación de chequeras y motivo de tardanza de chequera en casa</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Demora en entrega de chequera, si excedió el tiempo establecido tomamos el caso validando que la dirección sea correcta.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Reclamos Chequeras</p>
+        </div>
+
+        <!-- Tarjeta: Cuotas de Préstamos -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Préstamos</p>
+          <h3>Cuotas de Préstamos (Monto y Vencimiento)</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se guía al cliente para autogestión vía web. En caso de inconveniente, se brinda la información disponible en SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para guiar a la autogestión no cuenta con requisitos de seguridad. Para brindar información de SAC.com: Vía llamada: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Cheque rechazado - Consulta -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Chequera / Cheque</p>
+          <h3>Cheque rechazado</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Informamos ubicación y estado de cheque rechazado. *También el motivo de rechazo y estado de redepósito si corresponde.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para ubicación y estado no cuenta con requisitos de seguridad. Para indicar motivo y redepósito: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Cheque rechazado - Solicitud -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Chequera / Cheque</p>
+          <h3>Cheque rechazado</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Gestionamos el traslado de cheque rechazado de una agencia a otra.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Todos los segmentos: ingresar con el pin de la banca telefónica o remitir vía mail. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operativos de Agencias</p>
+        </div>
+
+        <!-- Tarjeta: Operaciones de Cambio -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Operaciones de Cambio</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Facilitamos al cliente la línea de Mesa de Dinero.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Disponibilidad de Efectivo -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Disponibilidad de efectivo para cobro de cheque en las agencias</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Facilitamos al cliente la línea de la Agencia deseada en caso de precisar disponibilidad inmediata.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Reserva de Dinero -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Reserva de Dinero</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de reserva de dinero a través de SAC.com. Pedidos hasta las 15:30 demoran 24 hs hábiles y posteriores a dicho horario se confirman en 48 hs hábiles.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para reservas en Guaraníes: • Autorizado para retiro/CI • Monto • Agencia deseada 1 • Agencia deseada 2 • Cantidad de cheques (Si corresponde). Para reservas en USD se agrega a lo anterior: • Nro. de cuenta afectada</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Pagarés Cancelados - Consulta -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Préstamos</p>
+          <h3>Pagarés Cancelados</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa estado de solicitud de pagarés cancelados.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Pagarés Cancelados - Solicitud -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Préstamos</p>
+          <h3>Pagarés Cancelados</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa pedido de pagarés cancelados.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad. Vía mail: Con Ok del oficial</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 10 días aprox</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Documental</p>
+        </div>
+
+        <!-- Tarjeta: Aumento temporal límites de transferencia -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Transferencias Locales</p>
+          <h3>Aumento temporal de límites diarios de PF para transferencias</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> El cliente visualiza el mensaje de: “Superaste el monto límite permitido por día” o “Superaste el monto límite permitido por mes", solicitamos que nos remita una captura completa a través del correo.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. Se gestiona con: • Plazo de aumento • Motivo del aumento • Autorización del gerente de la cuenta / coordinador del segmento • Prevención de Fraudes</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Prevención de Fraudes</p>
+        </div>
+
+        <!-- Tarjeta: Desbloqueo de PIN consultas/admin -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Desbloqueo de PIN consultas/admin</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Indicamos al cliente que remita el pedido de desbloqueo vía mail catastrado al oficial de cuentas y/o asistentes según corresponda el segmento. Si recibimos vía mail, se deriva el pedido al oficial / asistentes. En caso sea Pin Administrador y cuenta con itoken ADM, guiamos a la autogestión vía web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte - Oficial / Asistentes</p>
+        </div>
+
+        <!-- Tarjeta: Devolución de saldo a favor -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Devolución de saldo a favor</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa pedido vía BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Si es >500.000: Ok del coordinador. Si es <500.000: Ok del oficial. Vía llamada: Todos los segmentos: ingresar con el pin de la banca telefónica. Obs.: Segmento EMP4, puede llamar el Firmante debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Instructivos 24 horas Negocios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Envío de instructivos para 24 horas Negocios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Remitimos instructivos de la plataforma 24 horas Negocios a pedido del cliente.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Ordenantes de créditos en cuenta -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Ordenantes de créditos en cuenta</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se brinda ordenante de transferencias internas, SIPAP, SPI, cobro proveedores y transferencias crédito.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos ingresan con el pin de la banca telefónica. Segmento EMP4: puede llamar el Firmante y debe responder filtros de seguridad. Vía mail: correo catastrado o con dominio.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> SIPAP/SPI/Express: Operador Soporte | Internas: Central de Atención | Cobro Proveedores: Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Habilitación AW -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Habilitación AW</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Remitimos el pedido de habilitación para el servicio de Altas Web de Pago de Salarios.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Estado de ATM -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Estado de ATM</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Con los datos sobre el mal estado de un ATM dentro de la empresa, derivamos por mail.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. Cliente debe remitir los detalles por mail.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Monitoreo Servicios</p>
+        </div>
+
+        <!-- Tarjeta: Depósito en cuenta (Consulta) -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Depósito en cuenta</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa estado de depósito según verificado en SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos ingresan con el pin de la banca telefónica. Segmento EMP4: puede llamar el Firmante y debe responder filtros de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Depósito en cuenta (Reclamo) -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Depósito en cuenta</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Derivamos el reclamo de demora o acreditación incorrecta de depósito.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. El cliente debe remitir la copia de boleta de depósito y la regularización es confirmada vía mail dirigiendo al cliente a la web.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operativos de Agencias</p>
+        </div>
+
+        <!-- Tarjeta: Débito de TC en cuenta sin solicitud -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Débito de TC en cuenta sin solicitud</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de catastro para débito o modificación a través de BPM o SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos ingresan con el pin de la banca telefónica. Segmento EMP4: puede llamar el Firmante y debe responder filtros de seguridad. Vía mail: Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+        </div>
+
+        <!-- Tarjeta: Courier Express -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Courier Express</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de entrega express vía BPM en respuesta al pedido de urgencia del cliente indicando motivo y horario. *Se realiza solo por viaje o enfermedad.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para ingresar el ID: Ok del TEAM. Para tomar el pedido: Vía llamada: Todos los segmentos ingresan con el pin de la banca telefónica. Segmento EMP4: puede llamar el Firmante y debe responder filtros de seguridad. Vía mail: Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Pedidos Express Urgentes - Retenciones</p>
+        </div>
+
+        <!-- Tarjeta: Aviso de viaje al exterior -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Aviso de viaje al exterior</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Guíamos a la autogestión del cliente a través de la web. En caso excepcional, registramos el aviso en SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/En el día</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para autogestión: sin requisitos. Para registrar en SAC.com: Vía llamada con pin o, si EMP4, firmante con filtros. </p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Sugerencias varias -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Sugerencias varias</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente sugiere</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se documenta el pedido del cliente o sugerencia en la casilla sugerencias@itau.com.py.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Casilla de sugerencias</p>
+        </div>
+
+        <!-- Tarjeta: Correo seguro -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Correo seguro</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza el alta de correo seguro a través de SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: Todos los segmentos ingresan con el pin de la banca telefónica. Segmento EMP4: puede llamar el Firmante y debe responder filtros de seguridad. Vía mail: Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Rev. De Pago c/ Autorización -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Rev. De Pago c/ Autorización</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el ID de reversión de pago a TC con autorización vía BPM en caso que exista un pago incorrecto a TC Empresarial.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/En el día</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Mail con ok del oficial + Coordinador si amerita. No tomamos el pedido por llamada.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Cambio de Modalidad de pago a TC -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Cambio de Modalidad de pago a TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de cambio de modalidad de pago a TC a través de BPM o vía SAC.com en caso de ser con débito en cuenta.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Requerimos del Ok del oficial de cuentas.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+        </div>
+
+        <!-- Tarjeta: Actualización de Datos - Consulta -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Actualización de Datos</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Guiamos al cliente a que se autogestione desde la web de consultas.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Actualización de Datos - Solicita -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Actualización de Datos</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de catastro de mail a través de BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Requerimos del Ok del oficial de cuentas y la captura de que el cliente no logra autogestionarse.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+        </div>
+
+        <!-- Tarjeta: Facturas por comisión de pago de servicios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Facturas por comisión de pago de servicios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?:</span> Descargamos las facturas desde 24hs Admin y se remiten al oficial de cuentas para el envío. En caso de no visualizarse, se ingresa el pedido al Portal de Entidades de Bancard. En caso sea de Netel, se descarga desde su portal.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad, precisamos nos indiquen las transacciones cuyas facturas no recibieron de forma automática.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte/Oficial de Cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Disponibilidad de Línea para Sobregiro -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Disponibilidad de Línea para Sobregiro</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva al oficial puesto que no tenemos acceso a esta información.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Autorizados para retirar documentos -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Autorizados para retirar documentos para la empresa</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva al oficial/asistentes (en caso de corresponder a su segmento) ya que no tenemos acceso. Actualmente se guía a la autogestión desde Gestores Autorizados.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte/Oficial de cuentas/Asistentes MO</p>
+        </div>
+
+        <!-- Tarjeta: Uso de firmas vigente para la empresa -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Uso de firmas vigente para la empresa</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva al oficial/asistentes ya que no tenemos acceso a esta información.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas/Asistentes MO</p>
+        </div>
+
+        <!-- Tarjeta: Catastro del servicio de 24 horas Negocios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Catastro del servicio de 24 horas Negocios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se guía a la descarga del formulario desde la web para su presentación en agencias.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Habilitación de servicios dentro de 24 horas Negocios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Habilitación de servicios dentro de 24 horas Negocios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se guía a la autogestión desde el perfil administrador. En caso de no poder avanzar con Transferencias al Exterior, se deriva el pedido excepcionalmente.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Liberación de pago de salario en estado PnCr/ApSob -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Liberación de pago de salario en estado PnCr/ApSob</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa que corresponde a la falta de fondos suficientes en la cuenta, por lo que el oficial debe aprobar o directamente deben fondear la cuenta para que en un plazo de 1 hora aprox se liberen.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Estado/detalles de pagos realizados desde 24 hs Negocios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Estado/detalles de pagos realizados desde 24 hs Negocios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se guía a la autogestión desde el perfil operador, en caso de inconvenientes, se brinda información visualizada en SAC.com/24hs Admin/SNPI/XAIX.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Confirmación/Reversión de transferencias locales -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Transferencias Locales</p>
+          <h3>Confirmación/Reversión de transferencias locales</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa el ID a través de BPM según solicite el cliente.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Si es vía mail: mail catastrado en 24 hs en internet o con dominio de la empresa, u Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Indefinido</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> OIT / SAC Grupo</p>
+        </div>
+
+        <!-- Tarjeta: Reversión de pagos de servicios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Reversión de pagos de servicios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva a la procesadora mediante la cual se realizó el pago.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Si es vía mail: mail catastrado en 24 hs en internet o con dominio de la empresa, u Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Indefinido</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Confirmación de pagos de servicios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Confirmación de pagos de servicios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva el pedido a través de la portadora por la cual ingresó el pago. En caso de tratarse de servicios Corte Suprema de Justicia, Consorcio Automotor, Operaciones Aduaneras o Aduana seguirán vía correo interno. Si es ANDE, se confirma mediante archivo en la carpeta compartida "ANDE CASOS".</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Indefinido</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Comprobantes de pagos de servicios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Comprobantes de pagos de servicios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se guía a la autogestión a través de la web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte/Central de Atención</p>
+        </div>
+
+        <!-- Tarjeta: Regeneración de comprobantes -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Regeneración de comprobantes</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> En caso no logre autogestionarse, regeneramos el comprobante desde 24 hs Admin con ticket de inconveniente.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 3 comprobantes x día</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> De acuerdo a la cantidad de comprobantes.</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte/Central de Atención</p>
+        </div>
+
+        <!-- Tarjeta: Actualización de firmantes -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Actualización de firmantes</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa que debe ser vía formulario en agencias o con el oficial de cuentas / asistentes según el segmento.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas/Asistentes MO</p>
+        </div>
+
+        <!-- Tarjeta: Liberación de pago de salario en estado Autorizado -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Liberación de pago de salario en estado Autorizado</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa que se debe al corte de pago de salario y debe aguardar el plazo. Si es aguinaldo fuera de fecha, se deriva vía mail. Solo se libera automáticamente en diciembre.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. Precisamos el lote de pagos autorizados.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Liberación de pago de salario en estado PnCr/ApSob -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Liberación de pago de salario en estado PnCr/ApSob</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa que corresponde a la falta de fondos suficientes en la cuenta, por lo que el oficial debe aprobar o directamente deben fondear la cuenta para que en un plazo de 1 hora aprox se liberen.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Solicitud de préstamo/tarjetas -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Solicitud de préstamo/tarjetas</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva al oficial de cuentas; brindamos número y mail.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Cambio de Modalidad de Pago de Salario -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Cambio de Modalidad de Pago de Salario</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva a PGS Administración el cambio de Off Line a Online a pedido del cliente.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: CDA -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>CDA</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se deriva al oficial.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Oficial de cuentas</p>
+        </div>
+
+        <!-- Tarjeta: Incidentes Web PJ -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Incidentes Web PJ</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> En caso de existir algún inconveniente con cualquiera de las opciones disponibles en la web de consultas PJ como en 24 horas Negocios, realizamos las pruebas y cargamos el ticket.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. Precisamos de las capturas completas para avalar el inconveniente.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Indefinido</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Central de Atención</p>
+        </div>
+
+        <!-- Tarjeta: Catastro para pago de TC -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Catastro para pago de TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se ingresa el ID a través de BPM para pago de TC solicitado vía mail interno.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/En el día</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial de cuentas.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Débitos Comandados -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Débitos Comandados</p>
+          <h3>Asistencia sobre servicio de Débitos Comandados</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio siempre que sea relacionado a la web (cómo cargar, anular, autorizar o ver el estado de sus pagos, motivo de rechazo), no así al formulario de catastro.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Envío de nota de reversión PGS -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Envío de nota de reversión PGS</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se remite modelo de nota de reversión vía mail. *Debe ir acompañado del bloqueo de fondos.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Bloqueo de fondos PGS por acreditación errónea -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Bloqueo de fondos PGS por acreditación errónea</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se solicita el bloqueo de fondos por acreditación de salario incorrecta por 30 días a los operativos de la agencia de origen.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operativos de Agencias</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Pago a Proveedores -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago a Proveedores</p>
+          <h3>Asistencia sobre servicio de Pago a Proveedores</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web, no así para el Alta de Kits PGP.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Pago de Servicios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Servicios</p>
+          <h3>Asistencia sobre servicio de Pago de Servicios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Transferencias Locales -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Transferencias Locales</p>
+          <h3>Asistencia sobre servicio de Transferencias Locales</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web, no así para operaciones vía formulario.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Transferencias al Exterior Web -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Transferencias al Exterior</p>
+          <h3>Asistencia sobre servicio de Transferencias al Exterior Web</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web, no así para operaciones vía formulario ni lo que corresponda al límite operativo asignado a la empresa.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Débitos Automáticos -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Débitos Automáticos</p>
+          <h3>Asistencia sobre servicio de Débitos Automáticos</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo transmitir) siempre que sea para la web, no así para el reporte de sus pagos o catastro de nuevos clientes que es realizado vía formulario.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Reporte de débitos realizados -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Débitos Automáticos</p>
+          <h3>Reporte de débitos realizados</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Reporte de débitos realizados.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Pago de Salarios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Asistencia sobre servicio de Pago de Salarios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar altas o pagos, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+        
+        <!-- Tarjeta: Configuración de Operadores -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Configuración de Operadores</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se asiste al cliente para las configuraciones que debe realizar a los operadores a través del perfil Administrador.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre servicio de Pago de Salarios -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Asistencia sobre servicio de Pago de Salarios</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se realiza mantenimiento del servicio (cómo cargar altas o pagos, anular, autorizar o ver el estado de sus pagos, motivo de rechazo) siempre que sea para la web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Configuración de Operadores -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Configuración de Operadores</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se asiste al cliente para las configuraciones que debe realizar a los operadores a través del perfil Administrador.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Reimpresión de Pin IHB -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Reimpresión de Pin IHB</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de reimpresión vía BPM de forma excepcional.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre iToken PJ -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Asistencia sobre iToken PJ</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Realizamos todo tipo de asistencias relacionadas al uso del iToken digital para empresas.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. El cliente debe contar con el pin ADM a mano.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Envío de Número de cuenta para reactivación PGS -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Envío de Número de cuenta para reactivación PGS</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Realizamos el envío del número de cuenta del funcionario solicitado para la vinculación desde la web, el mismo es remitido via mail encriptado a los correos de operador registrados en SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Se remite vía mail encriptado al correo catastrado como operador.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Estado de cuenta / TC / Préstamo -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Estado de cuenta / TC / Préstamo</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se brinda la información disponible en SAC.com y Bancard Web. *No informamos número de cuenta PJ.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Retención/Reubicación de TC Empresarial -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Retención/Reubicación de TC Empresarial</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta / Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa estado del producto de acuerdo a lo verificado en Logística y Courier, brindamos línea del courier. Procesamos reubicación o retención de TC Empresarial vía SAC.com. Solicitamos prioridad de entrega del producto.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48hs / Online/24hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para llamada: filtros o pin telefónico. Vía mail: Ok del oficial o instrucción de Asistentes.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte / Reclamos Tarjetas y Pines</p>
+        </div>
+
+        <!-- Tarjeta: Levantamiento de Clip de Seguridad / Bypass 3D Secure -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Levantamiento de Clip de Seguridad / Bypass 3D Secure</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el levantamiento de clip de seguridad vía BPM / Bancard si lo permitiese. El Bypass es realizado en caso que no logre autogestionarse como PF.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/En el día</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Rechazo en BC o VCAS. Vía llamada: filtros/pin. Vía mail: ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte / Prevención de Fraudes</p>
+        </div>
+
+        <!-- Tarjeta: Reclamo por desconocimiento de transacción -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Reclamo por desconocimiento de transacción</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente reclama</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el reclamo a través de Bancard Web como “desconocimiento”.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada: filtros o pin. Vía mail: ok del oficial. *Se sugiere remitir formulario de reclamos para seguimiento del cliente.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte / Reclamos Tarjetas y Pines</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre Asignación de roles -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Asistencia sobre Asignación de roles</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se orienta al cliente respecto a la asignación de roles a los usuarios de la plataforma, incluyendo qué permisos otorga cada uno.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Inmediato</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Solicitud de nueva Tarjeta de Débito -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de Débito</p>
+          <h3>Solicitud de nueva Tarjeta de Débito</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de una nueva tarjeta para PJ por canal habilitado, siempre que exista una razón válida (pérdida, robo, vencimiento, mal funcionamiento).</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Ok del oficial.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Activación de Usuarios / Token -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Activación de Usuarios / Token</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Activación de acceso para usuarios habilitados previamente y envío de PIN o Token de seguridad para acceso a la plataforma.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Instrucción del oficial u operador habilitado en SAC.com</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+        </div>
+
+        <!-- Tarjeta: Asistencia sobre Transferencias a Proveedores -->
+        <div class="card">
+          <p><span class="highlight">Producto:</span> Transferencias</p>
+          <h3>Asistencia sobre Transferencias a Proveedores</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se brinda asistencia sobre cómo operar con transferencias a proveedores a través de la plataforma, incluyendo errores comunes y pasos a seguir.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Inmediato</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Canje de puntos TC Empresarial -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Canje de puntos TC Empresarial</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Guiamos al cliente a que se autogestione desde la web de consultas para confirmar cantidad y procesar canje de puntos. En caso excepcional, brindamos la información disponible en SAC.com. *El canje solo es vía voucher para entrega en agencias.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para guiar al cliente: No cuenta con requisitos de seguridad. Para brindar la información: Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Vía mail: con ok del oficial o instrucción de Asistentes.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Duplicación de Pago a TC -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+        <h3>Duplicación de Pago a TC</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de reversión de pago duplicado a través de BPM.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> En el día</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía mail: Ok del oficial / pedido de asistentes</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+        </div>
+
+        <!-- Tarjeta: Swift de transferencia al exterior vía web -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Transferencias al Exterior</p>
+        <h3>Swift de transferencia al exterior vía web</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Guíamos al cliente a que se autogestione desde la web de consultas u operador. En caso de inconvenientes avalados vía ticket, remitimos el comprobante vía mail catastrado.*Solo transferencias realizadas vía web</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para guiar al cliente: No cuenta con requisitos de seguridad. Para el envío de swift: solicitamos nos remita vía mail la operación y el swift se envía al correo catastrado en 24 hs en internet, caso contrario al oficial/asistentes.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Validación de archivos -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+        <h3>Validación de archivos</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Realizamos la validación de archivos TXT y Excel para transmisión en la web.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. Precisamos que el cliente nos remita vía mail su archivo.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Comprobantes de transferencias locales -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Transferencias Locales</p>
+        <h3>Comprobantes de transferencias locales</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> Guiamos al cliente a que se autogestione desde la web de consultas u operador.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24hs</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 24hs</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Comprobantes manuales por inconvenientes -->
+        <div class="card">
+        <p><span class="highlight">Producto:</span> Transferencias Locales</p>
+        <h3>Comprobantes de transferencias locales</h3>
+        <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+        <p><span class="highlight">¿Qué gestionamos?</span> En caso de inconvenientes, generamos manualmente los comprobantes avalando el incidente vía ticket. *Solo elaboramos hasta 12 meses atrás.</p>
+        <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 3 comprobantes x día</p>
+        <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad. El envío del comprobante es realizado al mail catastrado en 24 hs en internet o en su defecto al oficial/asistentes.</p>
+        <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+        <p><span class="highlight">¿Cuánto demora el pedido?:</span> De acuerdo a la cantidad de comprobantes.</p>
+        <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+        </div>
+
+        <!-- Tarjeta: Cuenta garantizada -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Cuenta garantizada</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> En caso que no visualice la cuenta o no pueda transferir, consultamos si está correctamente relacionada y configurada.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+      </div>
+
+      <!-- Tarjeta: Alta de Débito automático de Servicios públicos/privados en TC (Cliente consulta) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Alta de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Informamos el estado del débito automático de acuerdo a lo verificado en Bancard Web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Vía mail: con ok del oficial o instrucción de Asistentes.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 24hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Alta de Débito automático de Servicios públicos/privados en TC (Cliente solicita) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Alta de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de alta a través de BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía mail: Ok del oficial / pedido de asistentes + Factura del servicio público o datos del servicio privado.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> De acuerdo al servicio. (Público: 60 a 90 días, privado: 30 a 60 días)</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+      </div>
+
+      <!-- Tarjeta: Cuenta garantizada -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Cuenta garantizada</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> En caso que no visualice la cuenta o no pueda transferir, consultamos si está correctamente relacionada y configurada.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> PGS Administración</p>
+      </div>
+
+      <!-- Tarjeta: Alta de Débito automático de Servicios públicos/privados en TC (Cliente consulta) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Alta de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Informamos el estado del débito automático de acuerdo a lo verificado en Bancard Web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Vía mail: con ok del oficial o instrucción de Asistentes.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 24hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Alta de Débito automático de Servicios públicos/privados en TC (Cliente solicita) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Alta de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de alta a través de BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía mail: Ok del oficial / pedido de asistentes + Factura del servicio público o datos del servicio privado.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> De acuerdo al servicio. (Público: 60 a 90 días, privado: 30 a 60 días)</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+      </div>
+
+      <!-- Tarjeta: Ubicación de kits de PGP -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Pago a Proveedores</p>
+          <h3>Ubicación de kits de PGP</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se indica ubicación de kit de PGP de acuerdo a la información disponible en Logística y Courier de BPM. Hasta 5 por llamada. Si se trata de más funcionarios, damos la opción de que vuelva a contactar a la línea o que nos remita directamente el listado de funcionarios (hasta 20 kits vía mail).</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> La empresa nos debe indicar el Nro. de documento de sus funcionarios.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Envío de Número de cuenta para reactivación PGP -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Pago a Proveedores</p>
+          <h3>Envío de Número de cuenta para reactivación PGP</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Realizamos el envío del número de cuenta del funcionario solicitado para el pago, remitido vía mail encriptado a los correos de operador registrados en SAC.com.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Se remite vía mail encriptado al correo catastrado como operador.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 a 48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Estado de TC -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Estado de TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se brinda la información disponible en SAC.com en caso el cliente no logre autogestionarse.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Retención/Reubicación de Pines (Cliente consulta) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Retención/Reubicación de Pines</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa estado del producto de acuerdo a lo verificado en Logística y Courier, brindamos línea del courier.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Retención/Reubicación de Pines (Cliente solicita) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> 24 horas Negocios / Internet</p>
+          <h3>Retención/Reubicación de Pines</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Procesamos reubicación o retención de Pin administrador o Homebanking vía SAC.com. Solicitamos prioridad de entrega del producto.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Para retención/reubicación: Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Si es vía mail: Ok del oficial o instrucción de Asistentes.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 48 a 72 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte / Reclamos Tarjetas y Pines</p>
+      </div>
+
+      <!-- Tarjeta: Cancelación de Débito automático de Servicios públicos/privados en TC (Cliente consulta) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Cancelación de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Informamos el estado del débito automático de acuerdo a lo verificado en Bancard Web.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online/24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica. Vía mail: con ok del oficial o instrucción de Asistentes.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online / 24hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Cancelación de Débito automático de Servicios públicos/privados en TC (Cliente solicita) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Tarjetas de crédito</p>
+          <h3>Cancelación de Débito automático de Servicios públicos/privados en TC</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Ingresamos el pedido de alta a través de BPM.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> 24 hs</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía mail: Ok del oficial / pedido de asistentes + Factura del servicio público o datos del servicio privado.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> De acuerdo al servicio. (Público: 60 a 90 días, privado: 30 a 60 días)</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Operativa</p>
+      </div>
+
+      <!-- Tarjeta: Liberación de pago de salario en estado Rech. Bco (Cliente consulta) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Liberación de pago de salario en estado Rech. Bco</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Se informa que corresponde a la falta de vinculación de la cuenta del funcionario, por lo que debe vincular desde la web y volver a cargar el pago.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> 24 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Liberación de pago de salario en estado Rech. Bco (Cliente solicita) -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Pago de Salarios</p>
+          <h3>Liberación de pago de salario en estado Rech. Bco</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente solicita</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> En caso de imposibilidad o inconvenientes para realizar la carga de un nuevo pago, por excepción derivamos el pedido. *Siempre que aún no esté rechazado desde GT/PGS Admin.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> En el día</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Gestión Transaccional</p>
+      </div>
+
+      <!-- Tarjeta: Asistencia servicio 24 horas en el celular -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Productos y Servicios</p>
+          <h3>Asistencia servicio 24 horas en el celular</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Guiamos a la autogestión del cliente a través de la web de consultas. *Solo se puede configurar mail, no así celular.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> No cuenta con requisitos de seguridad.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada/Mail</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online/48 hs</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte</p>
+      </div>
+
+      <!-- Tarjeta: Restricciones en cuenta PJ -->
+      <div class="card">
+          <p><span class="highlight">Producto:</span> Cuentas bancarias</p>
+          <h3>Restricciones en cuenta PJ</h3>
+          <p><span class="highlight">Tipo de caso:</span> Cliente consulta</p>
+          <p><span class="highlight">¿Qué gestionamos?</span> Informamos speech en caso de visualizar la restricción en catastro, para mayor información derivamos al Oficial de Cuentas.</p>
+          <p><span class="highlight">¿En cuánto tiempo gestionamos?:</span> Online</p>
+          <p><span class="highlight">¿Qué necesitamos para gestionar?:</span> Vía llamada para EMP4: Firmante debe responder filtros de seguridad. Todas las bancas: ingresar con el pin de la banca telefónica.</p>
+          <p><span class="highlight">¿A través de qué canal ingresa el caso?:</span> Llamada</p>
+          <p><span class="highlight">¿Cuánto demora el pedido?:</span> Online</p>
+          <p><span class="highlight">¿A quién se deriva?:</span> Operador Soporte / Oficial de Cuentas</p>
+      </div>
+
+      <!-- Agregá aquí más tarjetas como estas, copiando el bloque y ajustando los datos -->
+    </div>
+  </section>
+
+  <script>
+    function filtrarTarjetas() {
+      const filtro = document.getElementById("busqueda").value.toLowerCase();
+      const tarjetas = document.querySelectorAll(".card");
+
+      tarjetas.forEach((card) => {
+        const texto = card.textContent.toLowerCase();
+        card.style.display = texto.includes(filtro) ? "block" : "none";
+      });
+    }
+    function filtrarPorProducto() {
+      const productoSeleccionado = document.getElementById("filtroProducto").value.toLowerCase();
+      const tarjetas = document.querySelectorAll(".card");
+
+      tarjetas.forEach(card => {
+        const productoTexto = card.querySelector("p").textContent.toLowerCase();
+        const filtroBusqueda = document.getElementById("busqueda").value.toLowerCase();
+        const contenidoCompleto = card.textContent.toLowerCase();
+
+        const coincideProducto = !productoSeleccionado || productoTexto.includes(productoSeleccionado);
+        const coincideBusqueda = !filtroBusqueda || contenidoCompleto.includes(filtroBusqueda);
+
+        card.style.display = coincideProducto && coincideBusqueda ? "block" : "none";
+      });
+    }
+  </script>
+      <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

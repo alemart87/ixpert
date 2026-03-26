@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suma de Línea Rotativa - AS400</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      color: #222;
+      margin-top: 25px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Proceso para Verificar Suma de Línea Rotativa en AS400</h1>
+  </header>
+
+  <nav>
+    <a href="#"> </a>
+    <a href="#"> </a>
+    <a href="#"> </a>
+    <a href="#"> </a>
+  </nav>
+
+  <section>
+    <h2>Pasos del proceso</h2>
+
+    <div class="info-box">
+      <h3>Paso 1</h3>
+      <p>Ingresar a <strong>AS400</strong>.</p>
+      <img src="../imagenes/nucleo/imgnucleo56.png" alt="56" style="width: 600px; height: auto;">
+    </div>
+
+    <div class="info-box">
+      <h3>Paso 2</h3>
+      <p>Seleccionar la opción <strong>D01</strong> ubicada en la parte inferior izquierda.</p>
+      <img src="../imagenes/nucleo/imgnucleo57.png" alt="57" style="width: 600px; height: auto;">
+    </div>
+
+    <div class="info-box">
+      <h3>Paso 3</h3>
+      <p>Ingresar el <strong>número del cliente</strong> y presionar <strong>Enter</strong>.  
+        <div style="margin-top: 5px; font-size: 0.9em; color: #555;">
+          ⚡ Para pegar en AS400 usar <strong>ALT + V</strong>, y para Enter utilizar el teclado numérico.
+          <img src="../imagenes/nucleo/imgnucleo58.png" alt="58" style="width: 600px; height: auto;">
+        </div>
+      </p>
+    </div>
+
+    <div class="info-box">
+      <h3>Paso 4</h3>
+      <p>Presionar <strong>F8 (líneas calculadas)</strong>. Esto desplegará las opciones disponibles.</p>}
+      <img src="../imagenes/nucleo/imgnucleo59.png" alt="59" style="width: 600px; height: auto;">
+    </div>
+
+    <div class="info-box">
+      <h3>Paso 5</h3>
+      <p>Desplazarse en la columna izquierda según corresponda:</p>
+      <ul>
+        <li><strong>Solo línea préstamo S/CCT:</strong> para préstamos sin Certificado de Cumplimiento Tributario.</li>
+        <li><strong>Solo línea de préstamo C/CCT:</strong> para préstamos con CCT.</li>
+      </ul>
+      <p>Colocar una <strong>X</strong> en la opción correcta y presionar <strong>Enter</strong>.</p>
+      <img src="../imagenes/nucleo/imgnucleo60.png" alt="60" style="width: 600px; height: auto;">
+    </div>
+
+    <div class="info-box">
+      <h3>Paso 6</h3>
+      <p>Verificar el <strong>monto máximo</strong> sumando la línea rotativa de la tarjeta de crédito.  
+      Esto sirve para determinar el monto y los plazos disponibles para ofrecer al cliente.</p>
+      <img src="../imagenes/nucleo/imgnucleo61.png" alt="61" style="width: 600px; height: auto;">
+      <div class="alert">
+        ⚠️ Tener en cuenta: <br>
+        - Este proceso <strong>no aplica para el cálculo de las cuotas</strong>. Las cuotas se deben verificar en las calculadoras dinámicas.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="#" class="button-fixed">⬆ Subir</a>
+  <a href="../Nucleo.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

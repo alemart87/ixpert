@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intervale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Incluir Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        h3 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 1000px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Intervale</h1>
+    </header>
+    <nav>
+        <a href="#introduccion">Definición</a>
+        <a href="#introduccion">Cálculadora de Intereses</a>
+        <a href="#introduccion">Estados de Intervale</a>
+    </nav>
+    <section id="introduccion">
+        <h2>🏷️ Intervale</h2>
+        <p>Un límite de crédito vinculado a una caja de ahorro a la vista PGS, diseñado como un adelanto de sueldo.</p>
+        <p><b>Beneficios:</b></p>
+        <ul>
+            <li>Compras en puntos de venta (POS).</li>
+            <li>Retiros de efectivo en cajeros automáticos (solo locales).</li>
+        </ul>
+        <p><b>Parámetros:</b></p>
+        <ul>
+            <li><b>Elegibilidad:</b> Disponible tras 3 meses de recibir salario con el banco.</li>
+            <li><b>Renovación automática:</b> Cada 6 meses.</li>
+            <li><b>Seguro de Cancelación de Deuda:</b> 0,396% del monto adeudado más IVA.</li>
+            <li><div>
+                <h3>Fórmula para calcular el interés</h3>
+                <p>La fórmula básica es:</p>
+                <pre>
+                  Interés = (Capital × Tasa de interés × Días utilizados) / 365
+                </pre>
+                <ul>
+                  <li><strong>Capital:</strong> Es la cantidad inicial de dinero que se presta o se deposita.</li>
+                  <li><strong>Tasa de interés:</strong> Es el porcentaje anual que se aplica al capital (por ejemplo, 5% se expresa como 0.05).</li>
+                  <li><strong>Días utilizados:</strong> El número de días que el dinero estuvo en uso.</li>
+                  <li><strong>365 días:</strong> Ajuste para el año calendario, ya que la tasa de interés es anual.</li>
+                </ul>
+              </div></li>
+              <ul>
+                <div style="max-width: 100%; margin: 0 auto; font-family: Arial, sans-serif; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+                    <form id="calculadoraInteres" style="display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+                      <input type="text" id="capital" name="capital" placeholder="Capital" required 
+                             style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center; min-width: 120px;"
+                             oninput="formatearMiles(this)">
+                      <div style="flex: 1; position: relative; min-width: 120px;">
+                        <input type="number" step="0.01" id="tasa" name="tasa" placeholder="Tasa (%)" required 
+                               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+                        <span style="position: absolute; right: 10px; top: 12px;">%</span>
+                      </div>
+                      <input type="number" id="dias" name="dias" placeholder="Días" required 
+                             style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center; min-width: 120px;">
+                      <button type="button" onclick="calcularInteres()" 
+                              style="flex: 1; padding: 8px; background-color: #ff6600; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; min-width: 120px;">Calcular</button>
+                    </form>
+                    <h3 style="text-align: center; margin-top: 15px; font-size: 16px; color: #333;">Resultado:</h3>
+                    <p id="resultado" style="text-align: center; font-weight: bold; color: #555;"></p>
+                  </div>
+                  
+                  <script>
+                    function formatearMiles(input) {
+                      let valor = input.value.replace(/,/g, '');
+                      if (!isNaN(valor) && valor !== '') {
+                        input.value = parseFloat(valor).toLocaleString('en');
+                      } else {
+                        input.value = input.value.replace(/[^0-9,]/g, '');
+                      }
+                    }
+                  
+                    function calcularInteres() {
+                      // Obtener valores ingresados
+                      const capital = parseFloat(document.getElementById('capital').value.replace(/,/g, ''));
+                      const tasa = parseFloat(document.getElementById('tasa').value) / 100; // Convertir porcentaje a decimal
+                      const dias = parseInt(document.getElementById('dias').value);
+                  
+                      // Validar datos
+                      if (isNaN(capital) || isNaN(tasa) || isNaN(dias)) {
+                        document.getElementById('resultado').innerText = "Por favor, ingresa valores válidos.";
+                        return;
+                      }
+                  
+                      // Calcular interés
+                      const interes = (capital * tasa * dias) / 365;
+                  
+                      // Mostrar resultado
+                      document.getElementById('resultado').innerText = `El interés calculado es: ${interes.toFixed(2)}`;
+                    }
+                  </script>
+              </ul>
+        </ul>
+        <p><b>Estados del Intervale:</b></p>
+        <ul>
+            <li><b>Activa:</b> Disponible para uso inmediato.</li>
+            <li><b>Inmovilizada:</b>  Línea recibida pero no utilizada. Se activa con una operación (compra o extracción).</li>
+            <li><b>Desactivada:</b>  Por mora mayor a 30 días. Se reactiva tras pago de la deuda (48 horas).</li>
+            <li><b>Cancelada: </b>  Vigencia perdida por mora mayor a 90 días. Requiere verificación para reactivación.</li>
+            <li><b>Anulada:</b> Vigencia perdida con opción de reactivación previa verificación.</li>
+            <li><b>Cancelada por Administración:</b> Línea cerrada a solicitud del cliente.</li>
+            <li><b>Vencida: </b> Línea expirada; puede renovarse automáticamente tras 6 meses o mediante solicitud especial.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="principa" style="width: 1800px; height: 100px;">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="tuto9.html" class="button-fixed">⬅ Volver Atras</a>
+</body>
+</html>

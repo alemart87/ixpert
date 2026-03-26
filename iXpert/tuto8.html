@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contracargo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        /* Section base (mantiene el ancho y centrado original) */
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        h3 {
+            color: #004080;
+        }
+        img {
+            width: 100%;
+            max-width: 800px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+        .button-fixed:hover {
+            background: #ff6600; /* Naranja */
+            transform: scale(1.05);
+        }
+
+        /* Estilo resaltado para bloque crítico - centrado y con mismo max-width */
+        .highlight-box {
+            background-color: #fff5f0; /* Fondo suave */
+            border: 2px solid #ff6600;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto; /* importante: auto para centrar */
+            max-width: 800px;   /* coincide con sections */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .highlight-box h2 {
+            color: #e65100;
+            margin-top: 0;
+        }
+        .highlight-box h3 {
+            color: #c0392b;
+        }
+        .highlight-box code {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Ajustes de listas dentro del highlight para buena lectura */
+        .highlight-box ol,
+        .highlight-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        a {
+            color: #0033cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Contracargo</h1>
+    </header>
+    <nav>
+        <a href="#motivo">¿Qué es?</a>
+        <a href="#procedimiento">Procedimiento Obligatorio</a>
+        <a href="#Paso1">Pre filtro</a>
+        <a href="#Paso2">¿Qué hacer ante un reclamo?</a>
+        <a href="#Paso3">Bloqueo de Producto</a>
+        <a href="#Paso4">Documentación</a>
+        <a href="#Paso5">Crédito Provisiorio</a>
+        <a href="#Paso6">Regrabación/Reimpresión de la TD</a>
+    </nav>
+
+    <section id="motivo">
+        <h2>💳 ¿Qué es un Contracargo?</h2>
+        <p>Es cuando un cliente disputa un cargo en su tarjeta de crédito o débito. Esto sucede cuando el cliente cree que la compra fue fraudulenta o no autorizada, y solicita que el dinero se devuelva.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <!-- SECCIÓN RESALTADA: centrada (max-width igual que las secciones) -->
+    <section id="procedimiento" class="highlight-box" aria-label="Procedimiento Obligatorio">
+        <h2>📌 Procedimiento Obligatorio en Casos de Contracargo</h2>
+        <p><strong>Para proteger al cliente y evitar reincidencias, siempre seguir estos pasos:</strong></p>
+        <ol>
+            <li>🔎 Identificar la <strong>tarjeta afectada</strong>.</li>
+            <li>🔒 Realizar el <strong>bloqueo y regrabación</strong> con nuevo número por seguridad.</li>
+            <li>
+                📧 Revisar si las <strong>transacciones desconocidas</strong> son <em>tokenizadas</em> (incluye billeteras digitales / wallets).  
+                Si lo son, enviar un correo a: <a href="mailto:prevenciondefraudes@itau.com.py">prevenciondefraudes@itau.com.py</a> indicando:
+                <ul>
+                    <li>📌 Número de tarjeta</li>
+                    <li>🏬 Comercios involucrados</li>
+                </ul>
+                ➡ Esto permitirá la <strong>desvinculación inmediata de los tokens</strong>.
+            </li>
+        </ol>
+
+        <h3>⚠ ¿Qué pasa si no cumplimos estos pasos?</h3>
+        <p>Las <strong>transacciones tokenizadas volverán a ingresar</strong> en la nueva tarjeta regrabada, impactando directamente en la <strong>experiencia y confianza del cliente</strong>.</p>
+
+        <h3>🔍 ¿Cómo identificar una transacción tokenizada en Bancard Web?</h3>
+        <ul>
+            <li>Ir a <em>Autorizaciones</em>.</li>
+            <li>Seleccionar <em>Consulta de Autorizaciones</em>.</li>
+            <li>En el detalle de la transacción, revisar los <strong>Datos del Adquirente</strong>.</li>
+            <li>La operación está tokenizada si en el apartado de <em>Prestación</em> aparece: <code>TCTK</code>.</li>
+        </ul>
+    </section>
+
+    <section id="Paso1">
+        <h2>✅ Paso 1: Consultas de Pre-filtro</h2>
+        <p>🔍 <b>Antes de proceder, realiza las siguientes preguntas al cliente:</b></p>
+        <ul>
+            <li>¿Cuenta con la tarjeta en su poder?</li>
+            <ul>
+                <li>❌ <b>No</b> → Especificar en comentarios si es por <b>robo o extravío</b> y solicitar la <b>denuncia policial.</b></li>
+            </ul>
+            <li>¿Alguien pudo tener acceso a su TC/TD?</li>
+            <li>¿Recibió algún contacto telefónico donde haya brindado sus datos?</li>
+            <li>¿Ya operó anteriormente con el comercio?</li>
+            <li>¿Anteriormente realizó algún viaje fuera del país?</li>
+            <li>¿Se encontraba en el país al momento de la transacción?</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <section id="Paso2">
+        <h2>✅ Paso 2: Confirmación de Operación y Regrabación</h2>
+        <p>📅 <b>Confirmar con el cliente:</b></p>
+        <ul>
+            <li>Fecha e importe de la operación</li>
+            <li>Informarle sobre la regrabación obligatoria de la TC/TD sin costo.</li>
+            <li>Recordarle que puede reclamar hasta 110 días después de la operación.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <section id="Paso3">
+        <h2>🚨 Paso 3: Bloqueo del Producto</h2>
+        <p>🔒 <b>Si es Tarjeta de Crédito (TC):</b></p>
+        <ul>
+            <li>Ingresar en Sac.com</li>
+            <li>Verificar registros anteriores</li>
+            <li>Ir a Tarjeta - Bloqueo</li>
+            <li>Seleccionar la tarjeta</li>
+            <li>En Tipo de bloqueo es, Prevención de Fraude</li>
+            <li>Bloquear ✅</li>
+        </ul>
+        <p>💳 <b>Si es Tarjeta de Débito (TD):</b></p>
+        <ul>
+            <li>En SAC.COM, verificar registros anteriores</li>
+            <li>Ingresar en Bancard / Infonet</li>
+            <li>Ir a Alta y modificaciones de la tarjeta de débito</li>
+            <li>Ir a Emisiones de la tarjeta adherente</li>
+            <li>Ingresar el número de documento del cliente y buscar 🔍</li>
+            <li>Clic en el candadito rojo 🔴</li>
+            <li>Seleccionar Motivo de bloqueo: Prevención de Fraude</li>
+            <li>Confirmar ✅</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <section id="Paso4">
+        <h2>📧 Paso 4: Envío de Documentación</h2>
+        <p>📌 <b>Indicar al cliente que debe enviar un correo a contracargo.doc@itau.com.py con:</b></p>
+        <ul>
+            <li>📄 Foto de ambos lados de su cédula.</li>
+            <li>📝 En el asunto, indicar su número de cédula + terminación del producto (TC o número de cuenta).</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <section id="Paso5">
+        <h2>💰 Paso 5: Crédito Provisorio</h2>
+        <p>💡 <b>Informar al cliente:</b></p>
+        <ul>
+            <li>Recibirá un crédito provisorio en un plazo de 72 horas hábiles después del envío del correo.</li>
+            <li>El monto será igual al importe del contracargo.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <section id="Paso6">
+        <h2>🔄 Paso 6: Regrabación/Reimpresión de la TD</h2>
+        <p>✅ <b>Si es TC: La regrabación se realiza automáticamente.</b></p>
+        <p>🛠 <b>Si es TD, seguir estos pasos:</b></p>
+        <ul>
+            <li>Ingresar en BPM</li>
+            <li>Crear un Nuevo proceso ➕</li>
+            <li>En Categoría, seleccionar Cliente</li>
+            <li>Ingresar el número de documento y hacer clic en el apellido del cliente</li>
+            <li>En Cuenta Corriente/Caja de Ahorro, hacer clic en el número de cuenta</li>
+            <li>Clic en Nuevo caso > Solicitudes > Reimpresión de TD</li>
+            <li>En Motivo de reimpresión, elegir Reimpresión por fraude 🚨</li>
+            <li>En Comentarios, redactar la solicitud en formato de correo ✍️</li>
+            <li>Guardar 💾</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 800px; height: 100px;">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

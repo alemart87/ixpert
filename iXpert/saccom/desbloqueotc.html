@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desbloqueo TC</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px; /* Ancho fijo */
+            height: 200px; /* Alto fijo */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+        .boton-centro {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            }
+
+        .boton-centro button {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            }
+        .boton-centro button:hover {
+                background: #ff6600;
+                transform: scale(1.05); /* un azul un poco más claro al pasar el mouse */
+        }
+        .button-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #004080;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 50%;
+            font-size: 20px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .button-top.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Desbloqueo de Tarjetas de Crédito</h1>
+    </header>
+    <nav>
+        <a href="#1">PIN Invalido</a>
+        <a href="#2">Orden de Usuario|Administrativo</a>
+        <a href="#3">3 Pines invalidos (Fin de Semana|Fuera de Horario)</a>
+    </nav>
+    <section id="1">
+        <h2>PIN Invalido/Mes de nacimiento</h2>
+        <p><b>Requisitos:</b></p>
+        <p>El bloqueo no debe superar los 6 meses.</p>
+        <p><b><i>Plazo: desbloqueo por Pin inválido/ mes de nacimiento: Inmediato</i></b></p>
+        <p><i>El sistema automáticamente posee un filtro de seguridad, es decir, sólo se podrán procesar tres desbloqueos consecutivos en un mismo día para un cliente, sí vuelve a bloquear, ya no será posible el desbloqueo. El sistema no permitirá seleccionar la tarjeta.</i></p>
+        <p><b>Pasos a seguir para desbloqueo por Pin invalido/ mes de nacimiento</b></p>
+        <ul>
+            <li>Se debe ingresar en SAC.com con los datos del cliente, en la opción:</li>
+        </ul>
+        <img src="../imagenes/imagen95.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Seleccionar la TC correspondiente: <b>(luego de verificar en el sistema bancard que efectivamente se encuentra la TC bloqueada por pin inválido.)</b></li>
+        </ul>
+        <p>Obs. Aparecerán las tarjetas del cliente, con sus respectivos adicionales. (Al presionar el botón adicional estará listando las tarjetas correspondientes a esa cuenta si existiese)</p>
+        <ul>
+            <li>Completar el comentario correspondiente: Se realiza el desbloqueo de la TC por pin inválido, cliente responde preguntas de seguridad.</li>
+        </ul>
+        <img src="../imagenes/imagen96.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Al presionar el botón desbloquear, se lista el mensaje de confirmación de la transacción.</li>
+        </ul>
+        <img src="../imagenes/imagen97.jpg" alt="Pantalla introductoria de Itaú">
+
+        <p><b>Pasos a seguir por contingencia: En caso de que SAC.com no funcione</b></p>
+        <ul>
+            <li>Ingresar en BPM con el Nro. De CI o Nro. De cliente</li>
+            <li>Cargar la solicitud en BPM bajo el nro. De Cta. De la TC. Correspondiente:</li>
+        </ul>
+        <img src="../imagenes/imagen98.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Completar todos los campos correspondientes</li>
+        </ul>
+        <img src="../imagenes/imagen99.jpg" alt="Pantalla introductoria de Itaú">
+        <ul>
+            <li>Selecciona la actividad correspondiente:</li>
+        </ul>
+        <img src="../imagenes/imagen100.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section  id="2">
+        <h2>Orden de Usuario|Administrativo</h2>
+        <p><i>Pasos a seguir para desbloqueo por Orden Usuario/ Administrativo</i></p>
+        <ul>
+            <li>Ingresar en BPM con el Nro. De CI o Nro. De cliente </li>
+            <li>Cargar la solicitud en BPM bajo el nro. De Cta. De la TC. Correspondiente:</li>
+        </ul>
+        <img src="../imagenes/imagen98.jpg" alt="Pantalla introductoria de Itaú">
+        <ul> 
+            <li>Completar todos los campos correspondientes.</li>
+        </ul>
+        <img src="../imagenes/imagen99.jpg" alt="Pantalla introductoria de Itaú">
+        <img src="../imagenes/imagen101.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="3">
+        <h2>3 Pines invalidos (Fin de Semana|Fuera de Horario)</h2>
+        <p><i>Desbloqueos de tarjetas de crédito x tres pines inválidos (Fines de semana) y excepcionalmente en caso de que SAC.com no funcione a partir de las 17:30 a 08:30 de Lunes a Viernes.</i></p>
+        <ul>
+            <li>Ingresar en BPM con el Nro. De CI o Nro. De cliente</li>
+            <li>Cargar la solicitud en BPM bajo el nro. De Cta. De la TC. Correspondiente:</li>
+        </ul>
+        <img src="../imagenes/imagen98.jpg" alt="Pantalla introductoria de Itaú">
+        <ul> 
+            <li>Completar todos los campos correspondientes.</li>
+        </ul>
+        <img src="../imagenes/imagen102.jpg" alt="Pantalla introductoria de Itaú">
+
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../saccom.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

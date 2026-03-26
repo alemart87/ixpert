@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Segmentación</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #000000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      padding: 20px;
+      margin: 10px auto;
+      max-width: 1000px;
+      border-bottom: 2px solid #ff6600;
+    }
+
+    h2 {
+      color: #0000ff;
+      text-align: center;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    img {
+      width: 100%;
+      max-width: 1000px;
+      display: block;
+      margin: 20px auto;
+      border-radius: 5px;
+    }
+
+    footer {
+      background-color: #000000;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .content-box {
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-box {
+      margin-bottom: 25px;
+      padding: 20px;
+      border-left: 6px solid;
+      border-radius: 12px;
+    }
+
+    .orange-box {
+      background-color: #fff4e5;
+      border-color: #f4a261;
+    }
+
+    .red-box {
+      background-color: #ffe5e5;
+      border-color: #e76f51;
+    }
+
+    .yellow-box {
+      background-color: #fff9cc;
+      border: 1px solid #f4d03f;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      color: #7f6000;
+    }
+
+    .impacto {
+      font-weight: bold;
+      color: #c0392b;
+    }
+
+    .sin-impacto {
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+
+    a.mail-link {
+      color: #2a7ae2;
+      text-decoration: underline;
+    }
+
+    .italic {
+      font-style: italic;
+      color: #555;
+      margin-top: 10px;
+    }
+    .segmentacion-empresas {
+        max-width: 1000px;
+        margin: 40px auto;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        color: #000;
+    }
+
+    .segment-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .segment-box {
+        background: #ffc7a4;
+        border: 3px solid #ff5a00;
+        border-radius: 15px;
+        padding: 20px;
+        flex: 1;
+        margin: 5px;
+        font-size: 20px;
+    }
+
+    .segment-box.full {
+        width: 100%;
+    }
+
+    .segment-box.dashed {
+        border-style: dashed;
+    }
+
+    .segment-col {
+        display: flex;
+        gap: 10px;
+        margin-left: 20px;
+    }
+
+    .segment-subbox {
+        border: 3px solid #ff5a00;
+        border-radius: 10px;
+        padding: 10px 15px;
+        background: #fff;
+        font-size: 16px;
+        flex: 1;
+    }
+
+    .segment-nota {
+        font-size: 14px;
+        color: #333;
+        text-align: right;
+        margin-top: 10px;
+        font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Segmentación Empresas</h1>
+  </header>
+
+  <nav>
+    <a href="#paso1"></a>
+    <a href="#paso2"></a>
+  </nav>
+
+  <section id="paso1">
+        <div class="segmentacion-empresas">
+            <div class="segment-row">
+                <div class="segment-box grande">
+                <strong>EMPs</strong><br>Unipersonales
+                </div>
+                <div class="segment-col">
+                <div class="segment-subbox">EMP3</div>
+                <div class="segment-subbox">EMP4</div>
+                <div class="segment-subbox">EMP5</div>
+                </div>
+            </div>
+
+            <div class="segment-row">
+                <div class="segment-box grande">
+                <strong>Empresas</strong><br>Nacionales
+                </div>
+                <div class="segment-col">
+                <div class="segment-subbox">Pequeñas</div>
+                <div class="segment-subbox">Medianas</div>
+                <div class="segment-subbox">Grandes</div>
+                </div>
+            </div>
+
+            <div class="segment-box full">
+                <strong>Itaú Campo</strong><br>Agroganadería
+            </div>
+
+            <div class="segment-box full dashed">
+                <strong>CIB</strong><br>Internacionales
+            </div>
+
+            <p class="segment-nota">*segmentación según facturación anual</p>
+        </div>
+  </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

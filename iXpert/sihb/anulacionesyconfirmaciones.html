@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anulaciones y Confirmaciones</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    h3 {
+      color: #222;
+      margin-top: 25px;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Anulaciones y Confirmaciones</h1>
+  </header>
+
+  <nav>
+    <a href="#">Inicio</a>
+    <a href="#">Pronet</a>
+    <a href="#">Netel</a>
+    <a href="#">Bancard</a>
+  </nav>
+
+  <section>
+    <h2>PRONET</h2>
+    
+    <h3>Anulaciones</h3>
+    <div class="info-box">
+      <ul>
+        <li>Solicitar datos en Excel de la operación a <b>sac@pronet.com.py</b>.</li>
+        <li>Datos necesarios: 
+          <ul>
+            <li>Detalles visualizados en PE Pagos (no adjuntar número de cuenta débito).</li>
+            <li>Nombre del Facturador (asunto o cuerpo de mail).</li>
+            <li>Motivo del pedido (en el portal).</li>
+            <li>En asunto: datos del cliente o número de ID.</li>
+            <p></p>
+            <img src="../imagenes/imagen322.webp" alt="322" style="width: 600px; height: auto;">
+          </ul>
+          <p></p>
+        </li>
+        <li>Respuesta llega el mismo día con los datos de la operación.</li>
+        <p><img src="../imagenes/imagen323.webp" alt="323" style="width: 600px; height: auto;">
+        <p>Datos necesarios para avanzar:</p>
+        <img src="../imagenes/imagen324.webp" alt="324" style="width: 600px; height: auto;">
+        </p>
+        <li>Ingresar al portal: <a href="https://seguro.aquipago.com.py/gestionExterna/" target="_blank">Portal AquiPago</a>.</li>
+        <p><img src="../imagenes/imagen325.webp" alt="325" style="width: 600px; height: auto;"></p>
+        <li>Ir a la opción <b>Procesos → PROCESO EXTORNOS</b>.</li>
+        <p><img src="../imagenes/imagen326.webp" alt="326" style="width: 600px; height: auto;">
+        <p><img src="../imagenes/imagen327.webp" alt="327" style="width: 600px; height: auto;"></p>
+        </p>
+        <li>Luego de seleccionar la opción de “PROCESO EXTORNOS”, solicitará los datos de la trx que se encuentran en el archivo indicado anteriormente, a excepción del ítem “Comprobante” donde pueden adjuntar el mail remitido a pronet o bien el archivo Excel directamente, no requiere de comprobante manual..</li>
+        <p><img src="../imagenes/imagen328.webp" alt="328" style="width: 600px; height: auto;"></p>
+        <li>Obs.: El costo y todos los datos indicados en rojo, se deben omitir por acuerdo bancario, las anulaciones no poseen costo hasta la fecha.:</li>
+        <li>Tras cargar todos los datos, generará un mensaje de que el pedido fue ingresado de forma exitosa, NO aparece en el portal el nro de ticket pero llega de forma automática en correo 24hs en internet de la siguiente manera.</li>
+        <p><img src="../imagenes/imagen329.webp" alt="329" style="width: 600px; height: auto;"></p>
+        <li>En un plazo aproximado de 1 semana, si la reversión fuera aprobada, se recibirá el correo de aviso de la siguiente manera:</li>
+        <p><img src="../imagenes/imagen330.webp" alt="330" style="width: 600px; height: auto;"></p>
+        <li>En el correo podrán identificar la transacción según los datos (terminal, lote, nro. Trx, monto, entidad, referencia).</li>
+        <li>Con este correo de aprobación, deben derivar el ID al área de Cámara Compensadora con el formato correspondiente en la fecha que se indica en el correo que será acreditado.</li>
+        <li>Si el pedido de reversión fuera rechazado, se recibirá también un correo de aviso de la siguiente manera:</li>
+        <p><img src="../imagenes/imagen331.webp" alt="331" style="width: 600px; height: auto;"></p>
+        <li>En este caso, el cliente debe ser informado y el ID se deriva a Cámara Compensadora con el comentario de “Favor finalizar sin éxito. Reversa rechazada, cliente informado” aclarando el motivo descripto por la procesadora.</li>
+    </ul>
+    </div>
+
+    <h3>Confirmaciones</h3>
+    <div class="info-box">
+      <ul>
+        <li>Enviar correo a <b>sac@pronet.com.py</b> con:
+          <ul>
+            <li>Detalles visualizados en PE Pagos (no adjuntar el número de cuenta débito)</li>
+            <li>Nombre del Facturador. (En el asunto o cuerpo de mail)</li>
+            <li>Motivo del pedido (en el portal).</li>
+            <li>En el asunto se sugiere colocar datos del cliente o bien el número de ID para seguimiento.</li>
+            <p><img src="../imagenes/imagen332.webp" alt="332" style="width: 600px; height: auto;"></p>
+            <p>Luego la procesadora nos comparte la respuesta del estado del pago:</p>
+            <p><img src="../imagenes/imagen333.webp" alt="333" style="width: 600px; height: auto;"></p>
+          </ul>
+        </li>
+        <li>Si la procesadora nos indicara que el pago no fue exitoso de su lado, se debe realizar la consulta al área interna de Gestión de Conciliación Operacional de modo a validar si hubo pendencia contable.
+          <ul>
+            <li><b>GCO confirma NO hubo pendencia contable:</b> solicitar OK a procesadora para reversión vía BPM.</li>
+            <li><b>GCO confirma hubo pendencia contable:</b> GCO deriva extorno a AOC.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <h2>NETEL</h2>
+    
+    <h3>Anulaciones</h3>
+    <div class="info-box">
+      <ul>
+        <li>Correo a <b>corporativos@pagoexpress.com.py</b>.</li>
+        <li>Datos necesarios:
+          <ul>
+            <li>Detalles PE Pagos.</li>
+            <li>Número de Ticket (24 Hs. Admin).</li>
+            <li>Motivo del pedido.</li>
+          </ul>
+        <p><img src="../imagenes/imagen334.webp" alt="334" style="width: 600px; height: auto;"></p>
+        </li>
+        <li>Si es billetera/giro: asunto debe incluir <b>Anulación de Giro o Anulación Billetera</b>.</li>
+        <p><img src="../imagenes/imagen335.webp" alt="335" style="width: 600px; height: auto;"></p>
+        <li>Correo de aprobación → derivar ID a Cámara Compensadora.</li>
+        <p><img src="../imagenes/imagen336.webp" alt="336" style="width: 600px; height: auto;"></p>
+        <p>Obs.: En el campo de EST debe indicar RE (reversada) si ya se reversó, caso contrario será CO (confirmada).</p>
+        <p>Con este correo de aprobación, deben derivar el ID al área de Cámara Compensadora con el formato correspondiente en la fecha que se indica en el correo que será acreditado.</p>
+        <li>Si hay rechazo: informar cliente y derivar a Cámara con comentario de rechazo.</li>
+        <p><img src="../imagenes/imagen337.webp" alt="337" style="width: 600px; height: auto;"></p>
+        <p>El cliente debe ser informado y el ID se deriva a Cámara Compensadora con el comentario de “Favor finalizar sin éxito. Reversa rechazada, cliente informado” aclarando el motivo descripto por la procesadora.</p>
+      </ul>
+    </div>
+
+    <h3>Confirmaciones</h3>
+    <div class="info-box">
+      <ul>
+        <li>Correo a <b>corporativos@pagoexpress.com.py</b>.</li>
+        <li>Datos necesarios:
+          <ul>
+             <li>Detalles visualizados en PE Pagos (no adjuntar número de cuenta débito).</li>
+            <li>Número de Ticket de la operación ubicado en 24 Hs. Admin.</li>
+            <li>Motivo del pedido.</li>
+            <li>Solicitar que se realice la confirmación del pago con el facturador, a los efectos de que la procesadora derive el pedido a la entidad beneficiaria.</li>
+          </ul>
+          <p><img src="../imagenes/imagen338.webp" alt="338" style="width: 600px; height: auto;"></p>
+          <p>Si es un caso de billetera/giro, en el asunto debe indicarse sí o sí “Confirmación de Giro o Anulación Billetera”</p>
+          <p><img src="../imagenes/imagen339.webp" alt="339" style="width: 600px; height: auto;"></p>
+          <p>Una vez que la procesadora reciba el caso y derive al facturador, el aviso llega de la siguiente manera:</p>
+        </p><img src="../imagenes/imagen340.webp" alt="340" style="width: 600px; height: auto;"></p>
+        <p>Una vez el facturador confirme el ingreso correcto del pago, se recepciona el siguiente mail:</p>
+        </p><img src="../imagenes/imagen341.webp" alt="341" style="width: 600px; height: auto;"></p>
+
+        </li>
+        <li>Si pago no fue exitoso: consultar al área interna de Gestión de Conciliación Operacional de modo a validar si hubo pendencia contable.
+          <ul>
+            <li><b>Sin pendencia contable:</b> solicitar OK a procesadora para reversión vía BPM adjuntando el OK   .</li>
+            <li><b>Con pendencia contable:</b> GCO deriva extorno a AOC.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <h2>BANCARD</h2>
+    
+    <h3>Confirmaciones de Pago – Portal de Entidades</h3>
+    <div class="info-box">
+        <p>Los pedidos de confirmación de estado de pago de servicios que correspondan a APIs en el horario de 08:00 a 17:00hs (día hábiles) deben ingresar por el Portal de Entidades en la opción de Soporte SAC/API ENTIDADES/ CONSULTA. Si son fuera de horario, consultar por mail al CAC.</p>
+      <ul>
+        <li>Ingresar en <a href="https://entidades.bancard.com.py/" target="_blank">Portal Entidades</a>.</li>
+        <p>Ingresar usuario y contraseña luego, seleccionar el captcha</p>
+        <p><img src="../imagenes/imagen342.webp" alt="342" style="width: 600px; height: auto;"></p>
+        <li>Tickets:
+          <ul>
+            <li>Para generar los reportes para el control de los tickets ingresados, se debe hacer click en el botón “Mostrar filtros” para realizar la búsqueda según el dato que considere (texto, N° de ticket, usuario creador, por niveles/categorías, fechas, podrá filtrar más de 1 estado) y también podrá Exportar. Si lo prefiere puede “Ocultar filtros”.</li>
+            <p><img src="../imagenes/imagen343.webp" alt="343" style="width: 600px; height: auto;"></p>
+            <li><b>+ Nuevo Ticket</b> → elegir tipo y prioridad.</li>
+            <p><img src="../imagenes/imagen344.webp" alt="344" style="width: 600px; height: auto;"></p>
+            <li>Se puede reabrir un caso (genera nuevo ticket).</li>
+            <li>Soporte SAC: consultas realizadas a Soporte a Entidades.</li>
+            <li>Completar los datos necesarios.</li>
+            <li>Prioridad Normal: Para consultas sin prioridad</li>
+            <li>Prioridad Urgente: Para casos con prioridad 2 de 3</li>
+            <li>Prioridad Inmediata: Para casos de amenazas de demanda, escraches, etc.</li>
+            <p><img src="../imagenes/imagen345.webp" alt="345" style="width: 600px; height: auto;"></p>
+            <p>Una vez ingresado el ticket, se puede visualizar el tiempo estimativo de respuesta.</p>
+            <p><img src="../imagenes/imagen346.webp" alt="346" style="width: 600px; height: auto;"></p>
+            <p>Si el caso es finalizado sin respuesta o se requiere volver a consultar algún dato, una vez resuelto, se puede reabrir el caso (siempre que sea reciente). Esto permitirá reabrir el caso pero genera un nuevo número de ticket y queda registrado ambos tickets.</p>
+            <p><img src="../imagenes/imagen347.webp" alt="347" style="width: 400px; height: auto;"></p>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <h3>Anulaciones – Portal de Comercios</h3>
+    <div class="info-box">
+      <ul>
+        <li>Ingresar a <b>Mis Transacciones – Infonet Cobranzas</b>.</li>
+        <p><img src="../imagenes/imagen348.webp" alt="348" style="width: 600px; height: auto;"></p>
+        <li>Buscar transacción por número de boleta y fecha.</li>
+        <p><img src="../imagenes/imagen349.webp" alt="349" style="width: 600px; height: auto;"></p>
+        <li>Dar click en “Solicitar anulación”.</li>
+        <p><img src="../imagenes/imagen350.webp" alt="350" style="width: 600px; height: auto;"></p>
+        <li>Indicar motivo y aceptar condiciones.</li>
+        <p><img src="../imagenes/imagen351.webp" alt="351" style="width: 600px; height: auto;"></p>
+        <p>La solicitud se creó con éxito.</p>
+        <p><img src="../imagenes/imagen352.webp" alt="352" style="width: 600px; height: auto;"></p>
+        <li>La solicitud se genera automáticamente y queda en la sección “Anulaciones”.</li>
+        <p><img src="../imagenes/imagen353.webp" alt="353" style="width: 600px; height: auto;"></p>
+      </ul>
+    </div>
+  </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

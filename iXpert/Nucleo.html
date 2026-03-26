@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Núcleo Ventas - SIHB</title>
+  <style>
+    :root {
+      --naranja-itau: #ff6600;
+      --naranja-claro: #f57c00;
+      --azul-itau: #002776;
+      --gris-claro: #f2f2f2;
+      --gris-texto: #333333;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--gris-claro);
+      margin: 0;
+      padding: 0;
+      color: var(--gris-texto);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(to right, var(--naranja-itau), var(--naranja-claro));
+      color: #ffffff;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.8em;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    nav {
+      background-color: var(--azul-itau);
+      padding: 14px 0;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0 25px;
+      font-weight: 600;
+      font-size: 1em;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffcc00;
+    }
+
+    section {
+      padding: 50px 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h2 {
+      color: var(--naranja-itau);
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 40px;
+    }
+
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .accordion-item {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .accordion-item:hover {
+      transform: scale(1.01);
+    }
+
+    .accordion-toggle {
+      background-color: var(--azul-itau);
+      color: #ffffff;
+      padding: 16px 20px;
+      font-size: 1.1em;
+      font-weight: bold;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .accordion-toggle:hover {
+      background-color: var(--naranja-itau);
+    }
+
+    .accordion-content {
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: var(--gris-texto);
+    }
+
+    .accordion-content a {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--azul-itau);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .accordion-content a:hover {
+      text-decoration: underline;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 14px 24px;
+      background: var(--azul-itau);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: var(--naranja-itau);
+      transform: scale(1.08);
+    }
+
+    footer {
+      background-color: #eeeeee;
+      color: #555555;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Núcleo Ventas</h1>
+  </header>
+  <nav>
+    <a href="Nucleo/restriccionesgerentes.html">Restricciones - Gerentes</a>
+    <a href=""></a>
+  </nav>
+  <section>
+    <h2>Accedé a cada proceso comercial</h2>
+    <div class="accordion">
+      <div class="accordion-item">
+        <button class="accordion-toggle">FLUJO PRÉSTAMOS</button>
+        <div class="accordion-content">
+          <p>Conoce los pasos para préstamo electrónico.</p>
+          <a href="Nucleo/flujoprestamoN.html">Ir al detalle →</a>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-toggle">CANCELACIÓN ANTICIPADA</button>
+        <div class="accordion-content">
+          <p>Flujo para verificar cancelación anticipada de préstamos.</p>
+          <a href="Nucleo/cancelacionanticipada.html">Ir al detalle →</a>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-toggle">FLUJO CAPSTONE</button>
+        <div class="accordion-content">
+          <p>Verificación de pasos a seguir desde CAPSTONE.</p>
+          <a href="Nucleo/capstone.html">Ir al detalle →</a>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-toggle">LINEA ROTATIVA AS400</button>
+        <div class="accordion-content">
+          <p>Proceso para verificar suma de linea rotativa en AS400.</p>
+          <a href="Nucleo/rotativaAS400.html">Ir al detalle →</a>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-toggle">REGISTRO SAC.COM</button>
+        <div class="accordion-content">
+          <p>Proceso para registrar en SAC.COM</p>
+          <a href="Nucleo/registrosac.html">Ir al detalle →</a>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-toggle">REGISTRO PRÉSTAMO SIN VUELTAS</button>
+        <div class="accordion-content">
+          <p>Registros para los casos de préstamos sin vueltas.</p>
+          <a href="Nucleo/registrosinvueltas.html">Ir al detalle →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+  <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+
+  <script>
+    const items = document.querySelectorAll('.accordion-item');
+    items.forEach(item => {
+      const toggle = item.querySelector('.accordion-toggle');
+      toggle.addEventListener('click', () => {
+        item.classList.toggle('active');
+        const content = item.querySelector('.accordion-content');
+        if (item.classList.contains('active')) {
+          content.style.maxHeight = content.scrollHeight + "px";
+        } else {
+          content.style.maxHeight = null;
+        }
+        items.forEach(other => {
+          if (other !== item) {
+            other.classList.remove('active');
+            other.querySelector('.accordion-content').style.maxHeight = null;
+          }
+        });
+      });
+    });
+  </script>
+</body>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extranet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        img {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+
+        /* Estilos adicionales para la sección visual */
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .funcion-icon {
+            font-size: 1.8rem;
+        }
+        .funcion-text h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #004080;
+        }
+        .funcion-text p {
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="imagenes/imagen36.jpg" alt="Pantalla Bancard" style="width: 300px; height: 100px;">
+    </header>
+    <nav>
+        <a href="#motivo"> </a>
+        <a href="#funcionamiento"> </a>
+        <a href="#reclamo"> </a>
+        <a href="#importante"> </a>
+    </nav>
+
+    <section id="motivo">
+        <h2>🌐 Funcionalidades de la Extranet</h2>
+        <div class="funciones-grid">
+            <div class="funcion-item">
+                <div class="funcion-icon">📧</div>
+                <div class="funcion-text">
+                    <h3>Comunicación Interna</h3>
+                    <p>✉️ <b>Envío de Correos</b></p>
+                    <ul>
+                        <p>Permite contactar directamente con:</p>
+                        <li>👥 Teams (Equipo Interno)</li>
+                        <li>🏢 Back Office</li>
+                        <p>Facilitando la gestión de casos, seguimiento y coordinación interna desde la plataforma.</p>
+                    </ul>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">💰</div>
+                <div class="funcion-text">
+                    <h3>Comisiones Pendientes</h3>
+                    <p>Accedé al detalle de las comisiones generadas que aún no fueron debitadas o liquidadas.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">📋</div>
+                <div class="funcion-text">
+                    <h3>Cheques Solicitados</h3>
+                    <p>Accedé al detalle de los cheques solicitados.</p>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">📇</div>
+                <div class="funcion-text">
+                    <h3>Catastro de Clientes</h3>
+                    <p>📱 <b>Visualización de Datos Alternativos</b></p>
+                    <ul>
+                        <p>Consultá otro número de contacto del cliente y accedé al perfil KyC (Know Your Customer) para verificación de identidad y cumplimiento normativo.</p>
+                    </ul>
+                </div>
+            </div>
+            <div class="funcion-item">
+                <div class="funcion-icon">🔄</div>
+                <div class="funcion-text">
+                    <h3>Gestión de Gerencias</h3>
+                    <p>🛠️ <b>Módulo de Cambio de Gerencia</b></p>
+                    <ul>
+                        <p>Herramienta habilitada para modificar la asignación de gerencia del cliente dentro del sistema, con trazabilidad y control.</p>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+
+    <a href="herramientas.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

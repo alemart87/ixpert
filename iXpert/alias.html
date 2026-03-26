@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+        .button-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #004080;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 50%;
+            font-size: 20px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .button-top.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Alias Itaú</h1>
+    </header>
+    <nav>
+        <a href="#Paso1">¿Qué es un <b>Alias?</b></a>
+        <a href="#Paso2">¿Cómo funciona?</a>
+        <a href="#Paso3">Tipos de Alias</a>
+        <a href="#Paso4">Alias en cuentas Conjuntas | Individuales</a>
+        <a href="#Paso5">Preguntas Frecuentes</a>
+    </nav>
+    <section id="Paso1">
+        <h2>¿Qué es un Alias?</h2>
+        <p>Es un dato personal que usted puede vincular a su cuenta para recibir transferencias interbancarias. De este modo, en lugar de compartir información tradicional como su nombre completo, número de cuenta, documento de identidad y entidad bancaria, solo necesita proporcionar su alias Itaú.</p>
+        
+       
+        <div class="boton-centro">
+            <button onclick="location.href='#Paso6'">Tutorial</button>
+        </div>
+        
+        <style>
+            .boton-centro {
+                display: flex;
+                justify-content: center;
+                margin: 40px 0; /* espacio arriba y abajo */
+            }
+        
+            .boton-centro button {
+                background-color: #ff8000; /* naranja */
+                color: white;
+                font-size: 16px;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                transition: background-color 0.3s ease;
+            }
+        
+            .boton-centro button:hover {
+                background-color: #e65c00; /* naranja más oscuro */
+            }
+        </style>
+        
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1000px; height: 115px;">
+    </section>
+    <section id="Paso2">
+        <h2>Funcionamiento</h2>
+        <p>Puede vincular su alias Itaú a los datos de su cuenta a través de los canales disponibles:</p>
+        <img src="imagenes/imagen103.jpg" alt="IMG">
+        <p>Gracias a este proceso, solo será necesario que comparta su alias Itaú para recibir transferencias interbancarias. Y tanto Personas Físicas como Personas Jurídicas de todos los segmentos pueden crear su Alias.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1000px; height: 115px;">
+    </section>
+    <section id="Paso3">
+        <h2>Tipos de Alias</h2>
+        <p>Se encuentran disponibles cuatro tipos de alias que pueden vincularse, siempre que estén registrados previamente en los sistemas del Banco.</p>
+        <img src="imagenes/imagen104.jpg" alt="IMG">
+        <p><b>¿Cuántos Alias de Itaú se puede activar?</b></p>
+        <ul>
+            <li>Se pueden tener varios, sin embargo, cada alias solo puede estar vinculado a <b>una cuenta.</b></li>
+        </ul>
+        <p><b>Ejemplo:</b></p>
+        <img src="imagenes/imagen105.jpg" alt="IMG">
+        <p><b>¿Con qué tipo de cuentas se puede crear?</b></p>
+        <ul>
+            <li>Cuenta de ahorro</li>
+            <li>Cuenta Corriente </li>
+            <li>Cuenta básica</li>
+        </ul>
+        <p>Exclusivo para cuentas en moneda guaraníes</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1000px; height: 115px;">
+    </section>
+    <section id="Paso4">
+        <h2>Alias en CTA Conjunta | Individuales</h2>
+        <p>Cada cuenta puede tener un solo alias Itaú vinculado.</p>
+        <ul>
+            <li>Para <b><i>cuentas conjuntas</i></b>, podrá crear el alias Itaú el 1er firmante, y ambos firmantes podrán utilizar el mismo alias.</li>
+            <li> Para <b><i>cuentas individuales</i></b>, podrá crear el titular.</li>
+        </ul>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1000px; height: 115px;">
+    </section>
+    
+    <section id="Paso5" class="faq-section">
+        <h2>❓ Preguntas Frecuentes</h2>
+      
+        <div class="faq-item">
+          <p><b>¿Con el alias Itaú solo se podrán recibir transferencias hasta Gs. 5.000.000.?</b></p>
+          <p><i>Podrá recibir transferencias por cualquier importe, exclusivamente en moneda guaraníes.</i></p>
+        </div>
+      
+        <div class="faq-item">
+          <p><b>Si ya se tiene vinculado la cédula de identidad como alias en otra entidad y se quiere vincular a una cuenta Itaú, ¿cómo es el proceso?</b></p>
+          <p><i>Primero deberá eliminar el alias asociado a su cédula de identidad en la otra entidad, y luego dar de alta su alias en Itaú. En dicha entidad podrá continuar operando sin inconvenientes utilizando cualquiera de los otros tipos de alias mencionados anteriormente.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>Si se quiere cambiar de tipo de alias Itaú de una cuenta, ¿Cómo se hace?</b></p>
+            <p><i>Inicialmente se debe eliminar el alias Itaú, y luego seleccionar el nuevo tipo de alias Itaú deseado.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>¿Dónde se visualiza el detalle de alias Itaú creados?</b></p>
+            <p><i>Puede visualizarse a través de los distintos canales digitales disponibles.</i></p>
+        </div>
+        <img src="imagenes/imagen103.jpg" alt="Ilustración" class="faq-img">
+
+        <div class="faq-item">
+            <p><b>¿La creación y eliminación del alias Itaú es en línea?</b></p>
+            <p><i>Una vez creado su alias Itaú, recibirá la confirmación por correo electrónico. Podrá realizar las operaciones en línea los 7 días de la semana, las 24 horas del día.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>¿Un cliente Persona Jurídica podrá vincular un alias de correo y/o celular?</b></p>
+            <p><i>Desde el sitio administrador en la web 24 Horas Negocios, el cliente podrá visualizar los correos y celulares que se encuentran validados en catastro. Si el cliente desea incluir algún contacto, deberá realizar el procedimiento de actualización de datos que se valida en un plazo de 24hs hábiles como plazo mínimo.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>¿Desde que sitio el Cliente Persona Jurídica podrá crear su alias Itaú?</b></p>
+            <p><i>El registro de alias será exclusivo desde el sitio administrador en la web 24 Horas Negocios, ingresando en la sección Solicitudes > Alias.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>¿Qué pasa si el Administrador no recuerda su pin administrador o se encuentra bloqueado? ¿Podría crear por otro medio?</b></p>
+            <p><i>El desbloqueo o reseteo del PIN administrador se puede realizar contactando al SAC o a su gerente comercial.</i></p>
+            <p><i>El registro de alias será exclusivo desde el sitio administrador en la web 24 Horas Negocios, ingresando en la sección Solicitudes > Alias.</i></p>
+            <p><i><b>OBS:</b> Próximamente se encontrará disponible la opción de desbloqueo y reseteo al momento de ingresar el PIN para acceder al sitio administrador, de manera que el cliente pueda autogestionarse con un flujo 100% digital.</i></p>
+        </div>
+
+        <div class="faq-item">
+            <p><b>¿Desde que sitio el Cliente Persona Jurídica podrá crear su alias Itaú?</b></p>
+            <p><i>El registro de alias será exclusivo desde el sitio administrador en la web 24 Horas Negocios, ingresando en la sección Solicitudes > Alias.</i></p>
+        </div>
+           
+        <div class="faq-item">
+          <p><b>¿La experiencia del cliente Persona Jurídica para la carga de sus transferencias cambiaría?</b></p>
+          <p><i>El flujo de transferencia no presenta cambios, el cliente podrá realizarlas de la misma manera que lo hace actualmente, inclusive una vez habilitada la opción transaccional por el BCP, el autorizador seguirá verificando los datos de la transferencia a como hoy se encuentra disponible, solamente añadiendo el dato del alias.</i></p>
+        </div>
+
+        <!-- ...más preguntas aquí... -->
+      
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" class="faq-img-wide">
+      </section>
+      
+      <style>
+        .faq-section {
+          background-color: #fef9f4;
+          padding: 40px;
+          border-radius: 16px;
+          max-width: 900px;
+          margin: auto;
+          box-shadow: 0 0 10px rgba(0,0,0,0.05);
+          font-family: "Segoe UI", sans-serif;
+        }
+      
+        .faq-section h2 {
+          text-align: center;
+          margin-bottom: 30px;
+          color: #ff8000;
+        }
+      
+        .faq-item {
+          background: #ffffff;
+          border-left: 4px solid #ff8000;
+          padding: 15px 20px;
+          margin-bottom: 20px;
+          border-radius: 8px;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+      
+        .faq-item p {
+          margin: 8px 0;
+        }
+      
+        .faq-img {
+          display: block;
+          margin: 30px auto;
+          max-width: 100%;
+          border-radius: 10px;
+        }
+      
+        .faq-img-wide {
+          display: block;
+          margin: 20px auto;
+          width: 100%;
+          max-width: 1000px;
+          height: auto;
+        }
+      </style>
+    <section id="Paso6">
+        <h2>Paso a Paso desde la APP</h2>
+        <p>Ejemplo de creación de Alias con Cédula de Identidad.</p>
+        <p><b>Paso 1</b></p>
+        <img src="imagenes/imagen106.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 2</b></p>
+        <img src="imagenes/imagen107.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 3</b></p>
+        <img src="imagenes/imagen108.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 4</b></p>
+        <img src="imagenes/imagen109.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 5</b></p>
+        <img src="imagenes/imagen110.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 6</b></p>
+        <img src="imagenes/imagen111.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <p><b>Paso 7</b></p>
+        <img src="imagenes/imagen112.jpg" alt="IMG" style="width: 700px; height: 500px;">
+        <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1000px; height: 115px;">
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+
+    <a href="#top" class="button-top" id="btnSubir">⬆</a>
+    <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+
+    <script>
+        const btnSubir = document.getElementById("btnSubir");
+      
+        window.addEventListener("scroll", () => {
+          const mitadPagina = document.documentElement.scrollHeight / 2;
+          if (window.scrollY > mitadPagina) {
+            btnSubir.classList.add("show");
+          } else {
+            btnSubir.classList.remove("show");
+          }
+        });
+    </script>
+    
+    
+</body>
+</html>

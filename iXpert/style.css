@@ -1,0 +1,46 @@
+#results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.result-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.result-card h3 {
+    color: #004080;
+    margin-bottom: 10px;
+}
+
+.result-card p {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.result-card .button {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    background: #ff6600;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.result-card .button:hover {
+    background: #004080;
+    transform: scale(1.05);
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIHB</title>
+  <style>
+    /* Fondo animado */
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #121212, #1c1c1c, #121212);
+      background-size: 600% 600%;
+      animation: backgroundShift 30s ease infinite;
+      margin: 0;
+      padding: 0;
+      color: #ffffff;
+      line-height: 1.6;
+    }
+
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Encabezado */
+    header {
+        background: linear-gradient(to right, #ff6600, #ff8533);
+        color: #ffffff;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        animation: fadeSlideDown 1s ease-out forwards;
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    @keyframes fadeSlideDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 3.5em;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    @keyframes shine {
+      0% { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* Navegación */
+    nav {
+      background-color: #004080;
+      padding: 12px 0;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0 20px;
+      font-weight: bold;
+      font-size: 1em;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffcc00;
+    }
+
+    /* Secciones */
+    section {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #ff6600;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 40px;
+    }
+
+    /* Grid */
+    .funciones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      justify-items: center;
+    }
+
+    .funcion-item-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .funcion-item {
+      width: 100%;
+      max-width: 350px;
+      height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+
+    .funcion-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(255, 102, 0, 0.4);
+    }
+
+    .funcion-item img {
+      max-width: 280px;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+
+    .funcion-item h3 {
+      margin: 0;
+      font-size: 1.2em;
+      color: #ffcc00;
+      text-align: center;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .funciones-grid .funcion-item:nth-child(1) { animation-delay: 0.1s; }
+    .funciones-grid .funcion-item:nth-child(2) { animation-delay: 0.2s; }
+    .funciones-grid .funcion-item:nth-child(3) { animation-delay: 0.3s; }
+    .funciones-grid .funcion-item:nth-child(4) { animation-delay: 0.4s; }
+    .funciones-grid .funcion-item:nth-child(5) { animation-delay: 0.5s; }
+    .funciones-grid .funcion-item:nth-child(6) { animation-delay: 0.6s; }
+    .funciones-grid .funcion-item:nth-child(7) { animation-delay: 0.7s; }
+
+    /* Botón flotante */
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 14px 24px;
+      background: #004080;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.08);
+    }
+
+    /* Footer */
+    footer {
+      background-color: #000000;
+      color: #ffffff;
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Soporte InterHome Banking</h1>
+  </header>
+  <nav>
+        <a href="sihb/contacto.html">Contacto</a>
+        <a href="sihb/clasificacion.html">Segmentación</a>
+  </nav>
+  <section id="Paso1">
+    <h2>Toda la gestión de contactos empresariales en un solo lugar.</h2>
+    <div class="funciones-grid">
+      <a href="sihb/productospj.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>PRODUCTOS PJ</h3>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" />
+        </div>
+      </a>
+      <a href="sihb/phishingempe.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>PHISHING</h3>
+          <img src="imagenes/imagen00.jpg" alt="Pantalla SAC.COM" />
+        </div>
+      </a>
+      <a href="sihb/canaldigital.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>CANAL DIGITAL</h3>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla PT Electronica" />
+        </div>
+      </a>
+      <a href="sihb/cambiopinemp.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>Cambio de PIN Empresas</h3>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla BPM" />
+        </div>
+      </a>
+      <a href="sihb/extractosemp.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>Visualización de Extractos</h3>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla SNPI" />
+        </div>
+      </a>
+      <a href="sihb/PEadministrador.html" class="funcion-item-link">
+        <div class="funcion-item">
+          <h3>PE Administrador</h3>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Extranet" />
+        </div>
+      </a>
+    </div>
+  </section>
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+  <a href="iXpert.html" class="button-fixed">⬅ Volver a la Portada</a>
+</body>
+</html>

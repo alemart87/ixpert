@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestamos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Incluir Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 1000px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Préstamos Bancarios</h1>
+    </header>
+    <nav>
+        <a href="#motivo"></a>
+        <a href="#identificar"></a>
+        <a href="#paso2"></a>
+        <a href="#confirmacion"></a>
+    </nav>
+    <section id="introduccion">
+        <h2>🏦 Tipos de Préstamos</h2>
+        <style>
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+          
+            th, td {
+              padding: 10px;
+              border: 1px solid #ccc;
+              text-align: center;
+            }
+          
+            th {
+              background-color: #f0f0f0;
+              font-weight: bold;
+            }
+          
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+          
+            tr:hover {
+              background-color: #e1e1e1;
+            }
+          </style>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>📌 Tipo de Préstamo</th>
+                <th>👨‍💼 Encargado de Desembolso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mi Casa</td>
+                <td>Oficiales de Cuentas</td>
+              </tr>
+              <tr>
+                <td>Mi Auto</td>
+                <td>Oficiales de Cuentas</td>
+              </tr>
+              <tr>
+                <td>Préstamos Personales</td>
+                <td>Oficiales de Cuentas</td>
+              </tr>
+              <tr>
+                <td>Préstamos Electrónicos (PE)</td>
+                <td>SAC</td>
+              </tr>
+            </tbody>
+          </table>
+          <img src="imagenes/imagen0.jpg" alt="Pantalla Bancard" style="width: 1800px; height: 100px;">
+    </section>
+    
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="tuto9.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>

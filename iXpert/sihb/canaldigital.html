@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canal Digital</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+                header {
+            background-color: #ff6600;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            border-bottom: 2px solid #ff6600;
+        }
+        h2 {
+            color: #0000ff;
+        }
+        .funciones-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .funciones-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .funcion-item-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .funcion-item {
+            width: 400px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .funcion-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .funcion-item img {
+            margin: 10px 0;
+            max-width: 300px;
+            height: auto;
+        }
+        footer {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #004080;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .button-fixed:hover {
+            background: #ff6600;
+            transform: scale(1.05);
+        }
+
+    
+
+        .menu-container {
+            background-color: #ff6600;
+            padding: 30px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .menu-box {
+            position: relative;
+            background-color: white;
+            width: 250px;
+            height: 220px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            padding: 20px 10px 10px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .menu-box:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0055ff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .menu-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .menu-subtitle {
+            font-size: 16px;
+            color: #000;
+        }
+
+        .content-panel {
+            display: none;
+            background-color: #ff6600;
+            padding: 30px 20px;
+            color: #000;
+        }
+
+        .content-boxes {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .content-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .content-box h3 {
+            text-align: center;
+            background-color: white;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .content-box ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+
+
+        .panel-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .panel-button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .panel-button:hover {
+            transform: scale(1.05);
+        }
+        .accordion-toggle {
+            width: 100%;
+            text-align: left;
+            background-color: #0077cc;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+            }
+
+            .accordion-toggle:hover {
+            background-color: #005fa3;
+            }
+
+            .accordion-content {
+            display: none;
+            padding: 15px 20px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease-in-out;
+            }
+
+            .accordion-content.show {
+            display: block;
+            }
+
+            @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+            }
+            .boton-centro {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            }
+
+            .boton-centro button {
+                background-color: #004080;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            .boton-centro button:hover {
+                    background: #ff6600;
+                    transform: scale(1.05); /* un azul un poco más claro al pasar el mouse */
+            }
+    </style>
+</head>
+<body>
+
+<!-- Encabezado superior y menú horizontal -->
+<div style="background-color: #ff6600; padding: 30px 0; text-align: center;">
+    <h1 style="color: white; font-size: 32px; margin: 0;">Canal Digital</h1>
+</div>
+
+<nav style="background-color: #000; padding: 15px 0;">
+    <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+        <a href="#" style="color: white; text-decoration: none; font-weight: bold;"></a>
+        <a href="#" style="color: white; text-decoration: none; font-weight: bold;"></a>
+        <a href="#" style="color: white; text-decoration: none; font-weight: bold;"></a>
+        <a href="#" style="color: white; text-decoration: none; font-weight: bold;"></a>
+    </div>
+</nav>
+
+<!-- Menú principal -->
+<section class="menu-container">
+    <div class="menu-box" onclick="showPanel(1)">
+        <div class="menu-number">1</div>
+        <div class="menu-icon">💻</div>
+        <div class="menu-title">24 Hs. Negocios</div>
+        <div class="menu-subtitle">Canal Transaccional</div>
+    </div>
+
+    <div class="menu-box" onclick="showPanel(2)">
+        <div class="menu-number">2</div>
+        <div class="menu-icon">📱</div>
+        <div class="menu-title">App PJ</div>
+        <div class="menu-subtitle">Consultas y Operaciones</div>
+    </div>
+
+    <div class="menu-box" onclick="showPanel(3)">
+        <div class="menu-number">3</div>
+        <div class="menu-icon">🧾</div>
+        <div class="menu-title">Homebanking PJ</div>
+        <div class="menu-subtitle">Resúmenes y Avisos</div>
+    </div>
+    <!-- Botones pequeños tipo barra -->
+    <div class="panel-buttons">
+        <button class="panel-button" onclick="showPanel(4)">Transaccional</button>
+        <button class="panel-button" onclick="showPanel(5)">Consultas</button>
+        <button class="panel-button" onclick="showPanel(6)">Pantallas OPR</button>
+    </div>
+</section>
+
+<!-- Panel de contenido para opción 1 -->
+<section id="panel1" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Sitio Administrador</h3>
+            <ul>
+                <li>Administración de Operadores</li>
+                <li>Servicios/Productos</li>
+                <li>Activación de iToken Admin y Operador</li>
+            </ul>
+        </div>
+        <div class="content-box">
+            <h3>Sitio Operador</h3>
+            <ul>
+                <li>Transacciones</li>
+                <li>Aprobaciones</li>
+                <li>Modificaciones</li>
+                <li>Anulaciones</li>
+            </ul>
+        </div>
+</section>
+
+<!-- Panel de contenido para opción 2 -->
+<section id="panel2" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Sitio Consultas</h3>
+            <ul>
+                <li>Consultas</li>
+            </ul>
+        </div>
+        <div class="content-box">
+            <h3>Sitio Autorizaciones</h3>
+            <ul>
+                <li>Autorizaciones</li>
+                <li>Anulaciones</li>
+                <li>iToken</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Panel de contenido para opción 3 -->
+<section id="panel3" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Funcionalidad similar al homebanking PF.</h3>
+            <ul>
+                <li>Solo se puede transaccionar con CGARA.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Panel de contenido para opción 4 -->
+<section id="panel4" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Transaccional</h3>
+            <img src="../imagenes/imagen152.jpg"  alt="Pantalla Bancard" style="width: 700px; height:400px;">
+            <ul>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Pago de Salario</button>
+                <div class="accordion-content">
+                <ul>
+                    <p>Le permite realizar el pago de sueldos, en guaraníes y dólares americanos, con rapidez y seguridad, a cualquier hora y en cualquier lugar a través de 24 horas en Internet o a través del aplicativo para empresas</p>
+                    <p><b>Ventajas para la empresa:</b></p>
+                    <ul>
+                        <li>Acceso a información online de la gestión de pagos</li>
+                        <li>Equipo de asesores especializados para la implementación del servicio</li>
+                    </ul>
+                    <p><b>Ventajas para los empleados:</b></p>
+                    <ul>
+                        <li>Apertura de cuentas corriente o ahorro sin exigencia de saldo promedio</li>
+                        <li>Disponibilidad inmediata de los fondos</li>
+                        <li>Máxima cobertura en cajeros automáticos, red de sucursales y corresponsales no bancarios</li>
+                    </ul>
+                    <p><b>Requisitos:</b></p>
+                    <ul>
+                        <li>Contrato de Pago de Salarios</li>
+                        <li>Acceso a PIN de Pagos Electrónicos</li>
+                    </ul>
+                    <p><b>Consideraciones:</b></p>
+                    <ul>
+                        <li>No se puede realizar operaciones con moneda cruzada</li>
+                        <li>Cuenta con la posibilidad de transmisión de archivos en txt /Excel</li>
+                        <li>Admite pagos con sobregiro ..(no online)</li>
+                        <li>Se puede realizar pagos a cuentas bancarias y/o tarjetas prepagas salario</li>
+                    </ul>
+                </ul>
+                <div class="boton-centro">
+                    <button class="btn-pagoservicios" onclick="window.location.href='pagosalario.html'">Instructivo Pago de Salario</button>
+                </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Pago a Proveedores</button>
+                <div class="accordion-content">
+                <ul>
+                    <p>Mejora la administración de sus pagos a los proveedores de su empresa, tanto en guaraníes como en dólares, en forma electrónica, ágil y segura</p>
+                    <p><b>Forma de pago:</b>crédito en cuenta, tarjeta prepaga, y/o cheques administrativos</p>
+                    <p><b>Ventajas para la empresa:</b></p>
+                    <ul>
+                        <li>Auto programación de pagos de hasta 180 días</li>
+                        <li>Generación de recibo de dinero Información de la gestión de pagos realizados y a vencer</li>
+                    </ul>
+                    <p><b>Ventajas para el proveedor:</b></p>
+                    <ul>
+                        <li>Exoneración de saldo promedio</li>
+                        <li>Disponibilidad inmediata de los pagos</li>
+                        <li>Generación de comprobantes de crédito en la web</li>
+                        <li>Acceso a los productos del banco</li>
+                    </ul>
+                    <p><b>Requisitos:</b>Contrato de Pago de Salarios Acceso a PIN de Pagos Electrónicos</p>
+                </ul>
+                <div class="boton-centro">
+                    <button class="btn-pagoservicios" onclick="window.location.href='pagoaproveedores.html'">Instructivo Pago a Proveedores</button>
+                </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Transferencia al Exterior</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Facilita a tus clientes la gestión de pagos online a través de Banco Itaú, de sus facturas y/o cuentas pendientes de pagos, de una forma ágil y sencilla, accediendo desde la web Itaú, Mobile y próximamente desde los Corresponsales no bancarios</p>
+                <p>Este servicio busca mejorar los tiempos de cobranzas y pagos de las empresas, teniendo una plataforma de conciliación y reportes on line del estado de los cobros de sus facturas</p>
+            </ul>
+                <div class="boton-centro">
+                    <button class="btn-pagoservicios" onclick="window.location.href='transferexterior.html'">Instructivo Transferencia al Exterior</button>
+                </div>
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Transferencia Locales</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Seguridad a la hora de transferir sus fondos a cuentas propias o de terceros dentro de Itaú y/o a otros bancos locales a través de SIPAP</p>
+                <ul>
+                    <li>Seguridad en sus transferencias utilizando el dispositivo token</li>
+                    <li>Disponibilidad de fondos online para transferencias dentro de Itaú, para transferencias vía SIPAP según horario de corte establecido</li>
+                    <li>Transferencia dentro de Itaú con operación de cambio con negociación de tasas especiales</li>
+                    <li>Alertas vía mail o SMS al beneficiario de su transferencia</li>
+                    <li>Disponibilidad de comprobantes en la web</li>
+                    <li>Ahorro de tiempo con las plantillas y carga masiva de pagos a través de archivo en formato Excel</li>
+                    <li>Gestión de pagos en línea vía web (reportes)</li>
+                </ul>
+            </ul>
+
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Pago de Servicios</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Permite a su empresa realizar pagos de facturas de diversos servicios públicos y privados, de una forma ágil y segura Desde 24 horas Negocios</p>
+                <ul>
+                    <li>Más de 50 empresas de servicios públicos, servicios de telefonía e internet, seguros y otros disponibles a través de la web</li>
+                    <li>Comodidad a la hora de realizar sus operaciones financieras</li>
+                    <li>Servicio sin costo</li>
+                    <li>Disponibilidad de comprobantes en la web</li>
+                    <li>Requisitos Acceso al servicio de 24 Horas Negocios</li>
+                </ul>
+                <p><strong>Consideraciones:</strong></p>
+                <ul>
+                    <li>Se recomienda que los pagos sean cargados y autorizados el mismo día</li>
+                    <li>Las autorizaciones se pueden realizar vía app/web con validación del pin operador</li>
+                    <li>Puede contar hasta nivel 3 de autorizaciones</li>
+                    <li>Válido para cuenta Gs y USD</li>
+                    <li>La confirmación de los pagos dependen de la conexión con la procesadora/facturador, por lo que el cliente deberá realizar seguimiento hasta el estado final de la transacción</li>
+                </ul>
+            </ul>
+                <div class="boton-centro">
+                    <button class="btn-pagoservicios" onclick="window.location.href='pagodeservicios.html'">Instructivo Pago de Servicios</button>
+                </div>
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Débitos Comandados / Automáticos</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Permite realizar débitos del monto correspondiente a su servicio a todos los clientes que tengan cuentas habilitadas en Itaú Paraguay</p>
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Cobro realizándole el débito de la cuenta del cliente</li>
+                    <li>Ahorro en costos de gestión de cobro y tiempo</li>
+                    <li>Autorización del cliente una sola vez</li>
+                    <li>Mejora en su gestión, con el envío de archivo una vez al mes</li>
+                    <li>Crédito del cobro realizado en el mismo día</li>
+                    <li>Información disponible sobre el proceso realizado</li>
+                    <li>Flexibilidad, al permitir el débito de más de una cuota</li>
+                </ul>
+                <p><strong>Consideraciones:</strong></p>
+                <ul>
+                    <li>Modalidad ML Los débitos comandados ingresados se reintentan desde la autorización del lote hasta lo que dura el día y si la cuenta debito no contaba con los fondos durante ese periodo de reintento, entonces al final del dìa se rechazan con el motivo de Insuf Fondos”</li>
+                    <li>Modalidad MD Se puede reintentar hasta el fin de los tiempos</li>
+                    <li>Los débitos aut se transmiten una vez y no se puede visualizar el status en la web, el cliente recibe un reporte vía mail</li>
+                    <li>Los débitos comandados se pueden programar hasta 180 días y se puede transmitir archivos Txt xls, xlsx o carga individual</li>
+                    <li>Reportes de las gestiones de cobranzas realizadas disponibles en la web de consultas</li>
+                    <li>Válido para cuentas GS y USD</li>
+                    <li>Se debe presentar el formulario de autorización del cliente pagador al banco</li>
+                    <li>No se puede negociar el costo en la web</li>
+                </ul>
+            </ul>
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Operaciones Aduaneras</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Este servicio le permite debitar de su cuenta el importe correspondiente a las operaciones aduaneras tales como:</p>
+                <ul>
+                    <li>Declaraciones de despacho</li>
+                    <li>IVA Despachante</li>
+                    <li>Centro de Despachantes</li>
+                    <li>Expedientes</li>
+                </ul>
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Comodidad a la hora de realizar sus operaciones financieras</li>
+                    <li>Servicio sin costo</li>
+                    <li>Disponibilidad de comprobantes en la web</li>
+                </ul>
+                <p><strong>Requisitos:</strong>Acceso a PIN de Pagos Electrónicos</p>
+            </ul>
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Custodia de Cheques</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Custodia y administración de cheques con fecha adelantada o de pago diferido, recibidos por nuestros clientes, en pago de operaciones comerciales</p>
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Administración de cheques a cargo del banco</li>
+                    <li>Tercerización de la gestión de depósitos de cheques</li>
+                    <li>Información de cheques en custodia a través de la web</li>
+                    <li>Seguridad en el proceso de depósito</li>
+                    <li>Aplicativo para carga de datos sin costo</li>
+                    <li>Área de soporte</li>
+                    <li>Posibilidad de excluir o cambiar de fecha los cheques</li>
+                    <li>Histórico de cheques por más de 12 meses</li>
+                    <li>Posibilidad de realizar descuento de cheques</li>
+                </ul>
+            </ul>
+            </div>
+            </div>
+            <div class="accordion-item">
+                <button class="accordion-toggle">Cobro Electrónico</button>
+                <div class="accordion-content">
+            <ul>
+                <p>Facilita a tus clientes la gestión de pagos online a través de Banco Itaú, de sus facturas y/o cuentas pendientes de pagos, de una forma ágil y sencilla, accediendo desde la web Itaú, Mobile y próximamente desde los Corresponsales no bancarios</p>
+                <p>Este servicio busca mejorar los tiempos de cobranzas y pagos de las empresas, teniendo una plataforma de conciliación y reportes on line del estado de los cobros de sus facturas</p>
+            </ul>
+
+            </ul>
+            </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Panel de contenido para opción 5 -->
+<section id="panel5" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Consultas Disponibles</h3>
+            <ul>
+                <li>Saldos</li>
+                <li>Movimientos</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Panel de contenido para opción 6 -->
+<section id="panel6" class="content-panel">
+    <div class="content-boxes">
+        <div class="content-box">
+            <h3>Pantallas OPR</h3>
+            <ul>
+                <li>Módulo Productos y Servicios</li>
+                <img src="../imagenes/imagen168.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <li>Extracto consolidado</li>
+                <img src="../imagenes/imagen169.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <li>Cuentas permitidas por el admin.</li>
+                <img src="../imagenes/imagen170.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <p></p>
+                <img src="../imagenes/imagen171.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <p></p>
+                <img src="../imagenes/imagen172.jpg"  alt="IMG" style="width: 800px; height: 150px;">
+                <img src="../imagenes/imagen173.jpg"  alt="IMG" style="width: 800px; height: 150px;">
+                <p><i>Hasta 11 meses atrás</i></p>
+                <li>Extracto de Cuentas</li>
+                <img src="../imagenes/imagen174.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <li>Avisos de crédito/débito</li>
+                <img src="../imagenes/imagen175.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+                <img src="../imagenes/imagen176.jpg"  alt="IMG" style="width: 800px; height: 400px;">
+            </ul>
+        </div>
+    </div>
+</section>
+
+<script>
+    function showPanel(num) {
+        const total = 6; // actualiza este número si agregas más paneles
+        for (let i = 1; i <= total; i++) {
+            document.getElementById('panel' + i).style.display = (i === num) ? 'block' : 'none';
+        }
+        // scroll automático al panel
+        document.getElementById('panel' + num).scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+<script>
+  document.querySelectorAll('.accordion-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const content = button.nextElementSibling;
+      content.classList.toggle('show');
+    });
+  });
+</script>
+
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+
+</body>
+</html>

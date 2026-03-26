@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iToken Excepcional en BPM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ff6600; /* Naranja */
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #000000; /* Negro */
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 800px;
+            border-bottom: 2px solid #ff6600; /* Naranja */
+        }
+        h2 {
+            color: #0000ff; /* Azul */
+        }
+        img {
+            width: 100%;
+            max-width: 800px; /* Aumenta el tamaño máximo */
+            display: block;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #000000; /* Negro */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+        .button-fixed {
+            position: fixed; /* Mantiene el botón en una posición fija */
+            bottom: 20px; /* A 20px del borde inferior de la pantalla */
+            right: 20px; /* A 20px del borde derecho de la pantalla */
+            padding: 15px 25px;
+            background: #004080; /* Azul oscuro */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000; /* Asegura que el botón esté encima de otros elementos */
+        }
+        .button-fixed:hover {
+            background: #ff6600; /* Naranja */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Paso a paso: Carga en BPM - iToken Excepcional</h1>
+    </header>
+    <nav>
+
+    </nav>
+    <section id="introduccion">
+        <h2> </h2>
+        <p>Este tutorial explica de manera sencilla cómo cargar una solicitud de activación excepcional de iToken en el sistema BPM. Sigue los pasos a continuación con las imágenes de referencia.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla introductoria de Itaú">
+    </section>
+    <section id="identificar">
+        <h2>1️⃣ Ingreso al Sistema BPM</h2>
+        <p>Accede al sistema BPM e ingresa con tus credenciales.</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla verificacion SAC.COM">
+    </section>
+    <section id="paso2">
+        <h2>2️⃣ Creación de un Nuevo Proceso</h2>
+        <p>Haz clic en "Nuevo proceso" para iniciar una nueva solicitud.</p>
+        <img src="imagenes/imagen18.webp" alt="Pantalla Bancard" style="width: 200px; height: auto;">
+    </section>
+    <section id="paso2">
+        <h2>3️⃣ Búsqueda del Cliente</h2>
+        <p>En el campo correspondiente, ingresa el número de cédula del cliente.</p>
+        <p>Presiona "Buscar" o directamente Enter.</p>
+        <img src="imagenes/imagen19.webp" alt="Pantalla Bancard" style="width: 600px; height: auto;">
+    </section>
+    <section id="paso2">
+        <h2>4️⃣ Selección del Cliente</h2>
+        <p>Aparecerá una lista con los resultados de la búsqueda.</p>
+        <p>Haz clic sobre el nombre del cliente para seleccionarlo.</p>
+        <img src="imagenes/imagen20.webp" alt="Pantalla Bancard" style="width: 600px; height: auto;">
+    </section>
+    <section id="paso2">
+        <h2>5️⃣ Selección de la Opción 24 hs Internet</h2>
+        <p>En el menú de opciones, selecciona "24 hs Internet".</p>
+        <img src="imagenes/imagen21.jpg" alt="Pantalla Bancard" style="width: 600px; height: auto;">
+    </section>
+    <section id="paso2">
+        <h2>6️⃣ Elección de la Opción Correcta</h2>
+        <p>Dentro de las opciones disponibles, selecciona la penúltima opción: "Solicitud soporte integral 24 hs".</p>
+        <img src="imagenes/imagen22.jpg" alt="Pantalla Bancard" style="width: 600px; height: auto;">
+    </section>
+    <section id="paso2">
+        <h2>7️⃣ Ingreso del Motivo</h2>
+        <p>En el campo Motivo, selecciona "Activación iToken Excepcional".</p>
+        <p>En el campo inferior, escribe "NA".</p>
+        <img src="imagenes/imagen23.jpg" alt="Pantalla Bancard" style="width: 600px; height: auto;">
+    </section>
+    <section id="paso2" style="max-width: 600px; margin: auto; font-family: Arial, sans-serif;">
+        <h2>8️⃣ Comentario de la Actividad</h2>
+        <p>Completa el campo <strong>"Comentario de la actividad"</strong> siguiendo el formato indicado.</p>
+        <img src="imagenes/imagen24.jpg" alt="Pantalla Bancard" style="width: 100%; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);">
+        
+        <form id="formComentario" style="background: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); margin-top: 20px; display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr);">
+            <label for="ci">📌 CI:</label><input type="text" id="ci" required>
+            <label for="telefono">📞 Teléfono:</label><input type="text" id="telefono" required>
+            <label for="correo">✉️ Mail:</label><input type="email" id="correo" required>
+            <label for="tipoSolicitud">📝 Tipo de solicitud:</label><input type="text" id="tipoSolicitud" required>
+            <label for="mensajeError">⚠️ Error:</label><input type="text" id="mensajeError" placeholder="Si aplica">
+            <label for="descripcion">📖 Descripción:</label><textarea id="descripcion" required></textarea>
+            <label for="canalPago">💳 Canal pago:</label><input type="text" id="canalPago" placeholder="Si aplica">
+            <label for="transacciones">🔄 Transacciones:</label><input type="text" id="transacciones" placeholder="Si aplica">
+            <label for="medioPago">💰 Medio pago:</label><input type="text" id="medioPago">
+            <label for="versionApp">📲 Versión app:</label><input type="text" id="versionApp" required>
+            <label for="modeloDispositivo">📱 Modelo:</label><input type="text" id="modeloDispositivo" required>
+            <label for="tipoDispositivo">🖥️ Tipo:</label><input type="text" id="tipoDispositivo" required>
+            <button type="button" onclick="generarComentario()" style="grid-column: span 2;">✅ Generar Formato</button>
+        </form>
+    
+        <h3>📋 Comentario Generado:</h3>
+        <textarea id="resultado" rows="8" readonly></textarea>
+    </section>
+    
+    <style>
+        label { font-weight: bold; display: block; }
+        input, textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        textarea { height: 60px; resize: none; }
+        button { background-color: #007BFF; color: white; border: none; padding: 10px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #resultado { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: #eef; color: #333; height: 80px; }
+    </style>
+    
+    <script>
+        function generarComentario() {
+            const campos = ['ci', 'telefono', 'correo', 'tipoSolicitud', 'mensajeError', 'descripcion', 'canalPago', 'transacciones', 'medioPago', 'versionApp', 'modeloDispositivo', 'tipoDispositivo'];
+            let resultado = '';
+            campos.forEach(id => {
+                let valor = document.getElementById(id).value || "NA";
+                let label = document.querySelector(`label[for="${id}"]`).innerText.replace(/[^a-zA-Z0-9\s]/g, "").trim();
+                resultado += `${label}: ${valor}\n`;  // Se agrega ": " después del label
+             });
+            resultado += "\n*********************************************************";
+            document.getElementById('resultado').value = resultado;
+        }
+    </script>
+    <section id="paso2">
+        <h2>9️⃣ Guardado y Finalización</h2>
+        <p>Una vez completados todos los campos, haz clic en "Guardar" para finalizar la solicitud.</p>
+    </section>
+    <section id="confirmacion">
+        <h2> </h2>
+        <p>✅ ¡Listo! La solicitud de activación excepcional de iToken ha sido enviada correctamente.</p>
+        <p>📌 <b>>Recuerda:</b> Si el cliente tiene dudas sobre los pasos a seguir luego de la solicitud, explícale el proceso de confirmación y tiempos de respuesta.</p>
+        <p>Si necesitas más ayuda, consulta con tu supervisor o revisa la documentación interna. 😊</p>
+        <img src="imagenes/imagen0.jpg" alt="Pantalla de confirmación final">
+    </section>
+    <footer>
+        <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+    </footer>
+    <a href="tuto4.html" class="button-fixed">⬅ Volver a Atras</a>
+</body>
+</html>

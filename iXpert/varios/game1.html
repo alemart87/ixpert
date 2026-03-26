@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trivia Bancaria WOW</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(270deg, #004080, #ff6600, #333);
+      background-size: 600% 600%;
+      animation: bgAnimation 18s ease infinite;
+      overflow: hidden;
+      color: #333;
+    }
+
+    @keyframes bgAnimation {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .game-container {
+      width: 95%;
+      max-width: 800px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      padding: 25px;
+      text-align: center;
+      position: relative;
+      animation: zoomIn 0.8s ease;
+      z-index: 2;
+    }
+
+    @keyframes zoomIn {
+      from {transform: scale(0.8); opacity: 0;}
+      to {transform: scale(1); opacity: 1;}
+    }
+
+    h1 {
+      margin-bottom: 15px;
+      font-size: 26px;
+      color: #004080;
+    }
+
+    .question-card {
+      margin: 20px 0;
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 80px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .option {
+      background: #ff6600;
+      color: #fff;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .option:hover { transform: scale(1.07); background: #cc5200; }
+    .correct { background: #28a745 !important; }
+    .incorrect { background: #dc3545 !important; }
+
+    .score {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+    .progress {
+      height: 100%;
+      width: 0;
+      background: #004080;
+      transition: width 0.5s ease;
+    }
+
+    .timer {
+      margin: 10px auto;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 6px solid #004080;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #004080;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% {transform: scale(1);}
+      50% {transform: scale(1.1);}
+      100% {transform: scale(1);}
+    }
+
+    .start-screen, .end-screen {
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    .btn {
+      background: #004080;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn:hover { background: #002d59; transform: scale(1.05); }
+
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .home-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 46px;
+      height: 46px;
+      background: #004080;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.2s, background 0.3s;
+      z-index: 3;
+    }
+    .home-button:hover {
+      background: #002d59;
+      transform: scale(1.15);
+    }
+    .home-button svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <a href="../iXpert.html" class="home-button" title="Volver al inicio">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-10.5z"/>
+    </svg>
+  </a>
+
+  <div class="game-container">
+    <div id="start" class="start-screen">
+      <h1>🎉 Bienvenido a la Trivia de iXpert 🎉</h1>
+      <p>Responde correctamente y suma puntos.</p>
+      <button class="btn" onclick="startGame()">Comenzar</button>
+    </div>
+
+    <div id="game" style="display:none;">
+      <h1>iXpert Trivia</h1>
+      <div class="progress-bar"><div id="progress" class="progress"></div></div>
+      <p id="progressText"></p>
+      <div id="timer" class="timer"></div>
+      <div id="question" class="question-card"></div>
+      <div id="options" class="options"></div>
+      <div id="score" class="score"></div>
+    </div>
+
+    <div id="end" class="end-screen" style="display:none;">
+      <h1>🎊 ¡Juego terminado! 🎊</h1>
+      <p id="finalScore"></p>
+      <p id="finalMessage"></p>
+      <p id="bestScore"></p>
+      <button class="btn" onclick="startGame()">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <script>
+    // Tus 20 preguntas exactas
+    const preguntas = [
+    //1
+        {pregunta: "¡Quiero pagar mi préstamo y no puedo! Me sale un error que dice 'Algo salió mal'. ¿Qué puedo hacer?",
+        correcta: "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
+        opciones: [
+        "Su PIN de transacción está vencido. Debe generar uno nuevo desde la app de Bancard >> 'Seguridad' >> 'Solicitar PIN de transacción' y activarlo con su tarjeta de débito (por SMS o en un cajero automático).",
+        "Reinstale la app para reiniciar el sistema de pagos. Al ingresar digite su PIN de nuevo y va a funcionar",
+        "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
+        "Contacte con atención al cliente para procesar el pago desde la Banca."
+        ]},
+    //2
+        //{pregunta: "Quiero generar pin de transferencia",
+    //correcta: "Verifico que en su consulta anterior ya había solicitado la activación de su pin de transacción y el mismo se derivó correctamente, le sugiero aguardar el plazo indicado de 24hs y realizar un intento luego del tiempo mencionado para verificar que esté activo y en caso de inconvenientes estoy para ayudarle.",
+    //opciones: [
+      //"Debe cerrar sesión y volver a ingresar a la app.",
+      //"Solicite nuevamente el PIN desde la app.",
+      //"Verifico que en su consulta anterior ya había solicitado la activación de su pin de transacción y el mismo se derivó correctamente, le sugiero aguardar el plazo indicado de 24hs y realizar un intento luego del tiempo mencionado para verificar que esté activo y en caso de inconvenientes estoy para ayudarle.",
+      //"Llame al banco para que lo activen manualmente."]},
+    //3
+        {pregunta: "Para saber el historial de transferencia",
+        correcta: "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días.",
+        opciones: [
+        "Solicite el historial desde la APP y sera remitido por correo electronico en un plazo no mayor a 72hs.",
+        "Por favor facilitar error desde la app por el canal de chat para que se pueda remitir la info desde SAC@.",
+        "Desde la sección 'Cuentas' en la APP > 'Movimientos'> Verificar Movimientos > Transferencias. Filtrar por 30 días",
+        "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días."
+        ]},
+    //4  
+        {pregunta: "Cómo activo mi token",
+        correcta: "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción.",
+        opciones: [
+        "Cerrar sesión en la web, entrar en 'iToken', aceptar términos y 'Instalar'. Luego ir a un cajero y hacer una consulta o extracción desde su TC de otra entidad para finalizar la activación.",
+        "El proceso de activación tiene una demora de 24hs por el canal de chat, por favor acerquese a un cajero para activar.",
+        "Debe ingresar desde la APP en la sección Seguridad > Accesos > iToken > Activar e instalar, luego reiniciar el celular para que funcione",
+        "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción."
+        ]}, 
+    //5
+        {pregunta: "Se me bloqueó el sistema para realizar transferencias",
+        correcta: "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
+        opciones: [
+        "El PIN de acceso está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
+        "Su PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en su celular: 'Seguridad' >> 'Solicitar PIN de seguridad' y activarlo con su tarjeta (SMS o cajero automático).",
+        "Debe ir a una sucursal para desbloquearlo.",
+        "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero)."
+        ]}, 
+    //6
+        {pregunta: "Necesito solicitar un préstamo",
+        correcta: "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted.",
+        opciones: [
+        "Debe enviar un correo electrónico al área correspondiente; no contamos con atención telefónica disponible.",
+        "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.",
+        "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 hs / sáb 8:30 a 12:00 hs).",
+        "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted."
+        ]}, 
+    //7
+        {pregunta: "Quiero saber por qué se me descontó 99mil anoche",
+        correcta: "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
+        opciones: [
+        "La cuenta de salario pasó a personal tras 60 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
+        "La cuenta de salario pasó a personal tras 90 días sin acreditación. La comisión (Gs. 199.000 en caja de ahorro, Gs. 200.000 en cuenta corriente) debe mantener el promedio exigido.",
+        "La cuenta de salario pasó a otra persona tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
+        "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido."
+        ]}, 
+    //8
+        {pregunta: "Hice una transferencia de un monto muy alto y todavía no le llegó a mi cliente",
+        correcta: "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
+        opciones: [
+        "Las transferencias SIPAP de Gs. 5.000.000 o mas son inmediatas. Montos menores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
+        "Las transferencias SIPAP de hasta Gs. 5.000.000 dependen del BCP. Contacte con entre 17:31 y 07:59,lo acreditan en el siguiente horario de corte.",
+        "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
+        "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Pero solo se acreditan los días hábiles por la mañana."
+        ]},
+    //9
+        {pregunta: "¿Cómo hago para crear mis alias?",
+        correcta: "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
+        opciones: [
+        "En la sucursal, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
+        "En la app, Transferencias > Alias. Teléfono y mail se registran y usan de inmediato sin plazo mínimo.",
+        "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
+        "En la app, opción 'Transferencias' >> 'Alias'. Alli debe ingresar el numero de registro de conducir (teléfono y mail deben estar registrados hace más de 2 meses)."
+        ]}, 
+    //10
+        {pregunta: "¿Cómo cambiar número de celular?",
+        correcta: "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).",
+        opciones: [
+        "Puede hacerlo desde la app en la sección 'Perfil'. Completar formulario con los datos actualizados y listo",
+        "Debe hacerlo por el chat llenando un formulario. El horario general de cambio es 08:30 a 13:30 (atención 24 horas).",
+        "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).",
+        "No es posible cambiar el número una vez registrado. Unicamente lo puede hacer en caso de que sea un caso Iphone"
+        ]}, 
+    //11
+        {pregunta: "¿Se puede adquirir tarjetas de crédito en Itaú?",
+        correcta: "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.",
+        opciones: [
+        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000. Puede solicitarla en https://www.itau.com.py/canaldigital, opción 'Full'.",
+        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.",
+        "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.",
+        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/ventas, opción 'Full'.",
+        ]},
+    //12
+        {pregunta: "Error de destinatario en una transferencia, ¿con quién puedo ver la reversión?",
+        correcta: "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
+        opciones: [
+        "Desde la app: 'Transferir' >> 'Solicitudes de desembolso' >> 'Solicitar una desembolso'. Seleccione la transacción, ingrese importe y motivo, y envíe. El beneficiario se contactara.",
+        "Desde la app: 'Seguiridad' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
+        "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
+        "No se puede revertir una transferencia una vez enviada. Lo unico que se puede realizar es contactar al que le llego y solicitar que le transfiera de nuevo"
+        ]}, 
+    //13
+        {pregunta: "Consulta: se me perdió mi tarjeta, ¿lo pueden bloquear?",
+        correcta: "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
+        opciones: [
+        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.",
+        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 5 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
+        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
+        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 45.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."
+        ]}, 
+    //14
+        {pregunta: "¿Cómo puedo extraer mi extracto de cuenta?",
+        correcta: "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
+        opciones: [
+        "Desde www.itau.com.br en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
+        "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Transferencias'. Allí puede descargar meses anteriores.",
+        "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
+        "Desde www.bancard.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
+        ]},
+    //15
+        {pregunta: "¿Desde mi app puedo ver mi código de seguridad de la tarjeta?",
+        correcta: "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.",
+        opciones: [
+        "Sí, en la app Itaú PY >> Productos >> Solictar Tarjeta Virtual.",
+        "No, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.",
+        "Sí, desde el cajero >> Cuentas >> Ver tarjeta virtual.",
+        "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual."
+        ]},
+    //16
+        {pregunta: "¿Por qué yo no tengo intervale?",
+        correcta: "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).",
+        opciones: [
+        "El intervale depende del gerente interno de crédito y riesgo (analiza pagos, referencias, comportamiento financiero, entre otros).",
+        "Solo se otorga a clientes con tarjeta de crédito. Y riesgo crediticio bajo (pagos, referencias, comportamiento financiero, entre otros).",
+        "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).",
+        "El intervale depende de devoluciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros)."
+        ]}, 
+    //17
+        {pregunta: "¿Cómo puedo bloquear mi tarjeta de crédito?",
+        correcta: "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
+        opciones: [
+        "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.",
+        "Solo puede bloquearla desde un cajero automático. Y solicitar reimpresión, es sin costo.",
+        "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
+        "Se puede bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."
+        ]}, 
+    //18
+        {pregunta: "Quiero saber el pago total a la fecha de mis tarjetas de crédito",
+        correcta: "Brindar importe e informar pasos para revisar en la APP",
+        opciones: [
+        "Brindar el importe sin rodeos.",
+        "No se puede saber el total desde el canal de chat.",
+        "Brindar importe e informar pasos para revisar en la APP",
+        "Brindar importe e informar pasos para abonar por chat"
+        ]}, 
+    //19
+        {pregunta: "Quisiera consultar sobre una acreditación de ahorro programado a mi cuenta, según la app el día de ayer se tuvo que haber acreditado",
+        correcta: "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
+        opciones: [
+        "Debe esperar 72 horas para que se procese. Ya que solo se realiza un día habil a partir de las 17:00 horas.",
+        "Las acreditaciones se realizan en días Lunes a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
+        "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
+        "Las acreditaciones no se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día no hábil."
+        ]}, 
+    //20
+        {pregunta: "¿Cómo activo mi token?",
+        correcta: "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.",
+        opciones: [
+        "Debe esperar 24 horas para que se active automáticamente. Luego ir a un cajero Itaú/Infonet con una consulta o extracción.",
+        "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Dinelco con una consulta o extracción.",
+        "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.",
+        "Cierre sesión en la app, entre en la APP, vaya a la sección de chat a solicitar. Luego active en un cajero Itaú/Infonet con una consulta o extracción."
+        ]},
+    //extras
+        {pregunta: "¿Cómo abro una cuenta digital en Itaú sin ir al banco?",
+        correcta: "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
+        opciones: [
+        "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu resgistro de conducir, comprobante de compras y domicilio. En minutos ya tenés tu cuenta activa..",
+        "Podés abrir la cuenta 100% digital desde tu celular, contacta con el chat, envia comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
+        "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
+        "Podés abrir la cuenta 100% digital desde tu celular, llamando al 5050, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa."
+        ]},
+        {pregunta: "¿Qué diferencia hay entre la cuenta Básica y la Full en Itaú?",
+        correcta: "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.",
+        opciones: [
+        "La Básica es mas barato y con menos requisitos, pero no tiene límites. La Full pide ingresos demostrables y ofrece más beneficios.",
+        "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y es para empresas.",
+        "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.",
+        "La Básica se abre más rápido y pero debo ser personal bank, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios."
+        ]},
+        {pregunta: "¿Cuáles son los requisitos para pedir una tarjeta de crédito Itaú Full?",
+        correcta: "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.",
+        opciones: [
+        "Solo tener una cuenta en Itaú. Ser mayor de edad y tener ingresos.",
+        "Ser mayor de edad, tener un préstamo activo demostrable que se abona con salario.",
+        "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.",
+        "Ser cliente del banco hace más de 5 años. Facilita el acceso a la tarjeta full"
+        ]},
+        {pregunta: "¿Qué es Itaú Ticket y cómo funciona?",
+        correcta: "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.",
+        opciones: [
+        "Es un servicio para prestar dinero del banco a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto de giro en 24 horas.",
+        "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas. Aplica solo para Personal Bank",
+        "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.",
+        "Es un servicio para enviar courier a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario recibe en un punto Itaú Express en 24 horas."
+        ]},
+        {pregunta: "¿Para qué sirve el iToken en Itaú?",
+        correcta: "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.",
+        opciones: [
+        "Sirve para usar tiktok de forma segura desde la app o web, generando una clave única.",
+        "Sirve como codigo para desbloquear el celular de forma segura desde la app o web, generando una clave única.",
+        "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.",
+        "Sirve para pedir transferencias o prestamos de forma segura desde la app o web, generando una clave única.."
+        ]},
+        {pregunta: "¿Qué requisitos necesito para solicitar un préstamo 'Mi Casa' en Itaú?",
+        correcta: "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
+        opciones: [
+        "Cédula vigente, vida y residencia, antigüedad en el domicilio (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
+        "Cédula vigente, comprobante de ingresos, antigüedad laboral (10 años asalariados / 20 años independientes) y que la propiedad esté asegurada y tasada.",
+        "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
+        "Cédula verde, comprobante de chapa, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada."
+        ]},
+        {pregunta: "¿Cómo cancelo mi cuenta Itaú si ya no la quiero usar?",
+        correcta: "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.",
+        opciones: [
+        "No podés cancelarla desde la app Itaú PY o llamando al SAC. Podés ir a sucursal si preferís.",
+        "Solo podés cancelarla en cajero automático. O escribiendo al Chat",
+        "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.",
+        "Podés cancelarla si lo dejas de usar o contactando al SAC. También podés ir a sucursal si preferís."
+        ]},
+        {pregunta: "Después de abrir mi cuenta Full, ¿dónde veo mis productos?",
+        correcta: "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
+        opciones: [
+        "Se recibe por email, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
+        "Solo contactando al Chat se puede validar todos los productos vigentes asi como saldos y movimientos.",
+        "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
+        "En la galeria de fotos de Itau Py, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos."
+        ]},
+        {pregunta: "¿Puedo pedir reversión de un pago con Itaú Ticket?",
+        correcta: "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.",
+        opciones: [
+        "Si, una vez generado y cobrado el ticket si se puede revertir. Solo se pedir cancelar una vez que fue cobrado.",
+        "No, una vez generado y cobrado el ticket no se puede revertir. Pero contactando al chat se puede revertir.",
+        "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.",
+        "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar por el chat."
+        ]},
+        {pregunta: "¿Cómo solicito mi extracto mensual en Itaú?",
+        correcta: "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.",
+        opciones: [
+        "Podés solicitarlo desde la web al oficial o contactar al chat en la sección Extractos.",
+        "No es posible descargarlo desde la web oficial o la app Itaú PY",
+        "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.",
+        "Se envía automáticamente por correo, revise sus correos anteriores."
+        ]},
+        {pregunta: "Cliente responde correctamente preguntas de seguridad para el PIN, menos la marca/modelo del celular. ¿Qué hago?",
+        correcta: "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia",
+        opciones: [
+        "Se indica que por el medio demora 24hs para la activación y procedo a derivar la solicitud.",
+        "Solicitar al cliente una foto selfie con su cédula en mano para validar titularidad",
+        "Actualmente es posible activarlo por este canal. En un plazo de 24hs recibirá un SMS confirmando la activación",
+        "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia"
+        ]},
+        {pregunta: "Cliente responde correctamente preguntas de seguridad para el PIN, menos la marca/modelo del celular. ¿Qué hago?",
+        correcta: "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia",
+        opciones: [
+        "Se indica que por el medio demora 24hs para la activación y procedo a derivar la solicitud.",
+        "Solicitar al cliente una foto selfie con su cédula en mano para validar titularidad",
+        "Actualmente es posible activarlo por este canal. En un plazo de 24hs recibirá un SMS confirmando la activación",
+        "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia"
+        ]},   
+    ];
+
+    let shuffledQuestions = [];
+    let score = 0;
+    let questionIndex = 0;
+    let timerInterval;
+    let streak = 0;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      score = 0;
+      questionIndex = 0;
+      streak = 0;
+      shuffledQuestions = shuffle([...preguntas]).slice(0, 10); // solo 10 preguntas
+      document.getElementById("start").style.display = "none";
+      document.getElementById("end").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (questionIndex >= shuffledQuestions.length) {
+        endGame();
+        return;
+      }
+
+      const q = shuffledQuestions[questionIndex];
+      document.getElementById("question").innerText = q.pregunta;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      const shuffledOptions = shuffle([...q.opciones]);
+
+      shuffledOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt === q.correcta);
+        optionsDiv.appendChild(btn);
+      });
+
+      document.getElementById("score").innerText = `Puntos: ${score}`;
+      document.getElementById("progress").style.width = `${(questionIndex / shuffledQuestions.length) * 100}%`;
+      document.getElementById("progressText").innerText = `Pregunta ${questionIndex + 1} de ${shuffledQuestions.length}`;
+
+      startTimer(20);
+    }
+
+    function checkAnswer(btn, correct) {
+      clearInterval(timerInterval);
+      if (correct) {
+        btn.classList.add("correct");
+        score += 10;
+        streak++;
+        if (streak % 3 === 0) score += 5; // bonus
+        launchConfetti(150);
+      } else {
+        btn.classList.add("incorrect");
+        streak = 0;
+      }
+
+      setTimeout(() => {
+        questionIndex++;
+        showQuestion();
+      }, 1000);
+    }
+
+    function startTimer(seconds) {
+      let time = seconds;
+      document.getElementById("timer").innerText = time;
+      timerInterval = setInterval(() => {
+        time--;
+        document.getElementById("timer").innerText = time;
+        if (time <= 0) {
+          clearInterval(timerInterval);
+          questionIndex++;
+          showQuestion();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      document.getElementById("game").style.display = "none";
+      document.getElementById("end").style.display = "block";
+
+      const totalPosible = shuffledQuestions.length * 10;
+      document.getElementById("finalScore").innerText = `Tu puntuación final es: ${score} puntos de ${totalPosible}.`;
+
+      let mensaje = "";
+      const porcentaje = (score / totalPosible) * 100;
+      if (porcentaje >= 80) mensaje = "¡Crack total 👏!";
+      else if (porcentaje >= 50) mensaje = "Bien hecho 💪";
+      else mensaje = "Podés mejorar 😉";
+      document.getElementById("finalMessage").innerText = mensaje;
+
+      // Guardar récord
+      const best = localStorage.getItem("bestScore") || 0;
+      if(score > best) localStorage.setItem("bestScore", score);
+      document.getElementById("bestScore").innerText = `Tu récord actual es: ${localStorage.getItem("bestScore")} puntos`;
+
+      document.getElementById("progress").style.width = "100%";
+      launchConfetti(600);
+    }
+
+    const confettiCanvas = document.getElementById("confetti");
+    const ctx = confettiCanvas.getContext("2d");
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    let confettiPieces = [];
+
+    function launchConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        confettiPieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          size: Math.random() * 8 + 4,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function updateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiPieces.forEach((p, i) => {
+        p.y += p.speed;
+        p.x += Math.sin(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        if (p.y > confettiCanvas.height) confettiPieces.splice(i, 1);
+      });
+      requestAnimationFrame(updateConfetti);
+    }
+    updateConfetti();
+
+    window.onresize = () => {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    };
+  </script>
+</body>
+</html>

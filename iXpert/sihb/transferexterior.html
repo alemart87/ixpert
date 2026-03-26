@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transferencias al Exterior - Itaú</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #333;
+    }
+
+    header {
+      background-color: #ff6600;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #000;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h2, h3 {
+      color: #004080;
+      margin-top: 40px;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    .info-box {
+      background-color: #f4f4f4;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert {
+      background-color: #fff7e6;
+      border-left: 5px solid #ff6600;
+      padding: 15px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+    }
+
+    .boton-centro {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .boton-centro button {
+      background-color: #004080;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .boton-centro button:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .button-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, background-color 0.3s;
+      z-index: 1000;
+    }
+
+    .button-fixed:hover {
+      background: #ff6600;
+      transform: scale(1.05);
+    }
+    .modelo-limites {
+    display: flex;
+    gap: 40px;
+    font-family: Arial, sans-serif;
+    }
+
+    .caja {
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    width: 50%;
+    }
+
+    .titulo-principal {
+    color: #003366;
+    font-size: 22px;
+    margin-bottom: 10px;
+    }
+
+    .titulo-secundario {
+    color: #FF6600;
+    font-size: 18px;
+    margin-bottom: 10px;
+    }
+
+    .lista {
+    list-style: none;
+    padding-left: 0;
+    color: #333;
+    line-height: 1.6;
+    }
+
+    .sub-lista {
+    margin-left: 20px;
+    }
+
+    .sector-lista {
+    margin-left: 20px;
+    columns: 2; /* Divide en 2 columnas automáticamente */
+    column-gap: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Transferencias al Exterior - Pagos Electrónicos</h1>
+  </header>
+
+  <nav>
+    <a href="#flujo">Flujo Operativo</a>
+    <a href="#pasos">Pasos</a>
+    <a href="#limites">Límites</a>
+    <a href="#mensajes">Mensajes</a>
+    <a href="#errores">Errores</a>
+    <a href="#resumen">Resumen</a>
+  </nav>
+
+  <section>
+    <h2 id="flujo">🧭 Nuevo Flujo Operativo</h2>
+    <div class="info-box">
+      <p>Ahora se habilita el canal digital para más clientes PJ mediante un <strong>límite operativo anual</strong>. Si la transferencia está dentro del límite asignado, se puede operar online, incluso sin KYC vigente. Si supera el límite, deberá gestionarse en sucursal con formulario físico.</p>
+    </div>
+    <img src="../imagenes/imagen306.webp"  alt="306" style="width: 800px; height: auto;">
+
+    <h2 id="pasos">📌 Pasos del Cliente</h2>
+    <ul>
+      <li>Ingresar al módulo de <strong>Transferencias al Exterior</strong> en pagos electrónicos.</li>
+      <li>Validar que no existan bloqueos, que el cliente no pertenezca a Gerencia “K” y tenga límite asignado.</li>
+      <li>Si todo está OK, ingresar monto, seleccionar moneda y valor en horas.</li>
+      <li>Cargar banco beneficiario e intermediario, datos del destinatario, motivo de la operación, y gastos.</li>
+      <li>Confirmar y autorizar la operación.</li>
+    </ul>
+    
+    <h2 id="limites">📊 Modelo de Límites</h2>
+    <div class="info-box">
+      <p>Los límites se asignan según ingreso, segmento, antigüedad, sector económico y riesgo PLD. Son <strong>internos</strong> y <strong>anuales</strong>, pudiendo ajustarse trimestralmente por comité.</p>
+      <p>Segmentos como Pymes, EMP, GGEE, CIB y Personal Bank tienen reglas porcentuales según riesgo y sector económico específico.</p>
+    </div>
+
+    <table border="1" cellspacing="0" cellpadding="8" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+        <thead style="background-color: #f58220; color: white; text-align: center;">
+            <tr>
+            <th>Situación</th>
+            <th>Límite operativo para transferencias al exterior<br><span style="font-weight: normal;">Nuevo</span></th>
+            <th>Límite de fraudes para canales digitales<br><span style="font-weight: normal;">sin cambios</span></th>
+            <th>Límite del administrador<br><span style="font-weight: normal;">sin cambios</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <td>Importe</td>
+            <td>Personalizado y distinto para cliente</td>
+            <td>
+                Es por segmento en dólares:<br>
+                Campo: 1.400.000 y 7.000.000<br>
+                CIB: 6.000.000 y 30.000.000<br>
+                GGEE: 3.000.000 y 20.000.000<br>
+                Empresas: 1.000.000 y 5.000.000<br>
+                Pypes: 150.000 y 500.000
+            </td>
+            <td>
+                Definido por el cliente con su acceso administrador para asignación de operadores p/ carga y autorización
+            </td>
+            </tr>
+            <tr>
+            <td>Validez</td>
+            <td>Anual</td>
+            <td>Diario y mensual</td>
+            <td>Diaria</td>
+            </tr>
+            <tr>
+            <td>¿Qué mensaje de error aparece si no tiene límite?</td>
+            <td colspan="3">La solicitud no reúne algunos requisitos solicitados por nuestras políticas para poder ser procesados. ¡Gracias!</td>
+            </tr>
+            <tr>
+            <td>¿Qué mensaje de error aparece al exceder el límite?</td>
+            <td colspan="3">
+                ⚠️ La solicitud no puede ser procesada por este canal, favor acercarse a la sucursal más cercana para realizar su pedido. ¡Gracias!<br>
+                <a href="#">Descargue el formulario aquí</a> <button style="background-color: #f58220; color: white; border: none; padding: 5px 10px; margin-left: 10px;">Aceptar</button>
+            </td>
+            </tr>
+            <tr>
+            <td>¿Qué alternativas tiene el cliente si se excede?</td>
+            <td colspan="3">
+                Presentar su solicitud en una agencia con formulario (solución rápida). Es para clientes que no realizan frecuentemente transferencias al exterior
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    <h2> </h2>
+    <img src="../imagenes/imagen307.webp"  alt="306" style="width: 1000px; height: auto;">
+    <h2> </h2>
+    <img src="../imagenes/imagen308.webp"  alt="306" style="width: 1000px; height: auto;">
+
+
+    <h3>Reglas resumidas</h3>
+    <ul>
+      <li>Riesgo PLD bajo → hasta 65%</li>
+      <li>Sector económico específico → hasta 75%</li>
+      <li>Antigüedad y tipo de cliente afectan asignación inicial</li>
+    </ul>
+
+    <h2 id="mensajes">🗣️ Mensajes del sistema</h2>
+    <div class="alert">
+      <strong>Requisitos no cumplidos:</strong><br>
+      <em>"La solicitud no reúne algunos requisitos solicitados por nuestras políticas para poder ser procesados. Gracias."</em><br><br>
+      <p><strong>Ocurre cuando:</strong> PJ que quiera tener el servicio pero que no tenga habilitado : porque no tiene límite o no cumple control IROMAN=no cumple centinela, cliente gerencia K.</p>
+      <strong>Speech:</strong><br>
+      “Disculpe Sr./ Sra. XX le comento que el servicio se encuentra sujeto al cumplimiento de ciertas políticas internas para encontrarse disponible, por el momento el mismo no se encuentra habilitado, pero estamos a su disposición para ayudarlo con cualquier otra gestión que desee.”
+    </div>
+
+    <div class="alert">
+      <strong>Importe excedido:</strong><br>
+      <em>"La solicitud no puede ser procesada por este canal, favor acercarse a la sucursal más cercana para realizar su pedido. Gracias."</em><br><br>
+      <p><strong>Ocurre cuando:</strong> PJ que suele realizar transferencias en la web y tiene límite disponible solo que el importe que quiere enviar supera su límite o llego al 100 % de su limite;</p>
+      <strong>Speech:</strong><br>
+      “Disculpe Sr./ Sra. Xx Por motivo de limitaciones de sistema no se puede procesar la operación en el canal digital, sin inconvenientes el mismo puede ser procesado en la agencia más cercana, por lo que le sugerimos descargar el formulario ubicado en el link; y una vez completado y firmado el mismo, acercarse a cualquiera de nuestras sucursales para realizar la operación. Aprovecho para comentarle que si la transferencia es mayor a USD 10.000 deberá llevar también la documentación respiratoria correspondiente.”
+    </div>
+    <h2> Clientes con límite operativo para transferencias enviadas al exterior </h2>
+    <img src="../imagenes/imagen309.webp"  alt="306" style="width: 800px; height: auto;">
+    <ul>
+        <li>Solo clientes que tengan un limite asignado podrán utilizar este servicio.</li>
+        <li>Los limites son asignados a ciertos clientes en base a la ejecución de un modelo.</li>
+        <li>Este modelo de limites se basa en los ingresos, segmentos, sector económico, riesgo y antigüedad del cliente.</li>
+    </ul>
+
+    <h2 id="errores">🚧 Errores y Flujos Fallidos</h2>
+    <div class="info-box">
+      <p>Controles operativos que bloquean el flujo digital:</p>
+      <ul>
+        <li>No tener límite asignado</li>
+        <liEstar sobregirado o bloqueado</li>
+        <li>Pertenecer a Gerencia K</li>
+        <li>No tener KYC vigente y superar monto permitido</li>
+      </ul>
+    </div>
+
+    <h3>Recomendaciones para el cliente</h3>
+    <ul>
+      <li>Consultar en agencia por límites si opera regularmente</li>
+      <li>Solicitar aumento de límite por comité</li>
+      <li>Usar plantillas predefinidas para evitar errores</li>
+      <li>Si tiene dudas, contactar área comercial o presentar en agencia</li>
+    </ul>
+
+    <h2> </h2>
+    <img src="../imagenes/imagen310.webp"  alt="306" style="width: 800px; height: auto;">
+    <p></p>
+    <img src="../imagenes/imagen311.webp"  alt="306" style="width: 800px; height: auto;">
+    <p></p>
+    <img src="../imagenes/imagen312.webp"  alt="306" style="width: 800px; height: auto;">
+    <p></p>
+    <img src="../imagenes/imagen313.webp"  alt="306" style="width: 800px; height: auto;">
+
+    <h2 id="resumen">✅ Resumen Final</h2>
+    <div class="info-box">
+      <p>Este nuevo modelo habilita a más clientes PJ a operar por canal digital, optimizando la experiencia y agilizando procesos. El límite operativo anual es clave para determinar la ruta de autorización, y el sistema guía al usuario según su situación.</p>
+      <p>Si el proceso no puede ser completado digitalmente, siempre está disponible la opción presencial en agencias, con formularios y documentación correspondiente.</p>
+    </div>
+
+    <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto;">
+
+        <h2 style="color: #003865;">Preguntas y Respuestas Generales</h2>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Qué es un Modelo de límite?</summary>
+            <p>Es un conjunto de reglas de negocio que establece el monto límite en moneda dólares asignado a un cliente para poder realizar Transferencias al Exterior.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿En base a qué criterios se asigna este importe de límite?</summary>
+            <p>El modelo de asignación de límites es dinámico, esto significa que sus criterios pueden ir evolucionando en el tiempo. En esta primera etapa está basado principalmente en los ingresos presentados por el cliente, segmentos, sector económico, riesgo y antigüedad del cliente.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿El cliente sabe que tiene un límite asignado?</summary>
+            <p>No, esta información es interna.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Este límite operativo para enviar transferencias al exterior se puede modificar?</summary>
+            <p>Sí, con aprobación de un comité que se reunirá de forma trimestral.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Las transferencias realizadas en agencias, impactan el límite operativo del cliente?</summary>
+            <p>En esta primera etapa no, las transferencias ingresadas en agencias van por flujo vigente de control de KYC en Iron Man. Se está preparando una siguiente entrega en la que el área operativa cargará las solicitudes recibidas en BPM y el BPM hará el control de límites y tracking de la solicitud.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Qué vigencia tiene un límite operativo?</summary>
+            <p>Este límite es anual.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿El cliente puede cargar operaciones con tasa negociada? ¿Hasta qué hora?</summary>
+            <p>Sí puede, hasta las 13:30hs.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Cuál es la contingencia en caso de problemas en la web?</summary>
+            <p>Presentar la solicitud física firmada en el canal agencias.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Cuáles son los cortes horarios de cotización?</summary>
+            <p>No existe horario de corte para transferencias con operación de cambio. Solo las que tienen una tasa negociada con la mesa de dinero pueden autorizar hasta las 13:30.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Qué sucede con el límite ya existente de fraudes para realizar transferencias al exterior en la web?</summary>
+            <p>Se mantiene sin cambios y convive con el nuevo límite operativo asignado, se controlan ambos.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Hay modificación en el flujo de contratación?</summary>
+            <p>No, se mantiene el vigente.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿Cómo será habilitado para aquellos clientes que tienen contratado y no tienen habilitado por tema KYC vigente?</summary>
+            <p>Estamos verificando la oportunidad para habilitarlos a todos con PGS Admin.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">¿El LOA para transferencias recibidas es igual a este LOA de enviadas que estamos mencionando?</summary>
+            <p>No. El LOA p/ TE recibidas: es un límite por operación que sirve para controlar la documentación. Si está dentro del LOA, se acredita la transferencia y tiene un plazo para presentar los documentos después. Si está fuera del LOA no se acredita hasta recibir los documentos respaldatorios.<br>LOA enviadas: es un límite anual y se impacta en base al resultado de la ejecución del modelo.</p>
+        </details>
+
+        <details style="margin-bottom: 10px;">
+            <summary style="color: #f58220; font-weight: bold;">En caso de que el cliente consulte por la transferencia, ¿hay algún sistema donde se ve el estatus? ¿O, ¿se debe contactar con el área de OIT?</summary>
+            <p>No se puede verificar el estatus, solo puede ver cuando se procesa o rechaza. Más adelante se tendrá el BPM para el flujo interno, no para los clientes.</p>
+        </details>
+
+    </div>
+
+    <div class="boton-centro">
+      <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">Volver arriba</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 ArrowX - Todos los derechos reservados.</p>
+  </footer>
+
+  <a href="../SIHB.html" class="button-fixed">⬅ Volver Atrás</a>
+</body>
+</html>
