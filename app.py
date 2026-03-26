@@ -34,23 +34,33 @@ def init_superadmin():
     """Create or update superadmin from environment variables."""
     email = os.environ.get('SUPERADMIN_EMAIL')
     password = os.environ.get('SUPERADMIN_PASSWORD')
+    print(f"[INIT] SUPERADMIN_EMAIL={'SET' if email else 'MISSING'}, SUPERADMIN_PASSWORD={'SET' if password else 'MISSING'}")
     if not email or not password:
+        print("[INIT] Skipping superadmin creation - missing env vars")
         return
-    user = User.query.filter_by(email=email).first()
-    if user:
-        user.role = 'superadmin'
-        user.set_password(password)
-        user.name = 'Super Admin'
-    else:
-        user = User(
-            email=email,
-            name='Super Admin',
-            role='superadmin',
-            is_active_user=True
-        )
-        user.set_password(password)
-        db.session.add(user)
-    db.session.commit()
+    try:
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.role = 'superadmin'
+            user.set_password(password)
+            user.name = 'Super Admin'
+            user.is_active_user = True
+            print(f"[INIT] Updated existing superadmin: {email}")
+        else:
+            user = User(
+                email=email,
+                name='Super Admin',
+                role='superadmin',
+                is_active_user=True
+            )
+            user.set_password(password)
+            db.session.add(user)
+            print(f"[INIT] Created new superadmin: {email}")
+        db.session.commit()
+        print("[INIT] Superadmin ready")
+    except Exception as e:
+        print(f"[INIT] Error creating superadmin: {e}")
+        db.session.rollback()
 
 
 # Register blueprints

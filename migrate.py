@@ -192,3 +192,7 @@ def process_file(filepath, filename, category_key):
 if __name__ == '__main__':
     print("Starting migration...")
     migrate()
+    print("Ensuring superadmin exists...")
+    from app import init_superadmin
+    with app.app_context():
+        init_superadmin()
