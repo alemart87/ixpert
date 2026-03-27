@@ -732,3 +732,9 @@ def vex_profile(user_id):
         user_id=user_id, status='completed'
     ).order_by(TrainingSession.created_at.desc()).all()
     return render_template('admin/vex_profile.html', profile=profile, sessions=sessions)
+
+
+@training_bp.route('/admin/vex/methodology')
+@superadmin_required
+def vex_methodology():
+    return render_template('admin/vex_methodology.html')

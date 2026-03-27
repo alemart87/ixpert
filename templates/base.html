@@ -38,6 +38,7 @@
                 {% endfor %}
                 <a href="{{ url_for('training.index') }}" style="background:rgba(255,102,0,0.15)">🎯 Entrenamiento</a>
                 {% if current_user.is_superadmin %}
+                <a href="{{ url_for('training.vex_dashboard') }}" style="background:rgba(255,255,255,0.15)">📊 Vex Predictive</a>
                 <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Admin</a>
                 {% endif %}
                 <a href="{{ url_for('logout') }}" class="nav-logout">Salir</a>
