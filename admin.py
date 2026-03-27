@@ -167,6 +167,7 @@ def user_save():
     role = request.form.get('role', 'asesor')
     password = request.form.get('password', '')
     is_active = request.form.get('is_active') == 'on'
+    max_concurrent = int(request.form.get('max_concurrent', 1) or 1)
 
     if role not in ('supervisor', 'asesor'):
         flash('Rol no válido.', 'error')
@@ -185,6 +186,7 @@ def user_save():
         user.name = name
         user.role = role
         user.is_active_user = is_active
+        user.max_concurrent_training = max(1, min(10, max_concurrent))
         if password:
             user.set_password(password)
     else:
@@ -194,7 +196,8 @@ def user_save():
         if User.query.filter_by(email=email).first():
             flash('Ya existe un usuario con ese email.', 'error')
             return redirect(url_for('admin.user_list'))
-        user = User(email=email, name=name, role=role, is_active_user=is_active)
+        user = User(email=email, name=name, role=role, is_active_user=is_active,
+                    max_concurrent_training=max(1, min(10, max_concurrent)))
         user.set_password(password)
         db.session.add(user)
 

@@ -3,8 +3,8 @@ import re
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from models import (db, User, TrainingScenario, TrainingSession, TrainingMessage,
-                    TrainingViewPermission, VexProfile)
+from models import (db, User, TrainingScenario, TrainingBatch, TrainingSession,
+                    TrainingMessage, TrainingViewPermission, VexProfile)
 from datetime import datetime, timezone
 from functools import wraps
 
@@ -56,84 +56,168 @@ def can_view_training(f):
 @login_required
 def index():
     scenarios = TrainingScenario.query.filter_by(is_active=True).all()
-    my_sessions = TrainingSession.query.filter_by(
+    my_batches = TrainingBatch.query.filter_by(
         user_id=current_user.id
-    ).order_by(TrainingSession.created_at.desc()).limit(10).all()
-    active_session = TrainingSession.query.filter_by(
+    ).order_by(TrainingBatch.created_at.desc()).limit(10).all()
+    active_batch = TrainingBatch.query.filter_by(
         user_id=current_user.id, status='active'
     ).first()
+    # Also check legacy sessions without batch
+    my_sessions = TrainingSession.query.filter(
+        TrainingSession.user_id == current_user.id,
+        TrainingSession.batch_id.is_(None)
+    ).order_by(TrainingSession.created_at.desc()).limit(10).all()
     return render_template('training/index.html',
-                           scenarios=scenarios, my_sessions=my_sessions,
-                           active_session=active_session)
+                           scenarios=scenarios, my_batches=my_batches,
+                           my_sessions=my_sessions, active_batch=active_batch)
 
 
-@training_bp.route('/api/training/start/<int:scenario_id>', methods=['POST'])
-@login_required
-def start_session(scenario_id):
-    scenario = TrainingScenario.query.get_or_404(scenario_id)
-
-    # Check no active session
-    active = TrainingSession.query.filter_by(user_id=current_user.id, status='active').first()
-    if active:
-        return jsonify({'error': 'Ya tienes una sesión activa', 'session_id': active.id}), 400
-
+def _create_interaction(batch, scenario, interaction_num):
+    """Create a single interaction (TrainingSession) within a batch."""
     session = TrainingSession(
+        batch_id=batch.id,
+        interaction_number=interaction_num,
         scenario_id=scenario.id,
-        user_id=current_user.id,
+        user_id=batch.user_id,
         status='active',
-        started_at=datetime.now(timezone.utc)
+        started_at=datetime.utcnow()
     )
     db.session.add(session)
     db.session.flush()
 
-    # Generate first client message
+    # Generate client message with slight persona variation
+    variation = ""
+    if interaction_num > 1:
+        variation = f"\nNota: Sos el cliente #{interaction_num} distinto. Variá ligeramente tu tono y nombre. Usá un nombre diferente."
+
     system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
 
-{scenario.client_persona}
+{scenario.client_persona}{variation}
 
 REGLAS:
-- Actúa como un cliente REAL llamando al banco
-- NO reveles que eres IA bajo ninguna circunstancia
-- Reaccioná naturalmente a lo que dice el asesor
-- Si el asesor resuelve bien tu problema, mostrá satisfacción gradual
-- Si no te atiende bien, mostrá frustración realista pero sin insultar
-- Respondé en español paraguayo natural
-- Tus respuestas deben ser cortas (1-3 oraciones), como un cliente real en un chat
-- Empezá la conversación describiendo tu problema o situación"""
+- Actúa como un cliente REAL en un chat del banco
+- NO reveles que eres IA
+- Reaccioná naturalmente al asesor
+- Respuestas cortas (1-3 oraciones)
+- Empezá describiendo tu problema"""
 
     ai_messages = [
         {'role': 'system', 'content': system_prompt},
-        {'role': 'user', 'content': 'Iniciá la conversación como el cliente. Presentá tu problema.'}
+        {'role': 'user', 'content': 'Iniciá la conversación como el cliente.'}
     ]
-
     response_text, tokens = call_openai(ai_messages)
 
-    # Save client's first message
     msg = TrainingMessage(
-        session_id=session.id,
-        role='client',
-        content=response_text,
-        word_count=len(response_text.split())
+        session_id=session.id, role='client',
+        content=response_text, word_count=len(response_text.split())
     )
     db.session.add(msg)
     session.tokens_used = tokens
+    return session, response_text
+
+
+@training_bp.route('/api/training/batch/start/<int:scenario_id>', methods=['POST'])
+@login_required
+def start_batch(scenario_id):
+    scenario = TrainingScenario.query.get_or_404(scenario_id)
+
+    # Check no active batch
+    active = TrainingBatch.query.filter_by(user_id=current_user.id, status='active').first()
+    if active:
+        return jsonify({'error': 'Ya tienes una sesión activa', 'batch_id': active.id}), 400
+
+    max_c = current_user.max_concurrent_training or 1
+
+    batch = TrainingBatch(
+        user_id=current_user.id,
+        scenario_id=scenario.id,
+        max_concurrent=max_c,
+        status='active',
+        started_at=datetime.utcnow()
+    )
+    db.session.add(batch)
+    db.session.flush()
+
+    # Create first interaction
+    session, first_msg = _create_interaction(batch, scenario, 1)
+    db.session.commit()
+
+    return jsonify({
+        'batch_id': batch.id,
+        'max_concurrent': max_c,
+        'scenario_title': scenario.title,
+        'interactions': [{
+            'session_id': session.id,
+            'interaction_number': 1,
+            'first_message': first_msg,
+            'status': 'active'
+        }]
+    })
+
+
+@training_bp.route('/api/training/batch/<int:batch_id>/add', methods=['POST'])
+@login_required
+def add_interaction(batch_id):
+    batch = TrainingBatch.query.filter_by(
+        id=batch_id, user_id=current_user.id, status='active'
+    ).first()
+    if not batch:
+        return jsonify({'error': 'Batch no encontrado'}), 404
+
+    current_count = TrainingSession.query.filter_by(batch_id=batch.id).count()
+    if current_count >= batch.max_concurrent:
+        return jsonify({'error': 'Máximo de interacciones alcanzado'}), 400
+
+    scenario = batch.scenario
+    session, first_msg = _create_interaction(batch, scenario, current_count + 1)
     db.session.commit()
 
     return jsonify({
         'session_id': session.id,
-        'session_name': f"Sesión {session.id} - {current_user.name}",
-        'scenario_title': scenario.title,
-        'first_message': response_text
+        'interaction_number': current_count + 1,
+        'first_message': first_msg,
+        'status': 'active'
     })
 
 
-@training_bp.route('/training/session/<int:session_id>')
+@training_bp.route('/api/training/batch/<int:batch_id>/status')
 @login_required
-def session_view(session_id):
-    session = TrainingSession.query.filter_by(
-        id=session_id, user_id=current_user.id
+def batch_status(batch_id):
+    batch = TrainingBatch.query.filter_by(
+        id=batch_id, user_id=current_user.id
     ).first_or_404()
-    return render_template('training/session.html', session=session)
+    sessions = TrainingSession.query.filter_by(batch_id=batch.id).all()
+    return jsonify({
+        'batch_id': batch.id,
+        'status': batch.status,
+        'max_concurrent': batch.max_concurrent,
+        'interactions': [{
+            'session_id': s.id,
+            'interaction_number': s.interaction_number,
+            'status': s.status,
+            'nps': s.nps_score,
+            'last_message': s.messages[-1].content[:80] if s.messages else ''
+        } for s in sessions],
+        'completed': sum(1 for s in sessions if s.status == 'completed'),
+        'active': sum(1 for s in sessions if s.status == 'active'),
+        'total': len(sessions)
+    })
+
+
+@training_bp.route('/training/batch/<int:batch_id>')
+@login_required
+def batch_view(batch_id):
+    batch = TrainingBatch.query.filter_by(
+        id=batch_id, user_id=current_user.id
+    ).first_or_404()
+    return render_template('training/session.html', batch=batch)
+
+
+# Keep legacy single-session route working
+@training_bp.route('/api/training/start/<int:scenario_id>', methods=['POST'])
+@login_required
+def start_session(scenario_id):
+    return start_batch(scenario_id)
 
 
 @training_bp.route('/api/training/message', methods=['POST'])
@@ -307,23 +391,69 @@ Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
     session.status = 'completed'
     db.session.commit()
 
-    # Auto-update Vex profile
-    calculate_vex_profile(current_user.id)
+    # Check if this was part of a batch
+    batch_complete = False
+    batch_id = session.batch_id
+    if batch_id:
+        batch = TrainingBatch.query.get(batch_id)
+        if batch:
+            all_sessions = TrainingSession.query.filter_by(batch_id=batch_id).all()
+            all_done = all(s.status == 'completed' for s in all_sessions)
+            all_spawned = len(all_sessions) >= batch.max_concurrent
 
-    return jsonify({'ok': True, 'session_id': session.id})
+            if all_done and all_spawned:
+                # Close the batch
+                batch.status = 'completed'
+                batch.ended_at = datetime.utcnow()
+                batch.duration_seconds = int(safe_elapsed(batch.started_at))
+                nps_scores = [s.nps_score for s in all_sessions if s.nps_score is not None]
+                batch.overall_nps = round(sum(nps_scores) / len(nps_scores), 1) if nps_scores else 0
+                correct = sum(1 for s in all_sessions if s.response_correct)
+                batch.overall_correct_rate = round(correct / len(all_sessions) * 100, 1)
+                batch.tokens_used = sum(s.tokens_used or 0 for s in all_sessions)
+                db.session.commit()
+                batch_complete = True
+
+                # Auto-update Vex profile
+                calculate_vex_profile(current_user.id)
+    else:
+        # Legacy single session — update vex directly
+        calculate_vex_profile(current_user.id)
+
+    return jsonify({
+        'ok': True,
+        'session_id': session.id,
+        'batch_id': batch_id,
+        'batch_complete': batch_complete
+    })
 
 
 @training_bp.route('/training/result/<int:session_id>')
 @login_required
 def result_view(session_id):
     session = TrainingSession.query.filter_by(id=session_id).first_or_404()
-    # Allow own sessions or admin/permitted supervisor
     if session.user_id != current_user.id and not current_user.is_superadmin:
         perm = TrainingViewPermission.query.filter_by(supervisor_id=current_user.id).first()
         if not perm:
             flash('No tienes permisos.', 'error')
             return redirect(url_for('index'))
+    # If part of batch, show batch result
+    if session.batch_id:
+        return redirect(url_for('training.batch_result', batch_id=session.batch_id))
     return render_template('training/result.html', session=session)
+
+
+@training_bp.route('/training/batch/<int:batch_id>/result')
+@login_required
+def batch_result(batch_id):
+    batch = TrainingBatch.query.get_or_404(batch_id)
+    if batch.user_id != current_user.id and not current_user.is_superadmin:
+        perm = TrainingViewPermission.query.filter_by(supervisor_id=current_user.id).first()
+        if not perm:
+            flash('No tienes permisos.', 'error')
+            return redirect(url_for('index'))
+    sessions = TrainingSession.query.filter_by(batch_id=batch_id).order_by(TrainingSession.interaction_number).all()
+    return render_template('training/batch_result.html', batch=batch, sessions=sessions)
 
 
 # ===== Admin Routes =====
@@ -591,6 +721,29 @@ def admin_session_detail(session_id):
             'created_at': m.created_at.strftime('%H:%M:%S') if m.created_at else ''
         } for m in s.messages]
     })
+
+
+# ===== Live Monitor =====
+
+@training_bp.route('/admin/api/training/live')
+@can_view_training
+def api_training_live():
+    batches = TrainingBatch.query.filter_by(status='active').all()
+    result = []
+    for b in batches:
+        sessions = TrainingSession.query.filter_by(batch_id=b.id).all()
+        result.append({
+            'batch_id': b.id,
+            'user_name': b.user.name if b.user else '-',
+            'scenario': b.scenario.title if b.scenario else '-',
+            'max_concurrent': b.max_concurrent,
+            'interactions_total': len(sessions),
+            'interactions_active': sum(1 for s in sessions if s.status == 'active'),
+            'interactions_completed': sum(1 for s in sessions if s.status == 'completed'),
+            'interactions_pending': b.max_concurrent - len(sessions),
+            'elapsed_seconds': int(safe_elapsed(b.started_at))
+        })
+    return jsonify({'active_batches': result})
 
 
 # ===== Vex People Skill Predictive =====

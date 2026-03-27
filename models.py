@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # superadmin, supervisor, asesor
     is_active_user = db.Column(db.Boolean, default=True)
+    max_concurrent_training = db.Column(db.Integer, default=1)  # 1-10 simultaneous chats
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
 
@@ -149,10 +150,33 @@ class TrainingScenario(db.Model):
     creator = db.relationship('User', foreign_keys=[created_by])
 
 
+class TrainingBatch(db.Model):
+    __tablename__ = 'training_batches'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    scenario_id = db.Column(db.Integer, db.ForeignKey('training_scenarios.id'), nullable=False)
+    max_concurrent = db.Column(db.Integer, default=1)
+    status = db.Column(db.String(20), default='active')  # active, completed
+    started_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    ended_at = db.Column(db.DateTime)
+    duration_seconds = db.Column(db.Integer, default=0)
+    overall_nps = db.Column(db.Float)
+    overall_correct_rate = db.Column(db.Float)
+    ai_feedback_summary = db.Column(db.Text)
+    tokens_used = db.Column(db.Integer, default=0)
+
+    sessions = db.relationship('TrainingSession', backref='batch', lazy=True)
+    user = db.relationship('User', backref='training_batches')
+    scenario = db.relationship('TrainingScenario')
+
+
 class TrainingSession(db.Model):
     __tablename__ = 'training_sessions'
 
     id = db.Column(db.Integer, primary_key=True)
+    batch_id = db.Column(db.Integer, db.ForeignKey('training_batches.id'), nullable=True)
+    interaction_number = db.Column(db.Integer, default=1)
     scenario_id = db.Column(db.Integer, db.ForeignKey('training_scenarios.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     status = db.Column(db.String(20), default='active')  # active, completed, abandoned

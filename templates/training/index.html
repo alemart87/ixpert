@@ -4,22 +4,22 @@
 
 {% block content %}
 <h1 style="color:#004080">Zona de Entrenamiento</h1>
-<p style="color:#888;margin-top:-8px;margin-bottom:24px">Practica tu atención al cliente con escenarios simulados por IA</p>
+<p style="color:#888;margin-top:-8px;margin-bottom:24px">Practica atención al cliente con escenarios simulados — {{ current_user.max_concurrent_training or 1 }} interacciones simultáneas</p>
 
-{% if active_session %}
-<div style="background:#fff4e5;border:2px solid #ff6600;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center">
+{% if active_batch %}
+<div style="background:#fff4e5;border:2px solid #ff6600;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
     <div>
         <strong style="color:#ff6600">Sesión activa en curso</strong>
-        <p style="margin:4px 0 0;font-size:13px;color:#666">{{ active_session.scenario.title }}</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#666">{{ active_batch.scenario.title }} — {{ active_batch.max_concurrent }} interacciones</p>
     </div>
-    <a href="{{ url_for('training.session_view', session_id=active_session.id) }}" class="btn btn-primary">Continuar</a>
+    <a href="{{ url_for('training.batch_view', batch_id=active_batch.id) }}" class="btn btn-primary">Continuar</a>
 </div>
 {% endif %}
 
 <h2 style="color:#004080;border-bottom:2px solid #ff6600;padding-bottom:8px">Escenarios Disponibles</h2>
 <div class="scenario-grid">
     {% for s in scenarios %}
-    <div class="scenario-card" id="scenario-{{ s.id }}">
+    <div class="scenario-card">
         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
             <h3>{{ s.title }}</h3>
             <span class="badge-difficulty badge-{{ s.difficulty }}">{{ s.difficulty }}</span>
@@ -27,33 +27,33 @@
         <p>{{ s.description or 'Escenario de práctica' }}</p>
         {% if s.category %}<span class="badge" style="margin-bottom:10px">{{ s.category }}</span>{% endif %}
         <br>
-        <button class="btn btn-primary" onclick="startTraining({{ s.id }})" {% if active_session %}disabled title="Finaliza tu sesión activa primero"{% endif %}>
+        <button class="btn btn-primary" onclick="startTraining({{ s.id }})" {% if active_batch %}disabled title="Finaliza tu sesión activa primero"{% endif %}>
             Iniciar Entrenamiento
         </button>
     </div>
     {% endfor %}
     {% if not scenarios %}
-    <p style="color:#888;padding:40px;text-align:center">No hay escenarios disponibles. El administrador debe crear escenarios de entrenamiento.</p>
+    <p style="color:#888;padding:40px;text-align:center">No hay escenarios disponibles.</p>
     {% endif %}
 </div>
 
-{% if my_sessions %}
+{% if my_batches %}
 <div class="session-history">
     <h2 style="color:#004080;border-bottom:2px solid #ff6600;padding-bottom:8px">Mi Historial</h2>
-    {% for s in my_sessions %}
+    {% for b in my_batches %}
     <div class="session-item">
         <div class="si-info">
-            <strong>Sesión {{ s.id }}</strong> — {{ s.scenario.title }}
-            <br><small style="color:#888">{{ s.created_at.strftime('%d/%m/%Y %H:%M') if s.created_at else '' }}
-            {% if s.status == 'active' %}<span style="color:#ff6600">• En curso</span>{% endif %}</small>
+            <strong>Batch {{ b.id }}</strong> — {{ b.scenario.title }} ({{ b.max_concurrent }} chats)
+            <br><small style="color:#888">{{ b.created_at.strftime('%d/%m/%Y %H:%M') if b.created_at else '' }}
+            {% if b.status == 'active' %}<span style="color:#ff6600">● En curso</span>{% endif %}</small>
         </div>
-        {% if s.status == 'completed' and s.nps_score is not none %}
+        {% if b.status == 'completed' and b.overall_nps is not none %}
         <div style="display:flex;align-items:center;gap:12px">
-            <span class="si-nps {% if s.nps_score >= 9 %}nps-promoter{% elif s.nps_score >= 7 %}nps-passive{% else %}nps-detractor{% endif %}">{{ s.nps_score }}/10</span>
-            <a href="{{ url_for('training.result_view', session_id=s.id) }}" class="btn btn-sm btn-secondary">Ver</a>
+            <span class="si-nps {% if b.overall_nps >= 9 %}nps-promoter{% elif b.overall_nps >= 7 %}nps-passive{% else %}nps-detractor{% endif %}">{{ b.overall_nps }}/10</span>
+            <a href="{{ url_for('training.batch_result', batch_id=b.id) }}" class="btn btn-sm btn-secondary">Ver</a>
         </div>
-        {% elif s.status == 'active' %}
-        <a href="{{ url_for('training.session_view', session_id=s.id) }}" class="btn btn-sm btn-primary">Continuar</a>
+        {% elif b.status == 'active' %}
+        <a href="{{ url_for('training.batch_view', batch_id=b.id) }}" class="btn btn-sm btn-primary">Continuar</a>
         {% endif %}
     </div>
     {% endfor %}
@@ -66,12 +66,11 @@ async function startTraining(scenarioId) {
     var btn = event.target;
     btn.disabled = true;
     btn.textContent = 'Iniciando...';
-
     try {
-        var res = await fetch('/api/training/start/' + scenarioId, { method: 'POST' });
+        var res = await fetch('/api/training/batch/start/' + scenarioId, { method: 'POST' });
         var data = await res.json();
-        if (data.session_id) {
-            window.location.href = '/training/session/' + data.session_id;
+        if (data.batch_id) {
+            window.location.href = '/training/batch/' + data.batch_id;
         } else {
             alert(data.error || 'Error al iniciar');
             btn.disabled = false;

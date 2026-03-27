@@ -28,6 +28,12 @@
         </div>
     </details>
 
+    <!-- Live Monitor -->
+    <div class="chart-card" style="margin-bottom:20px;border-left:4px solid #2e7d32">
+        <h3 style="display:flex;align-items:center;gap:8px"><span style="color:#2e7d32;font-size:12px">●</span> En Vivo</h3>
+        <div id="liveMonitor"><p style="color:#888">Cargando...</p></div>
+    </div>
+
     <!-- Date Filter -->
     <div class="date-filter" style="background:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:20px">
         <label>Desde: <input type="date" id="dateFrom"></label>
@@ -242,6 +248,35 @@ async function viewSession(sid) {
 }
 
 loadData();
+
+// Live Monitor
+async function loadLive() {
+    try {
+        var res = await fetch('/admin/api/training/live');
+        var d = await res.json();
+        var el = document.getElementById('liveMonitor');
+        if (d.active_batches.length === 0) {
+            el.innerHTML = '<p style="color:#888;font-size:13px">No hay sesiones activas en este momento</p>';
+        } else {
+            el.innerHTML = d.active_batches.map(function(b) {
+                var pct = b.interactions_total > 0 ? Math.round(b.interactions_completed / b.max_concurrent * 100) : 0;
+                var min = Math.floor(b.elapsed_seconds / 60);
+                return '<div class="live-card">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center">' +
+                    '<div><strong>' + b.user_name + '</strong> <small style="color:#888">— ' + b.scenario + '</small></div>' +
+                    '<span style="font-size:13px;color:#888">' + min + ' min</span></div>' +
+                    '<div style="display:flex;gap:12px;margin-top:8px;font-size:12px">' +
+                    '<span style="color:#2e7d32">✅ ' + b.interactions_completed + ' resueltas</span>' +
+                    '<span style="color:#ff6600">🟢 ' + b.interactions_active + ' activas</span>' +
+                    '<span style="color:#888">⏳ ' + b.interactions_pending + ' pendientes</span>' +
+                    '<span>/ ' + b.max_concurrent + ' total</span></div>' +
+                    '<div class="live-progress"><div class="live-progress-bar" style="width:' + pct + '%;background:linear-gradient(90deg,#2e7d32,#ff6600)"></div></div></div>';
+            }).join('');
+        }
+    } catch(e) {}
+}
+loadLive();
+setInterval(loadLive, 10000);
 </script>
 {% endblock %}
 {% endblock %}
