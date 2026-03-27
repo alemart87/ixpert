@@ -96,8 +96,8 @@ def extract_body(html):
         body = html
 
     # Fix image paths to use static folder
-    body = re.sub(r'src=["\'](?:\.\.\/)*imagenes/', 'src="/static/imagenes/', body)
-    body = re.sub(r'src=["\']imagenes/', 'src="/static/imagenes/', body)
+    body = re.sub(r'src=["\'](?:\.\.\/)*imagenes/', 'src="/imagenes/', body)
+    body = re.sub(r'src=["\']imagenes/', 'src="/imagenes/', body)
 
     return body
 

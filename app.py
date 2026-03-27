@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
+from flask import Flask, render_template, redirect, url_for, request, jsonify, flash, send_from_directory
 from flask_login import LoginManager, login_required, current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
@@ -8,6 +8,9 @@ from datetime import datetime, timezone
 
 load_dotenv()
 
+# Persistent disk path (Render) or local fallback
+UPLOAD_DIR = os.environ.get('UPLOAD_DIR', os.path.join(os.path.dirname(__file__), 'static', 'imagenes'))
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -15,6 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').repla
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 app.config['PREFERRED_URL_SCHEME'] = 'https'
+app.config['UPLOAD_DIR'] = UPLOAD_DIR
 
 db.init_app(app)
 
@@ -35,7 +39,6 @@ def init_superadmin():
     email = os.environ.get('SUPERADMIN_EMAIL')
     password = os.environ.get('SUPERADMIN_PASSWORD')
     print(f"[INIT] SUPERADMIN_EMAIL={'SET' if email else 'MISSING'}, SUPERADMIN_PASSWORD={'SET' if password else 'MISSING'}", flush=True)
-    print(f"[INIT] Password length={len(password) if password else 0}, first3={password[:3] if password else 'N/A'}, last3={password[-3:] if password else 'N/A'}", flush=True)
     if not email or not password:
         print("[INIT] Skipping superadmin creation - missing env vars")
         return
@@ -89,14 +92,7 @@ def login():
         print(f"[AUTH] POST login: email={email}", flush=True)
 
         user = User.query.filter_by(email=email).first()
-        print(f"[AUTH] User found: {user is not None}", flush=True)
-        if user:
-            pw_ok = user.check_password(password)
-            print(f"[AUTH] Password len={len(password)}, check={pw_ok}, active={user.is_active_user}", flush=True)
-            # Debug: re-verify with env password
-            env_pw = os.environ.get('SUPERADMIN_PASSWORD', '')
-            print(f"[AUTH] Env password len={len(env_pw)}, match_input={password == env_pw}", flush=True)
-            if pw_ok and user.is_active_user:
+        if user and user.check_password(password) and user.is_active_user:
                 user.last_login = datetime.now(timezone.utc)
                 db.session.commit()
                 login_user(user, remember=True)
@@ -124,6 +120,12 @@ def debug_check():
         'users': [{'id': u.id, 'email': u.email, 'role': u.role, 'active': u.is_active_user} for u in users],
         'total': len(users)
     })
+
+
+@app.route('/imagenes/<path:filename>')
+def serve_image(filename):
+    """Serve images from persistent disk or static fallback."""
+    return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.context_processor

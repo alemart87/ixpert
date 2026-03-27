@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
 from models import db, User, Content, Category
 from werkzeug.utils import secure_filename
@@ -220,9 +220,9 @@ def upload_image():
         return jsonify({'error': 'Tipo de archivo no permitido'}), 400
 
     filename = secure_filename(file.filename)
-    upload_dir = os.path.join('static', 'imagenes')
+    upload_dir = current_app.config['UPLOAD_DIR']
     os.makedirs(upload_dir, exist_ok=True)
     filepath = os.path.join(upload_dir, filename)
     file.save(filepath)
 
-    return jsonify({'url': '/' + filepath.replace('\\', '/')})
+    return jsonify({'url': '/imagenes/' + filename})
