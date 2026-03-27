@@ -1,62 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}Chat AI Analytics - Admin{% endblock %}
+{% block title %}Insights AI de Mejora - Admin{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block content %}
 <div class="admin-container">
-    <h1>Chat AI - Analytics</h1>
+    <h1>Insights AI de Mejora</h1>
+    <p style="color:#888;margin-top:-8px;margin-bottom:20px">Panel de decisiones para capacitación y mejora continua</p>
 
     <div class="admin-nav">
         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Dashboard</a>
         <a href="{{ url_for('admin.content_list') }}" class="btn btn-secondary">Contenidos</a>
         <a href="{{ url_for('admin.category_list') }}" class="btn btn-secondary">Categorías</a>
         <a href="{{ url_for('admin.user_list') }}" class="btn btn-secondary">Usuarios</a>
-        <a href="{{ url_for('admin.chat_analytics') }}" class="btn btn-primary">Chat AI</a>
+        <a href="{{ url_for('admin.chat_analytics') }}" class="btn btn-primary">Insights AI</a>
     </div>
 
-    <div class="stats-grid">
+    <!-- Stats Cards -->
+    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr)">
         <div class="stat-card">
-            <h3>{{ total_conversations }}</h3>
+            <h3 id="sConvs">-</h3>
             <p>Conversaciones</p>
         </div>
         <div class="stat-card">
-            <h3>{{ total_messages }}</h3>
-            <p>Mensajes</p>
+            <h3 id="sMsgs">-</h3>
+            <p>Consultas</p>
         </div>
         <div class="stat-card">
-            <h3>{{ total_tokens }}</h3>
-            <p>Tokens Usados</p>
+            <h3 id="sUsers">-</h3>
+            <p>Usuarios Activos</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="sTokens">-</h3>
+            <p>Tokens IA</p>
         </div>
     </div>
 
-    <h2>Conversaciones Recientes</h2>
-    <div class="table-responsive">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Tema</th>
-                    <th>Mensajes</th>
-                    <th>Tokens</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for conv in conversations %}
-                <tr>
-                    <td>{{ conv.user.name if conv.user else '-' }}</td>
-                    <td>{{ conv.title }}</td>
-                    <td>{{ conv.messages|length }}</td>
-                    <td>{{ conv.messages|sum(attribute='tokens_used') }}</td>
-                    <td>{{ conv.created_at.strftime('%d/%m/%Y %H:%M') if conv.created_at else '-' }}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewConv({{ conv.id }})">Ver</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Recommendations -->
+    <div class="chart-card" style="margin-bottom:20px;border-left:4px solid #ff6600">
+        <h3 style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:24px">💡</span> Recomendaciones de Capacitación
+        </h3>
+        <div id="recommendations" style="margin-top:12px">
+            <p style="color:#888">Cargando análisis...</p>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Consultas por Día</h3>
+            <canvas id="chartConvsDay" style="max-height:280px"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Temas Más Consultados</h3>
+            <canvas id="chartTopics" style="max-height:280px"></canvas>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Cobertura por Categoría</h3>
+            <canvas id="chartCoverage" style="max-height:280px"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Actividad por Usuario</h3>
+            <div id="usersList" class="data-list" style="max-height:280px"></div>
+        </div>
+    </div>
+
+    <!-- Word Cloud / Frequent terms -->
+    <div class="chart-card" style="margin-bottom:20px">
+        <h3>Términos Más Frecuentes en Consultas</h3>
+        <div id="wordCloud" style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0"></div>
+    </div>
+
+    <!-- Conversations Table -->
+    <div class="chart-card">
+        <h3>Conversaciones Recientes</h3>
+        <div class="table-responsive">
+            <table class="admin-table" id="convsTable">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Tema</th>
+                        <th>Msgs</th>
+                        <th>Tokens</th>
+                        <th>Fecha</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="convsBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -64,6 +104,7 @@
 <div id="convModal" class="modal" style="display:none">
     <div class="modal-content" style="max-width:700px">
         <h2 id="convModalTitle">Conversación</h2>
+        <p id="convModalUser" style="color:#888;margin-top:-8px"></p>
         <div id="convModalBody" style="max-height:50vh;overflow-y:auto"></div>
         <div class="form-actions">
             <button class="btn btn-secondary" onclick="document.getElementById('convModal').style.display='none'">Cerrar</button>
@@ -73,24 +114,152 @@
 
 {% block extra_scripts %}
 <script>
+let chartConvsDay, chartTopics, chartCoverage;
+
+async function loadInsights() {
+    const res = await fetch('/admin/api/insights');
+    const d = await res.json();
+
+    // Stats
+    document.getElementById('sConvs').textContent = d.stats.total_conversations.toLocaleString();
+    document.getElementById('sMsgs').textContent = d.stats.total_messages.toLocaleString();
+    document.getElementById('sUsers').textContent = d.stats.unique_users.toLocaleString();
+    document.getElementById('sTokens').textContent = d.stats.total_tokens.toLocaleString();
+
+    // Recommendations
+    const recEl = document.getElementById('recommendations');
+    if (d.recommendations.length === 0) {
+        recEl.innerHTML = '<p style="color:#888">Aún no hay suficientes datos para generar recomendaciones. Se necesitan más consultas.</p>';
+    } else {
+        recEl.innerHTML = d.recommendations.map(r =>
+            '<div style="display:flex;gap:12px;padding:12px;background:#f8f9fa;border-radius:10px;margin-bottom:8px">' +
+            '<span style="font-size:28px">' + r.icon + '</span>' +
+            '<div><strong style="color:#004080">' + r.title + '</strong>' +
+            '<p style="margin:4px 0 0;font-size:13px;color:#555">' + r.desc + '</p></div></div>'
+        ).join('');
+    }
+
+    // Conversations per day
+    if (chartConvsDay) chartConvsDay.destroy();
+    chartConvsDay = new Chart(document.getElementById('chartConvsDay'), {
+        type: 'line',
+        data: {
+            labels: d.convs_per_day.map(x => x.date),
+            datasets: [{
+                label: 'Consultas',
+                data: d.convs_per_day.map(x => x.count),
+                borderColor: '#ff6600',
+                backgroundColor: 'rgba(255,102,0,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: '#ff6600'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    // Top topics
+    if (chartTopics) chartTopics.destroy();
+    const topics = d.top_topics.slice(0, 8);
+    chartTopics = new Chart(document.getElementById('chartTopics'), {
+        type: 'bar',
+        data: {
+            labels: topics.map(t => t.word),
+            datasets: [{
+                label: 'Menciones',
+                data: topics.map(t => t.count),
+                backgroundColor: topics.map((_, i) => i === 0 ? '#ff6600' : '#004080'),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Category coverage
+    if (chartCoverage) chartCoverage.destroy();
+    const catNames = Object.keys(d.category_coverage);
+    const catValues = Object.values(d.category_coverage);
+    chartCoverage = new Chart(document.getElementById('chartCoverage'), {
+        type: 'doughnut',
+        data: {
+            labels: catNames,
+            datasets: [{
+                data: catValues.map(v => v || 0.5),
+                backgroundColor: ['#ff6600', '#004080', '#ff9500', '#002776', '#888', '#f4a261']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { font: { size: 12 } } }
+            }
+        }
+    });
+
+    // Users list
+    const usersEl = document.getElementById('usersList');
+    if (d.top_users.length === 0) {
+        usersEl.innerHTML = '<p style="padding:16px;color:#888;text-align:center">Sin datos</p>';
+    } else {
+        usersEl.innerHTML = d.top_users.map(u =>
+            '<div class="data-item">' +
+            '<span><strong>' + u.name + '</strong> <small style="color:#888">(' + u.role + ')</small></span>' +
+            '<span><span class="badge">' + u.convs + ' conv</span> <span class="badge" style="background:#004080;color:#fff">' + u.msgs + ' msgs</span></span>' +
+            '</div>'
+        ).join('');
+    }
+
+    // Word cloud
+    const wcEl = document.getElementById('wordCloud');
+    const maxCount = d.frequent_questions.length > 0 ? d.frequent_questions[0].count : 1;
+    wcEl.innerHTML = d.frequent_questions.map(w => {
+        const size = Math.max(12, Math.min(28, 12 + (w.count / maxCount) * 16));
+        const opacity = Math.max(0.5, w.count / maxCount);
+        return '<span style="font-size:' + size + 'px;color:#004080;opacity:' + opacity + ';padding:4px 8px;background:#f0f4f8;border-radius:8px;font-weight:600">' + w.word + '</span>';
+    }).join('');
+
+    // Conversations table
+    const tbody = document.getElementById('convsBody');
+    tbody.innerHTML = d.recent_conversations.map(c =>
+        '<tr>' +
+        '<td>' + c.user + '</td>' +
+        '<td><span class="badge badge-' + c.role + '">' + c.role + '</span></td>' +
+        '<td>' + c.title + '</td>' +
+        '<td>' + c.messages + '</td>' +
+        '<td>' + c.tokens.toLocaleString() + '</td>' +
+        '<td>' + c.date + '</td>' +
+        '<td><button class="btn btn-sm btn-primary" onclick="viewConv(' + c.id + ')">Ver</button></td>' +
+        '</tr>'
+    ).join('');
+}
+
 async function viewConv(convId) {
     const res = await fetch('/admin/chat/' + convId + '/detail');
     const data = await res.json();
 
     document.getElementById('convModalTitle').textContent = data.title || 'Conversación';
+    document.getElementById('convModalUser').textContent = data.user || '';
     const body = document.getElementById('convModalBody');
     body.innerHTML = data.messages.map(function(m) {
-        const cls = m.role === 'user' ? 'color:#004080' : 'color:#ff6600';
-        const label = m.role === 'user' ? 'Usuario' : 'iXpert AI';
-        return '<div style="margin-bottom:12px;padding:8px;border-bottom:1px solid #eee">' +
-            '<strong style="' + cls + '">' + label + '</strong> ' +
-            '<small style="color:#888">' + (m.created_at || '') + '</small>' +
-            '<p style="margin:4px 0 0;white-space:pre-wrap">' + m.content + '</p>' +
-            '</div>';
+        const isUser = m.role === 'user';
+        return '<div style="margin-bottom:12px;padding:10px 14px;border-radius:12px;' +
+            (isUser ? 'background:#e8f0fe;margin-left:20%' : 'background:#fff4e5;margin-right:20%') + '">' +
+            '<div style="font-size:11px;color:#888;margin-bottom:4px">' +
+            (isUser ? '👤 Usuario' : '🤖 iXpert AI') + ' • ' + (m.created_at || '') + '</div>' +
+            '<div style="font-size:14px;line-height:1.5;white-space:pre-wrap">' + m.content + '</div></div>';
     }).join('');
 
     document.getElementById('convModal').style.display = 'flex';
 }
+
+loadInsights();
 </script>
 {% endblock %}
 {% endblock %}
