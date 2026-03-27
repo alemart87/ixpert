@@ -467,7 +467,7 @@ def admin_dashboard():
 @training_bp.route('/admin/training/scenarios')
 @superadmin_required
 def admin_scenarios():
-    scenarios = TrainingScenario.query.order_by(TrainingScenario.created_at.desc()).all()
+    scenarios = TrainingScenario.query.order_by(TrainingScenario.is_active.desc(), TrainingScenario.created_at.desc()).all()
     return render_template('admin/training_scenarios.html', scenarios=scenarios)
 
 
@@ -514,7 +514,18 @@ def admin_scenario_delete(s_id):
     s = TrainingScenario.query.get_or_404(s_id)
     s.is_active = False
     db.session.commit()
-    flash('Escenario desactivado.', 'success')
+    flash('Escenario ocultado.', 'success')
+    return redirect(url_for('training.admin_scenarios'))
+
+
+@training_bp.route('/admin/training/scenarios/<int:s_id>/toggle', methods=['POST'])
+@superadmin_required
+def admin_scenario_toggle(s_id):
+    s = TrainingScenario.query.get_or_404(s_id)
+    action = request.form.get('action', 'hide')
+    s.is_active = (action == 'show')
+    db.session.commit()
+    flash('Escenario ' + ('visible' if s.is_active else 'ocultado') + '.', 'success')
     return redirect(url_for('training.admin_scenarios'))
 
 
