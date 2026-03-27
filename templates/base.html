@@ -122,14 +122,36 @@
                 <button id="chatClose" title="Cerrar">&times;</button>
             </div>
         </div>
-        <div class="chat-convs" id="chatConvs"></div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-welcome">
-                <h4>Hola! Soy iXpert AI</h4>
-                <p>Tu asistente virtual. Preguntame sobre cualquier tema de la plataforma y te ayudo con información y links directos.</p>
+        <!-- Tabs -->
+        <div class="chat-tabs">
+            <button class="chat-tab active" data-tab="chat">
+                <span class="chat-tab-icon">💬</span>Chat
+            </button>
+            <button class="chat-tab" data-tab="stats">
+                <span class="chat-tab-icon">📊</span>Mi Actividad
+            </button>
+        </div>
+
+        <!-- Chat Tab -->
+        <div class="chat-tab-content active" data-tab="chat">
+            <div class="chat-convs" id="chatConvs"></div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-welcome">
+                    <h4>Hola! Soy iXpert AI</h4>
+                    <p>Tu asistente virtual de Itaú.</p>
+                </div>
+            </div>
+            <div class="chat-typing" id="chatTyping"><span></span><span></span><span></span></div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="chat-tab-content" data-tab="stats">
+            <div class="chat-stats" id="chatStatsContent">
+                <p style="padding:20px;text-align:center;color:#888">Cargando...</p>
             </div>
         </div>
-        <div class="chat-typing" id="chatTyping"><span></span><span></span><span></span></div>
+
+        <!-- Input (always visible) -->
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Escribe tu pregunta..." autocomplete="off">
             <button id="chatSend" aria-label="Enviar">

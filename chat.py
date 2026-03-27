@@ -41,14 +41,48 @@ def strip_html(html):
     return text.strip()[:2500]
 
 
+STOP_WORDS = {'de', 'la', 'el', 'en', 'un', 'una', 'los', 'las', 'es', 'que', 'por',
+               'se', 'del', 'al', 'con', 'para', 'su', 'como', 'mas', 'ya', 'le', 'lo',
+               'me', 'si', 'no', 'mi', 'te', 'tu', 'hay', 'ser', 'son', 'era', 'fue'}
+
+
+def get_stem_variants(word):
+    """Generate simple Spanish stem variants for fuzzy matching."""
+    variants = {word}
+    # Plural/singular
+    if word.endswith('es'):
+        variants.add(word[:-2])
+        variants.add(word[:-1])
+    elif word.endswith('s'):
+        variants.add(word[:-1])
+    else:
+        variants.add(word + 's')
+        variants.add(word + 'es')
+    # Common suffixes
+    if word.endswith('ción'):
+        variants.add(word.replace('ción', 'ciones'))
+    if word.endswith('ciones'):
+        variants.add(word.replace('ciones', 'ción'))
+    # ando/endo -> ar/er
+    if word.endswith('ando'):
+        variants.add(word[:-4] + 'ar')
+    if word.endswith('endo'):
+        variants.add(word[:-4] + 'er')
+    return variants
+
+
 def find_relevant_contents(query, limit=4):
-    """Find relevant content using full-text search across all fields."""
+    """Find relevant content using full-text search with fuzzy matching."""
     query_lower = query.lower()
-    # Extract meaningful words (2+ chars)
-    words = [w for w in re.findall(r'\w+', query_lower) if len(w) >= 2]
+    words = [w for w in re.findall(r'\w+', query_lower) if len(w) >= 2 and w not in STOP_WORDS]
 
     if not words:
         return []
+
+    # Pre-compute stem variants for all query words
+    word_variants = {}
+    for w in words:
+        word_variants[w] = get_stem_variants(w)
 
     contents = Content.query.filter_by(is_active=True).all()
     scored = []
@@ -58,31 +92,39 @@ def find_relevant_contents(query, limit=4):
         keywords = (c.keywords or '').lower()
         title = c.title.lower()
         desc = (c.description or '').lower()
-        # Also search in the actual HTML content (plain text version)
         body_text = strip_html(c.html_content).lower()
+        # Combine all searchable text
+        all_text = f"{keywords} {title} {desc} {body_text}"
 
         for word in words:
-            # Skip very common Spanish stop words
-            if word in ('de', 'la', 'el', 'en', 'un', 'una', 'los', 'las', 'es', 'que', 'por', 'se', 'del', 'al', 'con', 'para', 'su', 'como', 'mas', 'ya', 'le', 'lo', 'me', 'si', 'no'):
-                continue
-            if word in keywords:
-                score += 5
-            if word in title:
-                score += 4
-            if word in desc:
-                score += 2
-            if word in body_text:
-                score += 1
+            # Check all variants of the word
+            for variant in word_variants[word]:
+                if variant in keywords:
+                    score += 5
+                    break
+            for variant in word_variants[word]:
+                if variant in title:
+                    score += 4
+                    break
+            for variant in word_variants[word]:
+                if variant in desc:
+                    score += 2
+                    break
+            for variant in word_variants[word]:
+                if variant in body_text:
+                    score += 1
+                    break
 
-        # Bonus: full query phrase match
+        # Bonus: multi-word phrase match
         if len(words) > 1:
-            phrase = ' '.join(w for w in words if w not in ('de', 'la', 'el', 'en', 'un', 'una', 'los', 'las'))
-            if phrase in title:
-                score += 8
-            if phrase in keywords:
-                score += 6
-            if phrase in body_text:
-                score += 3
+            phrase = ' '.join(words)
+            if phrase in all_text:
+                score += 10
+            # Partial phrase (adjacent words)
+            for i in range(len(words) - 1):
+                pair = words[i] + ' ' + words[i+1]
+                if pair in all_text:
+                    score += 4
 
         if score > 0:
             scored.append((score, c))
@@ -240,6 +282,48 @@ def chat_conversation_messages(conv_id):
             'content': m.content,
             'created_at': m.created_at.isoformat() if m.created_at else ''
         } for m in conv.messages]
+    })
+
+
+@chat_bp.route('/api/chat/my-stats')
+@login_required
+def chat_my_stats():
+    """User's own chat stats with training suggestions."""
+    from sqlalchemy import func
+
+    total_convs = ChatConversation.query.filter_by(user_id=current_user.id).count()
+    total_msgs = ChatMessage.query.join(ChatConversation).filter(
+        ChatConversation.user_id == current_user.id,
+        ChatMessage.role == 'user'
+    ).count()
+
+    # Get top topics from conversation titles
+    convs = ChatConversation.query.filter_by(
+        user_id=current_user.id
+    ).order_by(ChatConversation.updated_at.desc()).limit(20).all()
+    topics = [c.title for c in convs if c.title][:5]
+
+    # Generate training suggestions based on what they DON'T ask about
+    from models import Category
+    all_categories = Category.query.filter_by(is_active=True).all()
+    cat_names = [c.name for c in all_categories]
+
+    # Find categories the user hasn't explored
+    user_topics_text = ' '.join(topics).lower()
+    suggestions = []
+    for cat in cat_names:
+        if cat.lower() not in user_topics_text:
+            suggestions.append(f'Explora la sección "{cat}" para ampliar tu conocimiento.')
+    suggestions = suggestions[:4]
+
+    if total_convs > 5:
+        suggestions.insert(0, 'Llevas ' + str(total_convs) + ' consultas. Revisa tus temas más frecuentes para identificar áreas de mejora.')
+
+    return jsonify({
+        'total_conversations': total_convs,
+        'total_messages': total_msgs,
+        'top_topics': topics,
+        'suggestions': suggestions
     })
 
 

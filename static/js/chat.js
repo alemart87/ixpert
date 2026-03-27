@@ -1,8 +1,9 @@
-// iXpert AI Chat Widget
+// iXpert AI Chat Widget v2
 (function() {
     let currentConvId = null;
     let isOpen = false;
     let convsVisible = false;
+    let activeTab = 'chat';
 
     const panel = document.getElementById('chatPanel');
     const mascot = document.getElementById('chatMascot');
@@ -17,12 +18,15 @@
 
     if (!mascot) return;
 
-    // Toggle chat panel
+    var userName = (window.IXPERT_USER && window.IXPERT_USER.name) ? window.IXPERT_USER.name.split(' ')[0] : '';
+
+    // Toggle chat
     mascot.addEventListener('click', function() {
-        isOpen = !isOpen;
-        panel.classList.toggle('open', isOpen);
-        mascot.classList.toggle('chat-open', isOpen);
-        if (isOpen && !currentConvId) showWelcome();
+        isOpen = true;
+        panel.classList.add('open');
+        mascot.classList.add('chat-open');
+        if (!currentConvId) showWelcome();
+        inputEl.focus();
     });
 
     closeBtn.addEventListener('click', function() {
@@ -31,15 +35,14 @@
         mascot.classList.remove('chat-open');
     });
 
-    // New conversation
     newChatBtn.addEventListener('click', function() {
         currentConvId = null;
         convsEl.classList.remove('open');
         convsVisible = false;
+        switchTab('chat');
         showWelcome();
     });
 
-    // Toggle history
     historyBtn.addEventListener('click', function() {
         convsVisible = !convsVisible;
         if (convsVisible) {
@@ -50,7 +53,25 @@
         }
     });
 
-    // Send message
+    // Tabs
+    document.querySelectorAll('.chat-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            switchTab(tab.dataset.tab);
+        });
+    });
+
+    function switchTab(tabName) {
+        activeTab = tabName;
+        document.querySelectorAll('.chat-tab').forEach(function(t) {
+            t.classList.toggle('active', t.dataset.tab === tabName);
+        });
+        document.querySelectorAll('.chat-tab-content').forEach(function(c) {
+            c.classList.toggle('active', c.dataset.tab === tabName);
+        });
+        if (tabName === 'stats') loadMyStats();
+    }
+
+    // Send
     sendBtn.addEventListener('click', sendMessage);
     inputEl.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -60,32 +81,39 @@
     });
 
     function showWelcome() {
-        var userName = (window.IXPERT_USER && window.IXPERT_USER.name) ? window.IXPERT_USER.name.split(' ')[0] : '';
         var greeting = userName ? 'Hola ' + userName + '!' : 'Hola!';
-        messagesEl.innerHTML = '<div class="chat-welcome">' +
-            '<h4>' + greeting + ' Soy iXpert AI</h4>' +
-            '<p>Tu asistente virtual de Itaú. Preguntame sobre:</p>' +
-            '<p style="text-align:left;font-size:12px;margin-top:8px">' +
-            '- PIN, iToken y activaciones<br>' +
-            '- Tarjetas de crédito y débito<br>' +
-            '- Cuentas bancarias y transferencias<br>' +
-            '- Contracargos y devoluciones<br>' +
-            '- SAC.COM, SIHB, Núcleo<br>' +
-            '- Y cualquier otro tema de la plataforma</p>' +
+        messagesEl.innerHTML =
+            '<div class="chat-welcome">' +
+            '<h4>' + greeting + '</h4>' +
+            '<p>Soy <strong>iXpert AI</strong>, tu asistente de Itaú.</p>' +
+            '<div class="chat-welcome-topics">' +
+            '<div class="chat-welcome-topic" data-q="¿Cómo activo mi PIN de transacción e iToken?"><span class="chat-welcome-topic-icon">🔐</span>PIN & iToken</div>' +
+            '<div class="chat-welcome-topic" data-q="Información sobre tarjetas de crédito"><span class="chat-welcome-topic-icon">💳</span>Tarjetas</div>' +
+            '<div class="chat-welcome-topic" data-q="¿Cómo funciona un contracargo?"><span class="chat-welcome-topic-icon">🔄</span>Contracargos</div>' +
+            '<div class="chat-welcome-topic" data-q="Tipos de cuentas bancarias disponibles"><span class="chat-welcome-topic-icon">🏦</span>Cuentas</div>' +
+            '<div class="chat-welcome-topic" data-q="¿Cómo hacer transferencias?"><span class="chat-welcome-topic-icon">💸</span>Transferencias</div>' +
+            '<div class="chat-welcome-topic" data-q="¿Qué es phishing y cómo prevenirlo?"><span class="chat-welcome-topic-icon">🛡️</span>Seguridad</div>' +
+            '</div>' +
             '</div>';
+
+        // Quick topic click handlers
+        messagesEl.querySelectorAll('.chat-welcome-topic').forEach(function(el) {
+            el.addEventListener('click', function() {
+                inputEl.value = el.dataset.q;
+                sendMessage();
+            });
+        });
     }
 
     function addMessage(role, content) {
-        // Remove welcome if present
         var welcome = messagesEl.querySelector('.chat-welcome');
         if (welcome) welcome.remove();
 
         var div = document.createElement('div');
         div.className = 'chat-msg ' + role;
 
-        // Parse markdown links [text](url) to HTML
         var html = content
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
             .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
             .replace(/\n/g, '<br>');
         div.innerHTML = html;
@@ -98,11 +126,13 @@
         var text = inputEl.value.trim();
         if (!text) return;
 
+        // Switch to chat tab if not there
+        if (activeTab !== 'chat') switchTab('chat');
+
         inputEl.value = '';
         sendBtn.disabled = true;
         addMessage('user', text);
 
-        // Show typing
         typingEl.classList.add('active');
         messagesEl.scrollTop = messagesEl.scrollHeight;
 
@@ -116,7 +146,6 @@
                 })
             });
             var data = await res.json();
-
             typingEl.classList.remove('active');
 
             if (data.error) {
@@ -151,7 +180,6 @@
                     '</div>';
             }).join('');
 
-            // Click to load conversation
             convsEl.querySelectorAll('.chat-conv-item').forEach(function(el) {
                 el.addEventListener('click', function(e) {
                     if (e.target.classList.contains('conv-delete')) return;
@@ -159,7 +187,6 @@
                 });
             });
 
-            // Delete buttons
             convsEl.querySelectorAll('.conv-delete').forEach(function(btn) {
                 btn.addEventListener('click', async function(e) {
                     e.stopPropagation();
@@ -181,17 +208,43 @@
         try {
             var res = await fetch('/api/chat/conversations/' + convId);
             var data = await res.json();
-
             currentConvId = convId;
             messagesEl.innerHTML = '';
             convsEl.classList.remove('open');
             convsVisible = false;
-
-            data.messages.forEach(function(m) {
-                addMessage(m.role, m.content);
-            });
+            data.messages.forEach(function(m) { addMessage(m.role, m.content); });
         } catch (err) {
             addMessage('assistant', 'Error al cargar la conversación.');
+        }
+    }
+
+    async function loadMyStats() {
+        var statsEl = document.getElementById('chatStatsContent');
+        if (!statsEl) return;
+
+        try {
+            var res = await fetch('/api/chat/my-stats');
+            var data = await res.json();
+
+            statsEl.innerHTML =
+                '<h4>Tu Actividad</h4>' +
+                '<div class="chat-stat-card"><h5>Consultas realizadas</h5><div class="stat-number">' + data.total_conversations + '</div></div>' +
+                '<div class="chat-stat-card"><h5>Mensajes enviados</h5><div class="stat-number">' + data.total_messages + '</div></div>' +
+                '<div class="chat-stat-card"><h5>Temas más consultados</h5>' +
+                (data.top_topics.length > 0
+                    ? '<p>' + data.top_topics.map(function(t) { return '• ' + t; }).join('<br>') + '</p>'
+                    : '<p>Aún sin consultas</p>') +
+                '</div>' +
+                '<div class="chat-tips">' +
+                '<h4>Oportunidades de Capacitación</h4>' +
+                (data.suggestions.length > 0
+                    ? data.suggestions.map(function(s) {
+                        return '<div class="chat-tip"><span class="chat-tip-icon">📚</span><span>' + s + '</span></div>';
+                    }).join('')
+                    : '<div class="chat-tip"><span class="chat-tip-icon">✅</span><span>Explora la plataforma y consulta para recibir recomendaciones personalizadas.</span></div>') +
+                '</div>';
+        } catch (err) {
+            statsEl.innerHTML = '<p style="padding:20px;color:#888;text-align:center">Error al cargar estadísticas</p>';
         }
     }
 
