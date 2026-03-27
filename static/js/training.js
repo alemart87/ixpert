@@ -40,7 +40,7 @@
         chatList.innerHTML = ids.map(function(sid) {
             var i = interactions[sid];
             var isActive = sid == activeSessionId;
-            var statusIcon = i.status === 'completed' ? '✅' : '🟢';
+            var statusIcon = i.status === 'completed' ? '✅' : '🟠';
             var lastMsg = i.messages.length ? i.messages[i.messages.length-1].content.substring(0, 40) + '...' : '';
             if (i.status === 'completed') completed++;
             else active++;
@@ -159,8 +159,14 @@
             if (data.ok) {
                 interactions[activeSessionId].status = 'completed';
                 document.getElementById('chatInputArea').style.display = 'none';
-                chatHeader.textContent = 'Chat ' + interactions[activeSessionId].number + ' (completado)';
+                chatHeader.textContent = 'Chat ' + interactions[activeSessionId].number + ' ✅ Completado';
                 renderSidebar();
+                // If batch is fully complete, redirect to results
+                if (data.batch_complete) {
+                    setTimeout(function() {
+                        window.location.href = '/training/batch/' + batchId + '/result';
+                    }, 1500);
+                }
             }
         } catch(e) { alert('Error al cerrar'); }
         chatEnd.disabled = false;
