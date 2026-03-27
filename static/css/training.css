@@ -96,6 +96,8 @@
     background: #fff;
     border-radius: 0 0 12px 12px;
     align-items: center;
+    position: relative;
+    flex-shrink: 0;
 }
 .training-input-area input {
     flex: 1; padding: 12px 18px; border: 2px solid #e0e0e0;
@@ -119,9 +121,29 @@
 }
 .training-input-area .btn-end:hover { background: #b02a37; }
 
-/* Typing */
-.training-typing { display: none; align-self: flex-start; padding: 10px 16px; background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; }
+/* Typing - inside messages area */
+.training-typing { display: none; align-self: flex-start; padding: 10px 16px; background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; margin-top: auto; }
 .training-typing.active { display: flex; gap: 5px; align-items: center; }
+
+/* Emoji Picker */
+.btn-emoji {
+    background: none; border: none; font-size: 22px; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; transition: background 0.2s;
+    flex-shrink: 0;
+}
+.btn-emoji:hover { background: #f0f0f0; }
+.emoji-picker {
+    position: absolute; bottom: 60px; left: 0; right: 0;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+    padding: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    display: flex; flex-wrap: wrap; gap: 4px; max-height: 180px; overflow-y: auto;
+    z-index: 10;
+}
+.emoji-picker span {
+    font-size: 22px; cursor: pointer; padding: 4px 6px;
+    border-radius: 6px; transition: background 0.15s;
+}
+.emoji-picker span:hover { background: #fff4e5; }
 .training-typing span { width: 8px; height: 8px; border-radius: 50%; background: #ff6600; animation: loaderBounce 1.4s ease-in-out infinite; }
 .training-typing span:nth-child(2) { animation-delay: 0.16s; }
 .training-typing span:nth-child(3) { animation-delay: 0.32s; }

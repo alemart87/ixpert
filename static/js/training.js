@@ -19,6 +19,31 @@
     var chatSend = document.getElementById('chatSend');
     var chatEnd = document.getElementById('chatEnd');
     var chatTyping = document.getElementById('chatTyping');
+    var emojiBtn = document.getElementById('emojiBtn');
+    var emojiPicker = document.getElementById('emojiPicker');
+
+    // Emoji picker
+    var emojis = ['😊','😃','😅','😂','🤔','👍','👋','🙏','💪','⭐','✅','❌','📋','🔍','💳','🏦','📞','📧','🔐','💰','⏳','🎯','❤️','🙂','😢','😡','🤝','👏','🔔','📌'];
+    if (emojiPicker) {
+        emojiPicker.innerHTML = emojis.map(function(e) { return '<span data-emoji="' + e + '">' + e + '</span>'; }).join('');
+        emojiPicker.addEventListener('click', function(ev) {
+            if (ev.target.dataset.emoji) {
+                chatInput.value += ev.target.dataset.emoji;
+                chatInput.focus();
+            }
+        });
+    }
+    if (emojiBtn) {
+        emojiBtn.addEventListener('click', function() {
+            emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'flex' : 'none';
+        });
+        // Close picker when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                emojiPicker.style.display = 'none';
+            }
+        });
+    }
 
     // Initialize from server data
     (window.BATCH_INTERACTIONS || []).forEach(function(i) {
