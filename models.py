@@ -196,3 +196,24 @@ class TrainingViewPermission(db.Model):
 
     supervisor = db.relationship('User', foreign_keys=[supervisor_id])
     granter = db.relationship('User', foreign_keys=[granted_by])
+
+
+class VexProfile(db.Model):
+    __tablename__ = 'vex_profiles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=False)
+    communication_score = db.Column(db.Float, default=0)
+    empathy_score = db.Column(db.Float, default=0)
+    resolution_score = db.Column(db.Float, default=0)
+    speed_score = db.Column(db.Float, default=0)
+    adaptability_score = db.Column(db.Float, default=0)
+    compliance_score = db.Column(db.Float, default=0)
+    overall_score = db.Column(db.Float, default=0)
+    predictive_index = db.Column(db.Float, default=0)
+    profile_category = db.Column(db.String(30))  # elite, alto, desarrollo, refuerzo
+    recommendation = db.Column(db.String(30))  # recomendado, observaciones, no_recomendado
+    sessions_analyzed = db.Column(db.Integer, default=0)
+    last_updated = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship('User', backref=db.backref('vex_profile', uselist=False))
