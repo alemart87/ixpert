@@ -255,104 +255,191 @@ def admin_chat_detail(conv_id):
 def api_insights():
     from sqlalchemy import func, cast, Date
     from collections import Counter
+    from datetime import timedelta
     import re
 
-    # Basic stats
-    total_convs = ChatConversation.query.count()
-    total_msgs = ChatMessage.query.filter_by(role='user').count()
-    total_tokens = db.session.query(func.coalesce(func.sum(ChatMessage.tokens_used), 0)).scalar()
-    unique_users = db.session.query(func.count(func.distinct(ChatConversation.user_id))).scalar()
+    # Date filters
+    date_from = request.args.get('from', '')
+    date_to = request.args.get('to', '')
 
-    # Conversations per day (last 30 days)
+    if not date_from:
+        dt_from = datetime.now(timezone.utc) - timedelta(hours=24)
+    else:
+        dt_from = datetime.strptime(date_from, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+
+    if not date_to:
+        dt_to = datetime.now(timezone.utc)
+    else:
+        dt_to = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+
+    # Base filtered queries
+    convs_q = ChatConversation.query.filter(ChatConversation.created_at.between(dt_from, dt_to))
+    conv_ids = [c.id for c in convs_q.all()]
+    msgs_q = ChatMessage.query.filter(ChatMessage.conversation_id.in_(conv_ids)) if conv_ids else ChatMessage.query.filter(False)
+
+    # Stats
+    total_convs = len(conv_ids)
+    total_msgs = msgs_q.filter_by(role='user').count() if conv_ids else 0
+    total_tokens = db.session.query(func.coalesce(func.sum(ChatMessage.tokens_used), 0)).filter(
+        ChatMessage.conversation_id.in_(conv_ids)).scalar() if conv_ids else 0
+    unique_users = db.session.query(func.count(func.distinct(ChatConversation.user_id))).filter(
+        ChatConversation.id.in_(conv_ids)).scalar() if conv_ids else 0
+
+    # Conversations per day
     convs_per_day = db.session.query(
         cast(ChatConversation.created_at, Date).label('date'),
         func.count(ChatConversation.id).label('count')
+    ).filter(ChatConversation.created_at.between(dt_from, dt_to)
     ).group_by('date').order_by('date').all()
 
-    # Top users by conversations
+    # Top users
     top_users = db.session.query(
         User.name, User.role,
-        func.count(ChatConversation.id).label('convs'),
-        func.count(ChatMessage.id).label('msgs')
+        func.count(func.distinct(ChatConversation.id)).label('convs')
     ).join(ChatConversation, User.id == ChatConversation.user_id
-    ).outerjoin(ChatMessage, ChatConversation.id == ChatMessage.conversation_id
+    ).filter(ChatConversation.created_at.between(dt_from, dt_to)
     ).filter(User.role != 'superadmin'
     ).group_by(User.id, User.name, User.role
-    ).order_by(func.count(ChatConversation.id).desc()).limit(10).all()
+    ).order_by(func.count(func.distinct(ChatConversation.id)).desc()).limit(10).all()
 
-    # Topic analysis from conversation titles
-    all_titles = [c.title.lower() for c in ChatConversation.query.all() if c.title]
-    topic_words = Counter()
-    stop = {'hola', 'como', 'que', 'para', 'por', 'con', 'una', 'los', 'las', 'del', 'qué', 'cómo', 'información', 'sobre'}
-    for title in all_titles:
-        words = re.findall(r'\w+', title)
-        for w in words:
-            if len(w) > 3 and w not in stop:
-                topic_words[w] += 1
-    top_topics = topic_words.most_common(10)
+    # Analyze ALL user messages in period for topics
+    stop = {'hola', 'como', 'cómo', 'que', 'qué', 'para', 'por', 'con', 'una', 'uno',
+            'los', 'las', 'del', 'información', 'sobre', 'quiero', 'necesito', 'saber',
+            'puedo', 'hacer', 'tiene', 'tiene', 'esta', 'esto', 'esos', 'esas', 'tiene',
+            'favor', 'buenas', 'buenos', 'dias', 'gracias', 'muchas', 'bien', 'muy'}
 
-    # User messages for gap analysis (what users ask about most)
-    user_msgs = ChatMessage.query.filter_by(role='user').all()
-    question_words = Counter()
-    for msg in user_msgs:
-        words = re.findall(r'\w+', msg.content.lower())
-        for w in words:
-            if len(w) > 3 and w not in stop:
-                question_words[w] += 1
-    frequent_questions = question_words.most_common(15)
+    user_messages = []
+    if conv_ids:
+        user_messages = ChatMessage.query.filter(
+            ChatMessage.conversation_id.in_(conv_ids),
+            ChatMessage.role == 'user'
+        ).all()
 
-    # Content gap: categories with few/no questions
+    # Extract meaningful phrases (bigrams) from user messages
+    all_text = ' '.join(m.content.lower() for m in user_messages)
+    words_list = [w for w in re.findall(r'\w+', all_text) if len(w) > 2 and w not in stop]
+
+    # Single words
+    word_freq = Counter(words_list).most_common(15)
+
+    # Bigrams (two-word phrases) — more meaningful for topics
+    bigrams = Counter()
+    for i in range(len(words_list) - 1):
+        pair = words_list[i] + ' ' + words_list[i + 1]
+        bigrams[pair] += 1
+    top_bigrams = bigrams.most_common(8)
+
+    # Combine into top topics (prefer bigrams)
+    top_topics = [{'word': w, 'count': c} for w, c in top_bigrams if c > 1]
+    for w, c in word_freq:
+        if len(top_topics) >= 10:
+            break
+        if not any(w in t['word'] for t in top_topics):
+            top_topics.append({'word': w, 'count': c})
+
+    # Category coverage: analyze which categories' CONTENT is being asked about
     from models import Category, Content
     categories = Category.query.filter_by(is_active=True).all()
-    cat_mentions = {}
+    cat_coverage = {}
     for cat in categories:
-        cat_name_lower = cat.name.lower()
-        mentions = sum(1 for t in all_titles if cat_name_lower in t)
-        cat_mentions[cat.name] = mentions
+        # Get keywords from all contents in this category
+        contents_in_cat = Content.query.filter_by(category_id=cat.id, is_active=True).all()
+        cat_kw = set()
+        for cont in contents_in_cat:
+            for kw in (cont.keywords or '').split(','):
+                kw = kw.strip().lower()
+                if len(kw) > 2:
+                    cat_kw.add(kw)
 
-    # Training recommendations
+        # Count how many user messages mention these keywords
+        mentions = 0
+        for msg in user_messages:
+            msg_lower = msg.content.lower()
+            if any(kw in msg_lower for kw in cat_kw):
+                mentions += 1
+        cat_coverage[cat.name] = mentions
+
+    # --- SMART RECOMMENDATIONS ---
     recommendations = []
-    if top_topics:
-        top_topic_name = top_topics[0][0]
+
+    # 1. High demand topics
+    if top_topics and top_topics[0]['count'] >= 2:
+        t = top_topics[0]
         recommendations.append({
-            'type': 'high_demand',
             'icon': '🔥',
-            'title': f'Alta demanda: "{top_topic_name}"',
-            'desc': f'El tema "{top_topic_name}" concentra {top_topics[0][1]} consultas. Considerar capacitación grupal o material adicional.'
+            'title': f'Tema más consultado: "{t["word"]}"',
+            'desc': f'Con {t["count"]} menciones en el período. Evaluar si el equipo necesita capacitación específica o si el contenido existente es suficiente.',
+            'priority': 'alta'
         })
 
-    # Find underexplored categories
-    for cat_name, mentions in cat_mentions.items():
-        if mentions == 0:
+    # 2. Users that ask a lot (may need more training)
+    for name, role, convs in top_users:
+        if convs >= 3:
             recommendations.append({
-                'type': 'gap',
-                'icon': '📊',
-                'title': f'Brecha: "{cat_name}" sin consultas',
-                'desc': f'La categoría "{cat_name}" no tiene consultas. Puede indicar desconocimiento o falta de necesidad. Verificar con el equipo.'
+                'icon': '🎓',
+                'title': f'{name} ({role}) realizó {convs} consultas',
+                'desc': f'Alta actividad puede indicar necesidad de capacitación personalizada. Revisar los temas de sus consultas.',
+                'priority': 'media'
             })
+            break  # Only top user
 
+    # 3. Categories with low coverage vs high coverage
+    if cat_coverage:
+        max_cov = max(cat_coverage.values()) if cat_coverage.values() else 0
+        for cat_name, mentions in cat_coverage.items():
+            if mentions == 0 and total_msgs > 3:
+                recommendations.append({
+                    'icon': '⚠️',
+                    'title': f'Sin consultas sobre "{cat_name}"',
+                    'desc': f'Ninguna consulta relacionada a contenidos de "{cat_name}". El equipo podría no conocer estos recursos. Considerar difusión.',
+                    'priority': 'media'
+                })
+            elif max_cov > 0 and mentions == max_cov:
+                recommendations.append({
+                    'icon': '📈',
+                    'title': f'"{cat_name}" es la más consultada',
+                    'desc': f'{mentions} consultas relacionadas. Verificar que el contenido esté actualizado y sea suficiente.',
+                    'priority': 'alta'
+                })
+
+    # 4. Engagement metric
     if unique_users and total_convs:
         avg = total_convs / unique_users
-        if avg > 5:
+        if avg >= 2:
             recommendations.append({
-                'type': 'engagement',
-                'icon': '👥',
-                'title': 'Alto engagement del equipo',
-                'desc': f'Promedio de {avg:.1f} consultas por usuario. El equipo está usando activamente la herramienta.'
+                'icon': '✅',
+                'title': f'Buen nivel de uso ({avg:.1f} consultas/usuario)',
+                'desc': 'El equipo está adoptando la herramienta activamente.',
+                'priority': 'info'
+            })
+        elif total_convs > 0 and avg < 1.5:
+            recommendations.append({
+                'icon': '📢',
+                'title': 'Bajo engagement general',
+                'desc': f'Promedio de {avg:.1f} consultas/usuario. Considerar promover más el uso de iXpert AI en el equipo.',
+                'priority': 'media'
             })
 
-    if total_tokens > 50000:
+    # 5. Token cost
+    if total_tokens > 20000:
+        cost_est = total_tokens * 0.00015 / 1000  # rough gpt-4o-mini estimate
         recommendations.append({
-            'type': 'cost',
             'icon': '💰',
-            'title': 'Monitorear consumo de tokens',
-            'desc': f'{total_tokens:,} tokens consumidos. Considerar optimizar respuestas o establecer límites.'
+            'title': f'Consumo: {total_tokens:,} tokens (~${cost_est:.2f} USD)',
+            'desc': 'Monitorear el costo. El modelo gpt-4o-mini es económico pero el volumen importa.',
+            'priority': 'info'
         })
 
-    # Recent conversations for table
-    recent_convs = ChatConversation.query.order_by(
-        ChatConversation.updated_at.desc()
-    ).limit(20).all()
+    if not recommendations:
+        recommendations.append({
+            'icon': '📊',
+            'title': 'Datos insuficientes en este período',
+            'desc': 'Ampliá el rango de fechas para obtener recomendaciones más precisas.',
+            'priority': 'info'
+        })
+
+    # Recent conversations
+    recent_convs = convs_q.order_by(ChatConversation.updated_at.desc()).limit(30).all()
 
     return jsonify({
         'stats': {
@@ -362,10 +449,10 @@ def api_insights():
             'unique_users': unique_users
         },
         'convs_per_day': [{'date': str(d), 'count': c} for d, c in convs_per_day],
-        'top_users': [{'name': n, 'role': r, 'convs': c, 'msgs': m} for n, r, c, m in top_users],
-        'top_topics': [{'word': w, 'count': c} for w, c in top_topics],
-        'frequent_questions': [{'word': w, 'count': c} for w, c in frequent_questions],
-        'category_coverage': cat_mentions,
+        'top_users': [{'name': n, 'role': r, 'convs': c} for n, r, c in top_users],
+        'top_topics': top_topics,
+        'frequent_questions': [{'word': w, 'count': c} for w, c in word_freq],
+        'category_coverage': cat_coverage,
         'recommendations': recommendations,
         'recent_conversations': [{
             'id': c.id,

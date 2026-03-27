@@ -19,6 +19,17 @@
         <a href="{{ url_for('admin.chat_analytics') }}" class="btn btn-primary">Insights AI</a>
     </div>
 
+    <!-- Date Filter -->
+    <div class="date-filter" style="background:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:20px">
+        <label>Desde: <input type="date" id="dateFrom"></label>
+        <label>Hasta: <input type="date" id="dateTo"></label>
+        <button class="btn btn-primary" onclick="loadInsights()">Filtrar</button>
+        <button class="btn btn-secondary" onclick="setQuickRange(1)">24h</button>
+        <button class="btn btn-secondary" onclick="setQuickRange(7)">7 días</button>
+        <button class="btn btn-secondary" onclick="setQuickRange(30)">30 días</button>
+        <button class="btn btn-secondary" onclick="setQuickRange(0)">Todo</button>
+    </div>
+
     <!-- Stats Cards -->
     <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr)">
         <div class="stat-card">
@@ -116,8 +127,27 @@
 <script>
 let chartConvsDay, chartTopics, chartCoverage;
 
+function setQuickRange(days) {
+    const to = new Date();
+    document.getElementById('dateTo').value = to.toISOString().split('T')[0];
+    if (days === 0) {
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+    } else {
+        const from = new Date(to.getTime() - days * 86400000);
+        document.getElementById('dateFrom').value = from.toISOString().split('T')[0];
+    }
+    loadInsights();
+}
+
 async function loadInsights() {
-    const res = await fetch('/admin/api/insights');
+    const from = document.getElementById('dateFrom').value;
+    const to = document.getElementById('dateTo').value;
+    let url = '/admin/api/insights?';
+    if (from) url += 'from=' + from + '&';
+    if (to) url += 'to=' + to;
+
+    const res = await fetch(url);
     const d = await res.json();
 
     // Stats
@@ -131,12 +161,14 @@ async function loadInsights() {
     if (d.recommendations.length === 0) {
         recEl.innerHTML = '<p style="color:#888">Aún no hay suficientes datos para generar recomendaciones. Se necesitan más consultas.</p>';
     } else {
-        recEl.innerHTML = d.recommendations.map(r =>
-            '<div style="display:flex;gap:12px;padding:12px;background:#f8f9fa;border-radius:10px;margin-bottom:8px">' +
-            '<span style="font-size:28px">' + r.icon + '</span>' +
+        const prColors = {alta:'#fff0e0;border-left:4px solid #ff6600', media:'#f0f4ff;border-left:4px solid #004080', info:'#f0faf0;border-left:4px solid #28a745'};
+        recEl.innerHTML = d.recommendations.map(r => {
+            const bg = prColors[r.priority] || prColors.info;
+            return '<div style="display:flex;gap:12px;padding:14px;background:' + bg + ';border-radius:10px;margin-bottom:8px">' +
+            '<span style="font-size:28px;flex-shrink:0">' + r.icon + '</span>' +
             '<div><strong style="color:#004080">' + r.title + '</strong>' +
-            '<p style="margin:4px 0 0;font-size:13px;color:#555">' + r.desc + '</p></div></div>'
-        ).join('');
+            '<p style="margin:4px 0 0;font-size:13px;color:#555;line-height:1.5">' + r.desc + '</p></div></div>';
+        }).join('');
     }
 
     // Conversations per day
@@ -211,7 +243,7 @@ async function loadInsights() {
         usersEl.innerHTML = d.top_users.map(u =>
             '<div class="data-item">' +
             '<span><strong>' + u.name + '</strong> <small style="color:#888">(' + u.role + ')</small></span>' +
-            '<span><span class="badge">' + u.convs + ' conv</span> <span class="badge" style="background:#004080;color:#fff">' + u.msgs + ' msgs</span></span>' +
+            '<span class="badge" style="background:#ff6600;color:#fff">' + u.convs + ' consultas</span>' +
             '</div>'
         ).join('');
     }
@@ -259,6 +291,7 @@ async function viewConv(convId) {
     document.getElementById('convModal').style.display = 'flex';
 }
 
+// Default: load all data (no date filter) on first load
 loadInsights();
 </script>
 {% endblock %}
