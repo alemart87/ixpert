@@ -251,18 +251,30 @@
 .chat-input-area button:hover { background: #e55c00; transform: scale(1.05); }
 .chat-input-area button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
-/* ===== Responsive ===== */
-@media (max-width: 480px) {
+/* ===== Responsive: Small phones ===== */
+@media (max-width: 767px) {
     .chat-panel {
         bottom: 0;
         right: 0;
         left: 0;
+        top: 0;
         width: 100%;
-        max-height: 100vh;
-        height: 100vh;
+        max-height: 100%;
+        height: 100%;
         border-radius: 0;
+        position: fixed;
     }
-    .chat-messages { max-height: none; flex: 1; }
-    .chat-mascot { bottom: 16px; right: 16px; width: 56px; height: 56px; }
+    .chat-messages {
+        max-height: none;
+        flex: 1;
+        min-height: 0;
+    }
+    .chat-mascot {
+        bottom: 16px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+    }
     .chat-mascot svg { width: 34px; height: 34px; }
+    .chat-input-area input { font-size: 16px; } /* Prevents iOS zoom */
 }

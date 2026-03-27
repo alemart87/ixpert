@@ -44,14 +44,15 @@ img { max-width: 100%; height: auto; }
 header {
     background: linear-gradient(135deg, var(--naranja-itau), var(--naranja-claro));
     color: var(--blanco);
-    padding: 16px 20px;
+    padding: 12px 60px 12px 16px; /* Right padding for hamburger */
     text-align: center;
     box-shadow: var(--sombra-md);
     position: relative;
+    z-index: 100;
 }
 
-header h1 { font-size: 2em; margin: 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-header p { margin: 4px 0 0; font-size: 0.9em; opacity: 0.9; }
+header h1 { font-size: 1.5em; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+header p { margin: 2px 0 0; font-size: 0.75em; opacity: 0.85; display: none; }
 .logo-link { color: var(--blanco); text-decoration: none; }
 
 /* ===== Hamburger (Mobile) ===== */
@@ -417,8 +418,9 @@ footer p { margin: 0; font-size: 14px; }
    RESPONSIVE: Tablet (768px+)
    ======================================== */
 @media (min-width: 768px) {
-    header h1 { font-size: 3em; }
-    header { padding: 24px 30px; }
+    header h1 { font-size: 2.5em; }
+    header { padding: 20px 30px; }
+    header p { display: block; font-size: 0.85em; }
     main { padding: 30px 24px; }
 
     .card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -448,7 +450,9 @@ footer p { margin: 0; font-size: 14px; }
         font-size: 16px;
     }
 
-    header h1 { font-size: 3.5em; }
+    header h1 { font-size: 3em; }
+    header p { display: block; }
+    header { padding: 24px 30px; }
     main { padding: 40px 24px; }
 
     .card-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }

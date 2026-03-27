@@ -60,9 +60,18 @@
     });
 
     function showWelcome() {
+        var userName = (window.IXPERT_USER && window.IXPERT_USER.name) ? window.IXPERT_USER.name.split(' ')[0] : '';
+        var greeting = userName ? 'Hola ' + userName + '!' : 'Hola!';
         messagesEl.innerHTML = '<div class="chat-welcome">' +
-            '<h4>Hola! Soy iXpert AI</h4>' +
-            '<p>Tu asistente virtual. Preguntame sobre cualquier tema de la plataforma y te ayudo con información y links directos.</p>' +
+            '<h4>' + greeting + ' Soy iXpert AI</h4>' +
+            '<p>Tu asistente virtual de Itaú. Preguntame sobre:</p>' +
+            '<p style="text-align:left;font-size:12px;margin-top:8px">' +
+            '- PIN, iToken y activaciones<br>' +
+            '- Tarjetas de crédito y débito<br>' +
+            '- Cuentas bancarias y transferencias<br>' +
+            '- Contracargos y devoluciones<br>' +
+            '- SAC.COM, SIHB, Núcleo<br>' +
+            '- Y cualquier otro tema de la plataforma</p>' +
             '</div>';
     }
 

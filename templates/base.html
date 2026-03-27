@@ -79,6 +79,7 @@
 
     {% if current_user.is_authenticated %}
     <!-- Chat Widget -->
+    <script>window.IXPERT_USER = {name: "{{ current_user.name }}", role: "{{ current_user.role }}"};</script>
     <button class="chat-mascot" id="chatMascot" aria-label="Chat con iXpert AI">
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Mascot: cute bot face -->

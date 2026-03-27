@@ -1,26 +1,54 @@
 import os
 import re
+import json
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from models import db, Content, ChatConversation, ChatMessage
 from datetime import datetime, timezone
+from urllib.request import Request, urlopen
+from urllib.error import URLError
 
 chat_bp = Blueprint('chat', __name__)
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
-SYSTEM_PROMPT = """Eres iXpert AI, asistente virtual de la plataforma de ayuda en línea de Itaú.
-Respondes en español de forma clara y concisa.
-Usa SOLO la información proporcionada como contexto para responder.
-Si no tienes información suficiente en el contexto, dilo honestamente y sugiere buscar en la plataforma.
-Siempre incluye el link al artículo relevante cuando sea posible usando formato markdown: [Título](/content/slug)
-Sé amigable y profesional. No inventes información que no esté en el contexto."""
+SYSTEM_PROMPT = """Eres iXpert AI, el asistente virtual inteligente de la plataforma iXpert de Itaú.
+Tu rol es ayudar a los asesores y supervisores del banco con información precisa.
+
+REGLAS:
+- Respondes SIEMPRE en español
+- Saluda al usuario por su nombre cuando sea la primera interacción
+- Usa la información del CONTEXTO proporcionado para responder
+- Si encuentras información relevante, incluye el link: [Título del artículo](/content/slug)
+- Si NO hay información suficiente en el contexto, dilo honestamente y sugiere qué buscar
+- Sé conciso pero completo. Usa listas cuando sea apropiado
+- No inventes procedimientos ni pasos que no estén en el contexto
+- Puedes hacer preguntas de seguimiento para entender mejor qué necesita el usuario"""
 
 
-def find_relevant_contents(query, limit=3):
-    """Find the most relevant content articles for a query."""
+def strip_html(html):
+    """Remove HTML tags and get clean plain text."""
+    # Remove script and style blocks completely
+    text = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    # Replace block elements with newlines
+    text = re.sub(r'<(?:br|p|div|h[1-6]|li|tr)[^>]*>', '\n', text, flags=re.IGNORECASE)
+    # Remove remaining tags
+    text = re.sub(r'<[^>]+>', ' ', text)
+    # Clean whitespace
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r'\n\s*\n', '\n', text)
+    return text.strip()[:2500]
+
+
+def find_relevant_contents(query, limit=4):
+    """Find relevant content using full-text search across all fields."""
     query_lower = query.lower()
-    words = re.findall(r'\w+', query_lower)
+    # Extract meaningful words (2+ chars)
+    words = [w for w in re.findall(r'\w+', query_lower) if len(w) >= 2]
+
+    if not words:
+        return []
 
     contents = Content.query.filter_by(is_active=True).all()
     scored = []
@@ -30,16 +58,31 @@ def find_relevant_contents(query, limit=3):
         keywords = (c.keywords or '').lower()
         title = c.title.lower()
         desc = (c.description or '').lower()
+        # Also search in the actual HTML content (plain text version)
+        body_text = strip_html(c.html_content).lower()
 
         for word in words:
-            if len(word) < 3:
+            # Skip very common Spanish stop words
+            if word in ('de', 'la', 'el', 'en', 'un', 'una', 'los', 'las', 'es', 'que', 'por', 'se', 'del', 'al', 'con', 'para', 'su', 'como', 'mas', 'ya', 'le', 'lo', 'me', 'si', 'no'):
                 continue
             if word in keywords:
-                score += 3
+                score += 5
             if word in title:
-                score += 2
+                score += 4
             if word in desc:
+                score += 2
+            if word in body_text:
                 score += 1
+
+        # Bonus: full query phrase match
+        if len(words) > 1:
+            phrase = ' '.join(w for w in words if w not in ('de', 'la', 'el', 'en', 'un', 'una', 'los', 'las'))
+            if phrase in title:
+                score += 8
+            if phrase in keywords:
+                score += 6
+            if phrase in body_text:
+                score += 3
 
         if score > 0:
             scored.append((score, c))
@@ -48,26 +91,15 @@ def find_relevant_contents(query, limit=3):
     return [c for _, c in scored[:limit]]
 
 
-def strip_html(html):
-    """Remove HTML tags and get plain text, truncated."""
-    text = re.sub(r'<[^>]+>', ' ', html)
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text[:1500]  # Max 1500 chars per article to save tokens
-
-
 def call_openai(messages):
     """Call OpenAI API."""
     if not OPENAI_API_KEY:
         return "Lo siento, el servicio de IA no está configurado. Contacta al administrador.", 0
 
-    import json
-    from urllib.request import Request, urlopen
-    from urllib.error import URLError
-
     payload = json.dumps({
         'model': 'gpt-4o-mini',
         'messages': messages,
-        'max_tokens': 800,
+        'max_tokens': 1000,
         'temperature': 0.3
     }).encode('utf-8')
 
@@ -133,19 +165,23 @@ def chat_send():
     ref_links = []
     for c in relevant:
         plain = strip_html(c.html_content)
-        context_parts.append(f"Artículo: {c.title}\nURL: /content/{c.slug}\nContenido: {plain}")
+        context_parts.append(f"ARTÍCULO: {c.title}\nURL: /content/{c.slug}\nCATEGORÍA: {c.category.name if c.category else 'General'}\nCONTENIDO:\n{plain}")
         ref_links.append({'title': c.title, 'slug': c.slug})
 
-    context_text = "\n\n---\n\n".join(context_parts) if context_parts else "No se encontró información relevante en la base de conocimiento."
+    context_text = "\n\n===\n\n".join(context_parts) if context_parts else "No se encontró información directamente relevante. Sugiere al usuario buscar en la plataforma o reformular su pregunta."
 
     # Build messages for OpenAI
-    ai_messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
-    ai_messages.append({'role': 'system', 'content': f"CONTEXTO DE LA BASE DE CONOCIMIENTO:\n\n{context_text}"})
+    user_info = f"El usuario se llama {current_user.name} y tiene el rol de {current_user.role}."
+    ai_messages = [
+        {'role': 'system', 'content': SYSTEM_PROMPT},
+        {'role': 'system', 'content': f"INFORMACIÓN DEL USUARIO: {user_info}"},
+        {'role': 'system', 'content': f"CONTEXTO DE LA BASE DE CONOCIMIENTO:\n\n{context_text}"}
+    ]
 
-    # Add recent conversation history (last 6 messages)
+    # Add recent conversation history (last 8 messages)
     recent = ChatMessage.query.filter_by(
         conversation_id=conv.id
-    ).order_by(ChatMessage.created_at.desc()).limit(6).all()
+    ).order_by(ChatMessage.created_at.desc()).limit(8).all()
     recent.reverse()
     for msg in recent[:-1]:  # Exclude the message we just added
         ai_messages.append({'role': msg.role, 'content': msg.content})
