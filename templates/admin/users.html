@@ -72,7 +72,7 @@
                     <td>{{ user.last_login.strftime('%d/%m/%Y %H:%M') if user.last_login else 'Nunca' }}</td>
                     <td>
                         {% if not user.is_superadmin %}
-                        <button class="btn btn-sm btn-primary" onclick="editUser({{ user.id }}, '{{ user.name }}', '{{ user.email }}', '{{ user.role }}', {{ 'true' if user.is_active_user else 'false' }})">Editar</button>
+                        <button class="btn btn-sm btn-primary" onclick="editUser({{ user.id }}, '{{ user.name }}', '{{ user.email }}', '{{ user.role }}', {{ 'true' if user.is_active_user else 'false' }}, {{ user.max_concurrent_training or 1 }})">Editar</button>
                         {% else %}
                         <span class="badge badge-superadmin">SuperAdmin</span>
                         {% endif %}
@@ -110,6 +110,10 @@
                 <input type="password" name="password" minlength="6">
             </div>
             <div class="form-group">
+                <label>Chats Simultáneos (entrenamiento)</label>
+                <input type="number" name="max_concurrent" id="editMaxConcurrent" min="1" max="10" value="1" style="width:80px">
+            </div>
+            <div class="form-group">
                 <label><input type="checkbox" name="is_active" id="editActive"> Activo</label>
             </div>
             <div class="form-actions">
@@ -122,9 +126,10 @@
 
 {% block extra_scripts %}
 <script>
-function editUser(id, name, email, role, active) {
+function editUser(id, name, email, role, active, maxConcurrent) {
     document.getElementById('editId').value = id;
     document.getElementById('editName').value = name;
+    document.getElementById('editMaxConcurrent').value = maxConcurrent || 1;
     document.getElementById('editEmail').value = email;
     document.getElementById('editRole').value = role;
     document.getElementById('editActive').checked = active;
