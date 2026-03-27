@@ -314,8 +314,10 @@ def chat_conversation_messages(conv_id):
 @chat_bp.route('/api/chat/my-stats')
 @login_required
 def chat_my_stats():
-    """User's own chat stats with training suggestions."""
+    """User's own chat stats with real training recommendations."""
     from sqlalchemy import func
+    from collections import Counter
+    from models import Category, Content
 
     total_convs = ChatConversation.query.filter_by(user_id=current_user.id).count()
     total_msgs = ChatMessage.query.join(ChatConversation).filter(
@@ -323,32 +325,119 @@ def chat_my_stats():
         ChatMessage.role == 'user'
     ).count()
 
-    # Get top topics from conversation titles
-    convs = ChatConversation.query.filter_by(
-        user_id=current_user.id
-    ).order_by(ChatConversation.updated_at.desc()).limit(20).all()
-    topics = [c.title for c in convs if c.title][:5]
+    # Get ALL user messages to analyze topics
+    user_messages = ChatMessage.query.join(ChatConversation).filter(
+        ChatConversation.user_id == current_user.id,
+        ChatMessage.role == 'user'
+    ).all()
 
-    # Generate training suggestions based on what they DON'T ask about
-    from models import Category
-    all_categories = Category.query.filter_by(is_active=True).all()
-    cat_names = [c.name for c in all_categories]
+    all_text = ' '.join(m.content.lower() for m in user_messages)
+    stop = {'hola', 'como', 'cómo', 'que', 'qué', 'para', 'por', 'con', 'una', 'uno',
+            'los', 'las', 'del', 'información', 'sobre', 'quiero', 'necesito', 'saber',
+            'puedo', 'hacer', 'tiene', 'esta', 'esto', 'favor', 'buenas', 'buenos',
+            'dias', 'gracias', 'muchas', 'bien', 'muy'}
+    words_list = [w for w in re.findall(r'\w+', all_text) if len(w) > 2 and w not in stop]
 
-    # Find categories the user hasn't explored
-    user_topics_text = ' '.join(topics).lower()
+    # Bigrams for topic detection
+    bigrams = Counter()
+    for i in range(len(words_list) - 1):
+        bigrams[words_list[i] + ' ' + words_list[i + 1]] += 1
+    word_freq = Counter(words_list)
+
+    # Build top topics combining bigrams + words
+    top_topics = []
+    for phrase, count in bigrams.most_common(5):
+        if count >= 1:
+            top_topics.append(phrase)
+    for word, count in word_freq.most_common(10):
+        if len(top_topics) >= 5:
+            break
+        if not any(word in t for t in top_topics):
+            top_topics.append(word)
+
+    # Analyze category coverage: which categories' content the user asks about
+    categories = Category.query.filter_by(is_active=True).all()
+    consulted_cats = set()
+    not_consulted_cats = []
+
+    for cat in categories:
+        contents_in_cat = Content.query.filter_by(category_id=cat.id, is_active=True).all()
+        cat_kw = set()
+        for cont in contents_in_cat:
+            for kw in (cont.keywords or '').split(','):
+                kw = kw.strip().lower()
+                if len(kw) > 2:
+                    cat_kw.add(kw)
+
+        # Check if user messages touch this category
+        found = False
+        for msg in user_messages:
+            if any(kw in msg.content.lower() for kw in cat_kw):
+                consulted_cats.add(cat.name)
+                found = True
+                break
+        if not found:
+            not_consulted_cats.append(cat)
+
+    # Build REAL recommendations
     suggestions = []
-    for cat in cat_names:
-        if cat.lower() not in user_topics_text:
-            suggestions.append(f'Explora la sección "{cat}" para ampliar tu conocimiento.')
-    suggestions = suggestions[:4]
 
-    if total_convs > 5:
-        suggestions.insert(0, 'Llevas ' + str(total_convs) + ' consultas. Revisa tus temas más frecuentes para identificar áreas de mejora.')
+    # 1. Most consulted topic
+    if top_topics:
+        suggestions.append({
+            'icon': '🔍',
+            'text': f'Tu tema más consultado es "{top_topics[0]}". Revisá el contenido disponible en la plataforma para profundizar.'
+        })
+
+    # 2. Repeated questions → training need
+    if total_msgs > 5 and top_topics:
+        repeated = [t for t in top_topics[:3] if word_freq.get(t.split()[0], 0) >= 3]
+        if repeated:
+            suggestions.append({
+                'icon': '🎯',
+                'text': f'Consultás frecuentemente sobre "{repeated[0]}". Esto puede indicar una oportunidad de capacitación en este tema.'
+            })
+
+    # 3. Categories not explored
+    for cat in not_consulted_cats[:2]:
+        # Count contents in this category
+        content_count = Content.query.filter_by(category_id=cat.id, is_active=True).count()
+        if content_count > 0:
+            suggestions.append({
+                'icon': '📚',
+                'text': f'Aún no consultaste sobre "{cat.name}" ({content_count} artículos disponibles). Explorá esta sección para ampliar tu conocimiento.'
+            })
+
+    # 4. Categories explored
+    if consulted_cats:
+        cats_str = ', '.join(list(consulted_cats)[:3])
+        suggestions.append({
+            'icon': '✅',
+            'text': f'Estás consultando activamente sobre: {cats_str}. Buen trabajo manteniéndote informado.'
+        })
+
+    # 5. Usage level
+    if total_convs == 0:
+        suggestions.append({
+            'icon': '💬',
+            'text': 'Aún no tenés consultas. Probá preguntarme sobre PIN, tarjetas, transferencias o cualquier procedimiento.'
+        })
+    elif total_convs >= 10:
+        suggestions.append({
+            'icon': '⭐',
+            'text': f'Llevas {total_convs} conversaciones. Sos un usuario activo de iXpert AI.'
+        })
+
+    if not suggestions:
+        suggestions.append({
+            'icon': '💡',
+            'text': 'Empezá a consultar sobre los temas de la plataforma para recibir recomendaciones personalizadas.'
+        })
 
     return jsonify({
         'total_conversations': total_convs,
         'total_messages': total_msgs,
-        'top_topics': topics,
+        'top_topics': top_topics[:5],
         'suggestions': suggestions
     })
 

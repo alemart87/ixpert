@@ -226,23 +226,32 @@
             var res = await fetch('/api/chat/my-stats');
             var data = await res.json();
 
-            statsEl.innerHTML =
-                '<h4>Tu Actividad</h4>' +
-                '<div class="chat-stat-card"><h5>Consultas realizadas</h5><div class="stat-number">' + data.total_conversations + '</div></div>' +
-                '<div class="chat-stat-card"><h5>Mensajes enviados</h5><div class="stat-number">' + data.total_messages + '</div></div>' +
-                '<div class="chat-stat-card"><h5>Temas más consultados</h5>' +
-                (data.top_topics.length > 0
-                    ? '<p>' + data.top_topics.map(function(t) { return '• ' + t; }).join('<br>') + '</p>'
-                    : '<p>Aún sin consultas</p>') +
-                '</div>' +
-                '<div class="chat-tips">' +
-                '<h4>Oportunidades de Capacitación</h4>' +
-                (data.suggestions.length > 0
-                    ? data.suggestions.map(function(s) {
-                        return '<div class="chat-tip"><span class="chat-tip-icon">📚</span><span>' + s + '</span></div>';
-                    }).join('')
-                    : '<div class="chat-tip"><span class="chat-tip-icon">✅</span><span>Explora la plataforma y consulta para recibir recomendaciones personalizadas.</span></div>') +
+            var statsHtml = '<h4>Tu Actividad</h4>' +
+                '<div style="display:flex;gap:10px;margin-bottom:14px">' +
+                '<div class="chat-stat-card" style="flex:1;text-align:center"><div class="stat-number">' + data.total_conversations + '</div><h5>Consultas</h5></div>' +
+                '<div class="chat-stat-card" style="flex:1;text-align:center"><div class="stat-number">' + data.total_messages + '</div><h5>Mensajes</h5></div>' +
                 '</div>';
+
+            // Top topics
+            if (data.top_topics.length > 0) {
+                statsHtml += '<div class="chat-stat-card"><h5>Tus temas frecuentes</h5>' +
+                    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">' +
+                    data.top_topics.map(function(t) {
+                        return '<span style="background:#fff4e5;color:#ff6600;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600">' + t + '</span>';
+                    }).join('') + '</div></div>';
+            }
+
+            // Recommendations
+            statsHtml += '<h4 style="margin-top:16px">Recomendaciones para Vos</h4>';
+            if (data.suggestions.length > 0) {
+                statsHtml += data.suggestions.map(function(s) {
+                    return '<div class="chat-tip">' +
+                        '<span class="chat-tip-icon">' + s.icon + '</span>' +
+                        '<span>' + s.text + '</span></div>';
+                }).join('');
+            }
+
+            statsEl.innerHTML = statsHtml;
         } catch (err) {
             statsEl.innerHTML = '<p style="padding:20px;color:#888;text-align:center">Error al cargar estadísticas</p>';
         }
