@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
-from models import db, User, Content, Category
+from models import db, User, Content, Category, ChatConversation, ChatMessage
 from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime, timezone
@@ -226,3 +226,35 @@ def upload_image():
     file.save(filepath)
 
     return jsonify({'url': '/imagenes/' + filename})
+
+
+# --- Chat Analytics ---
+@admin_bp.route('/chat')
+@superadmin_required
+def chat_analytics():
+    from sqlalchemy import func
+    total_conversations = ChatConversation.query.count()
+    total_messages = ChatMessage.query.count()
+    total_tokens = db.session.query(func.coalesce(func.sum(ChatMessage.tokens_used), 0)).scalar()
+    conversations = ChatConversation.query.order_by(
+        ChatConversation.updated_at.desc()
+    ).limit(50).all()
+    return render_template('admin/chat_analytics.html',
+                           total_conversations=total_conversations,
+                           total_messages=total_messages,
+                           total_tokens=total_tokens,
+                           conversations=conversations)
+
+
+@admin_bp.route('/chat/<int:conv_id>/detail')
+@superadmin_required
+def admin_chat_detail(conv_id):
+    conv = ChatConversation.query.get_or_404(conv_id)
+    return jsonify({
+        'title': conv.title,
+        'messages': [{
+            'role': m.role,
+            'content': m.content,
+            'created_at': m.created_at.strftime('%d/%m/%Y %H:%M') if m.created_at else ''
+        } for m in conv.messages]
+    })

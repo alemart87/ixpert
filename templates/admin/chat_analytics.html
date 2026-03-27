@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Chat AI Analytics - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Chat AI - Analytics</h1>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        <a href="{{ url_for('admin.content_list') }}" class="btn btn-secondary">Contenidos</a>
+        <a href="{{ url_for('admin.category_list') }}" class="btn btn-secondary">Categorías</a>
+        <a href="{{ url_for('admin.user_list') }}" class="btn btn-secondary">Usuarios</a>
+        <a href="{{ url_for('admin.chat_analytics') }}" class="btn btn-primary">Chat AI</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>{{ total_conversations }}</h3>
+            <p>Conversaciones</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_messages }}</h3>
+            <p>Mensajes</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_tokens }}</h3>
+            <p>Tokens Usados</p>
+        </div>
+    </div>
+
+    <h2>Conversaciones Recientes</h2>
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Tema</th>
+                    <th>Mensajes</th>
+                    <th>Tokens</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conv in conversations %}
+                <tr>
+                    <td>{{ conv.user.name if conv.user else '-' }}</td>
+                    <td>{{ conv.title }}</td>
+                    <td>{{ conv.messages|length }}</td>
+                    <td>{{ conv.messages|sum(attribute='tokens_used') }}</td>
+                    <td>{{ conv.created_at.strftime('%d/%m/%Y %H:%M') if conv.created_at else '-' }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewConv({{ conv.id }})">Ver</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Conversation Detail Modal -->
+<div id="convModal" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:700px">
+        <h2 id="convModalTitle">Conversación</h2>
+        <div id="convModalBody" style="max-height:50vh;overflow-y:auto"></div>
+        <div class="form-actions">
+            <button class="btn btn-secondary" onclick="document.getElementById('convModal').style.display='none'">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+async function viewConv(convId) {
+    const res = await fetch('/admin/chat/' + convId + '/detail');
+    const data = await res.json();
+
+    document.getElementById('convModalTitle').textContent = data.title || 'Conversación';
+    const body = document.getElementById('convModalBody');
+    body.innerHTML = data.messages.map(function(m) {
+        const cls = m.role === 'user' ? 'color:#004080' : 'color:#ff6600';
+        const label = m.role === 'user' ? 'Usuario' : 'iXpert AI';
+        return '<div style="margin-bottom:12px;padding:8px;border-bottom:1px solid #eee">' +
+            '<strong style="' + cls + '">' + label + '</strong> ' +
+            '<small style="color:#888">' + (m.created_at || '') + '</small>' +
+            '<p style="margin:4px 0 0;white-space:pre-wrap">' + m.content + '</p>' +
+            '</div>';
+    }).join('');
+
+    document.getElementById('convModal').style.display = 'flex';
+}
+</script>
+{% endblock %}
+{% endblock %}
