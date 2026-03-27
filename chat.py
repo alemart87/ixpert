@@ -12,33 +12,43 @@ chat_bp = Blueprint('chat', __name__)
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
-SYSTEM_PROMPT = """Eres iXpert AI, el asistente virtual inteligente de la plataforma iXpert de Itaú.
-Tu rol es ayudar a los asesores y supervisores del banco con información precisa.
+SYSTEM_PROMPT = """Eres iXpert AI, el asistente virtual inteligente de Itaú Paraguay.
+Eres un experto en todos los productos y servicios bancarios de Itaú.
 
-REGLAS:
-- Respondes SIEMPRE en español
-- Saluda al usuario por su nombre cuando sea la primera interacción
-- Usa la información del CONTEXTO proporcionado para responder
-- Si encuentras información relevante, incluye el link: [Título del artículo](/content/slug)
-- Si NO hay información suficiente en el contexto, dilo honestamente y sugiere qué buscar
-- Sé conciso pero completo. Usa listas cuando sea apropiado
-- No inventes procedimientos ni pasos que no estén en el contexto
-- Puedes hacer preguntas de seguimiento para entender mejor qué necesita el usuario"""
+REGLAS ESTRICTAS:
+1. Respondes SIEMPRE en español paraguayo profesional
+2. Saluda al usuario por su nombre en la primera interacción
+3. SIEMPRE analiza TODO el contexto proporcionado antes de responder. El contexto CONTIENE la información que necesitas
+4. Cuando el contexto tiene información relevante, DEBES usarla y responder con detalle
+5. Incluye SIEMPRE el link al artículo: [Título](/content/slug)
+6. Si hay MÚLTIPLES artículos relevantes, menciona TODOS con sus links
+7. Usa listas con viñetas para pasos y procedimientos
+8. Si realmente NO hay información en el contexto (está vacío o no relacionado), sugiere reformular la pregunta
+9. NUNCA digas "no tengo información" si el contexto tiene artículos relacionados
+10. Sé proactivo: si el usuario pregunta algo general, ofrece las diferentes opciones disponibles en el contexto"""
 
 
 def strip_html(html):
     """Remove HTML tags and get clean plain text."""
+    import html as html_module
     # Remove script and style blocks completely
     text = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    # Remove nav, header, footer boilerplate
+    text = re.sub(r'<nav[^>]*>.*?</nav>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<footer[^>]*>.*?</footer>', '', text, flags=re.DOTALL | re.IGNORECASE)
     # Replace block elements with newlines
-    text = re.sub(r'<(?:br|p|div|h[1-6]|li|tr)[^>]*>', '\n', text, flags=re.IGNORECASE)
+    text = re.sub(r'<(?:br|p|div|h[1-6]|li|tr|dt|dd)[^>]*/?>', '\n', text, flags=re.IGNORECASE)
     # Remove remaining tags
     text = re.sub(r'<[^>]+>', ' ', text)
+    # Decode HTML entities
+    text = html_module.unescape(text)
     # Clean whitespace
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r'\n\s*\n', '\n', text)
-    return text.strip()[:2500]
+    text = text.strip()
+    # More context (3500 chars)
+    return text[:3500]
 
 
 STOP_WORDS = {'de', 'la', 'el', 'en', 'un', 'una', 'los', 'las', 'es', 'que', 'por',
@@ -141,8 +151,8 @@ def call_openai(messages):
     payload = json.dumps({
         'model': 'gpt-4o-mini',
         'messages': messages,
-        'max_tokens': 1000,
-        'temperature': 0.3
+        'max_tokens': 1200,
+        'temperature': 0.2
     }).encode('utf-8')
 
     req = Request(
@@ -201,23 +211,39 @@ def chat_send():
     )
     db.session.add(user_msg)
 
-    # Find relevant content
-    relevant = find_relevant_contents(message)
+    # Find relevant content (up to 5 articles)
+    relevant = find_relevant_contents(message, limit=5)
     context_parts = []
     ref_links = []
-    for c in relevant:
+    for i, c in enumerate(relevant, 1):
         plain = strip_html(c.html_content)
-        context_parts.append(f"ARTÍCULO: {c.title}\nURL: /content/{c.slug}\nCATEGORÍA: {c.category.name if c.category else 'General'}\nCONTENIDO:\n{plain}")
+        cat_name = c.category.name if c.category else 'General'
+        context_parts.append(
+            f"[ARTÍCULO {i}]\n"
+            f"Título: {c.title}\n"
+            f"Link: [Ver artículo completo](/content/{c.slug})\n"
+            f"Categoría: {cat_name}\n"
+            f"Contenido:\n{plain}"
+        )
         ref_links.append({'title': c.title, 'slug': c.slug})
 
-    context_text = "\n\n===\n\n".join(context_parts) if context_parts else "No se encontró información directamente relevante. Sugiere al usuario buscar en la plataforma o reformular su pregunta."
+    if context_parts:
+        separator = "\n\n" + "=" * 40 + "\n\n"
+        context_text = (
+            f"Se encontraron {len(context_parts)} artículos relevantes. "
+            f"DEBES usar esta información para responder:\n\n"
+            + separator.join(context_parts)
+        )
+    else:
+        context_text = "No se encontraron artículos. Sugiere al usuario reformular su pregunta con términos más específicos."
 
     # Build messages for OpenAI
     user_info = f"El usuario se llama {current_user.name} y tiene el rol de {current_user.role}."
     ai_messages = [
         {'role': 'system', 'content': SYSTEM_PROMPT},
-        {'role': 'system', 'content': f"INFORMACIÓN DEL USUARIO: {user_info}"},
-        {'role': 'system', 'content': f"CONTEXTO DE LA BASE DE CONOCIMIENTO:\n\n{context_text}"}
+        {'role': 'system', 'content': f"USUARIO: {user_info}"},
+        {'role': 'user', 'content': f"[CONTEXTO INTERNO - BASE DE CONOCIMIENTO]\n\n{context_text}"},
+        {'role': 'assistant', 'content': 'Entendido, tengo el contexto de la base de conocimiento. Estoy listo para responder.'}
     ]
 
     # Add recent conversation history (last 8 messages)
