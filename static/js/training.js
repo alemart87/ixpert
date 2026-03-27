@@ -107,10 +107,9 @@
     function selectChat(sid) {
         activeSessionId = sid;
         var i = interactions[sid];
-        chatHeader.textContent = 'Chat ' + i.number + (i.status === 'completed' ? ' (completado)' : '');
-        chatMessages.innerHTML = '';
-        i.messages.forEach(function(m) { addMsgToDOM(m.role, m.content); });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatHeader.textContent = 'Chat ' + i.number + (i.status === 'completed' ? ' ✅ Completado' : '');
+        // Re-render from state (prevents message mixing)
+        renderChat(sid);
 
         if (i.status === 'completed') {
             document.getElementById('chatInputArea').style.display = 'none';
@@ -122,10 +121,33 @@
     }
 
     function addMsgToDOM(role, content) {
+        var typing = document.getElementById('chatTyping');
         var div = document.createElement('div');
         div.className = 'training-msg ' + role;
         div.textContent = content;
-        chatMessages.appendChild(div);
+        // Insert before typing indicator
+        if (typing) chatMessages.insertBefore(div, typing);
+        else chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function renderChat(sid) {
+        /**Re-render the chat area from the interaction state (source of truth).**/
+        var i = interactions[sid];
+        if (!i) return;
+        // Remove all messages but keep typing indicator
+        var typing = document.getElementById('chatTyping');
+        chatMessages.innerHTML = '';
+        if (typing) chatMessages.appendChild(typing);
+        // Re-add all messages from state
+        i.messages.forEach(function(m) {
+            var div = document.createElement('div');
+            div.className = 'training-msg ' + m.role;
+            div.textContent = m.content;
+            if (typing) chatMessages.insertBefore(div, typing);
+            else chatMessages.appendChild(div);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     // Send message
@@ -158,7 +180,10 @@
             chatTyping.classList.remove('active');
             if (data.response) {
                 i.messages.push({role: 'client', content: data.response});
-                addMsgToDOM('client', data.response);
+                // Only add to DOM if this chat is still the active one
+                if (activeSessionId == activeSessionId) {
+                    addMsgToDOM('client', data.response);
+                }
             }
         } catch(e) {
             chatTyping.classList.remove('active');
