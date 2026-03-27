@@ -108,6 +108,43 @@ nav a:hover { background-color: var(--naranja-itau); }
 nav .nav-admin { background-color: rgba(255,255,255,0.1); }
 nav .nav-logout { color: #ffcccc; }
 
+/* Nav Dropdowns */
+.nav-dropdown { position: relative; }
+.nav-dropdown-btn {
+    color: var(--blanco);
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: inherit;
+    transition: background-color 0.3s;
+}
+.nav-dropdown-btn:hover { background-color: var(--naranja-itau); }
+.nav-dropdown-btn.nav-admin { background-color: rgba(255,255,255,0.1); }
+.nav-dropdown-menu {
+    display: none;
+    background: var(--blanco);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    z-index: 2000;
+}
+.nav-dropdown.open .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a {
+    color: var(--gris-texto) !important;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    display: block;
+}
+.nav-dropdown-menu a:hover { background: #fff4e5 !important; color: var(--naranja-itau) !important; }
+
 /* ===== Flash Messages ===== */
 .flash-messages { padding: 0 16px; max-width: 1200px; margin: 10px auto; width: 100%; }
 .flash {
@@ -446,8 +483,23 @@ footer p { margin: 0; font-size: 14px; }
 
     nav a {
         border-bottom: none;
-        padding: 12px 20px;
-        font-size: 16px;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    .nav-dropdown { display: inline-block; }
+    .nav-dropdown-btn {
+        border-bottom: none;
+        padding: 12px 16px;
+        font-size: 14px;
+        width: auto;
+    }
+    .nav-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 200px;
+        border-radius: 0 0 8px 8px;
     }
 
     header h1 { font-size: 3em; }

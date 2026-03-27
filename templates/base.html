@@ -36,11 +36,42 @@
                 {% for cat in nav_categories %}
                 <a href="{{ url_for('view_category', slug=cat.slug) }}">{{ cat.name }}</a>
                 {% endfor %}
-                <a href="{{ url_for('training.index') }}" style="background:rgba(255,102,0,0.15)">🎯 Entrenamiento</a>
+
+                <!-- Entrenamiento dropdown -->
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn">🎯 Entrenamiento ▾</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('training.index') }}">Mis Entrenamientos</a>
+                        {% if current_user.is_superadmin %}
+                        <a href="{{ url_for('training.admin_scenarios') }}">Crear Escenarios</a>
+                        <a href="{{ url_for('training.admin_dashboard') }}">CX Dashboard</a>
+                        {% endif %}
+                    </div>
+                </div>
+
                 {% if current_user.is_superadmin %}
-                <a href="{{ url_for('training.vex_dashboard') }}" style="background:rgba(255,255,255,0.15)">📊 Vex Predictive</a>
-                <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Admin</a>
+                <!-- Vex Predictive dropdown -->
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn">📊 Vex Predictive ▾</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('training.vex_dashboard') }}">Resultados</a>
+                        <a href="{{ url_for('training.vex_methodology') }}">Metodología</a>
+                    </div>
+                </div>
+
+                <!-- Admin dropdown -->
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn nav-admin">⚙ Admin ▾</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('admin.content_list') }}">Contenidos</a>
+                        <a href="{{ url_for('admin.category_list') }}">Categorías</a>
+                        <a href="{{ url_for('admin.user_list') }}">Usuarios</a>
+                        <a href="{{ url_for('admin.chat_analytics') }}">Insights AI</a>
+                    </div>
+                </div>
                 {% endif %}
+
                 <a href="{{ url_for('logout') }}" class="nav-logout">Salir</a>
             {% endif %}
         </div>
@@ -76,6 +107,24 @@
             var loader = document.getElementById('loader');
             loader.classList.add('hidden');
             setTimeout(function() { loader.style.display = 'none'; }, 400);
+        });
+
+        // Nav dropdowns
+        document.querySelectorAll('.nav-dropdown-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var dd = btn.parentElement;
+                // Close others
+                document.querySelectorAll('.nav-dropdown').forEach(function(d) {
+                    if (d !== dd) d.classList.remove('open');
+                });
+                dd.classList.toggle('open');
+            });
+        });
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.nav-dropdown').forEach(function(d) {
+                d.classList.remove('open');
+            });
         });
     </script>
 
