@@ -58,7 +58,7 @@ def index():
     scenarios = TrainingScenario.query.filter_by(is_active=True).all()
     my_batches = TrainingBatch.query.filter_by(
         user_id=current_user.id
-    ).order_by(TrainingBatch.created_at.desc()).limit(10).all()
+    ).order_by(TrainingBatch.started_at.desc()).limit(10).all()
     active_batch = TrainingBatch.query.filter_by(
         user_id=current_user.id, status='active'
     ).first()
