@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Escenarios de Entrenamiento - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Escenarios de Entrenamiento</h1>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        <a href="{{ url_for('training.admin_dashboard') }}" class="btn btn-secondary">CX Dashboard</a>
+        <a href="{{ url_for('training.admin_scenarios') }}" class="btn btn-primary">Escenarios</a>
+    </div>
+
+    <!-- Guide -->
+    <details style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+        <summary style="cursor:pointer;font-weight:700;color:#004080;font-size:15px">📖 ¿Cómo crear un buen entrenamiento?</summary>
+        <div style="margin-top:12px;font-size:13px;color:#555;line-height:1.7">
+            <p><strong>Persona del Cliente:</strong> Describí cómo es el cliente: nombre, estado emocional, problema específico.<br>
+            <em>Ejemplo: "Sos María González, 45 años, llamás enojada porque te cobraron dos veces la cuota de tu tarjeta VISA. Querés que te devuelvan el dinero ya. Si el asesor te pide datos: CI 3.456.789, tarjeta terminada en 4521."</em></p>
+            <p><strong>Respuesta Esperada:</strong> Qué debería hacer el asesor para resolver correctamente.<br>
+            <em>Ejemplo: "1) Verificar identidad, 2) Revisar en SAC.COM el débito duplicado, 3) Iniciar devolución online, 4) Informar plazo de 48-72hs."</em></p>
+            <p><strong>Dificultad:</strong><br>
+            🟢 Fácil: Cliente tranquilo, caso sencillo<br>
+            🟡 Medio: Cliente algo impaciente, pasos múltiples<br>
+            🔴 Difícil: Cliente enojado, caso complejo con excepciones</p>
+        </div>
+    </details>
+
+    <!-- New Scenario Form -->
+    <div class="inline-form">
+        <h2>Nuevo Escenario</h2>
+        <form method="POST" action="{{ url_for('training.admin_scenario_save') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" name="title" required placeholder="Ej: Doble cobro en tarjeta de crédito">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" name="category" placeholder="Ej: Tarjetas, Cuentas, Reclamos">
+                </div>
+                <div class="form-group">
+                    <label>Dificultad</label>
+                    <select name="difficulty">
+                        <option value="facil">Fácil</option>
+                        <option value="medio" selected>Medio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Descripción breve</label>
+                <input type="text" name="description" placeholder="Descripción visible para los asesores">
+            </div>
+            <div class="form-group">
+                <label>Persona del Cliente (instrucciones para la IA)</label>
+                <textarea name="client_persona" rows="4" required placeholder="Describí la personalidad, situación y datos del cliente simulado..." style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Respuesta Esperada (criterio de evaluación)</label>
+                <textarea name="expected_response" rows="3" required placeholder="¿Qué pasos debe seguir el asesor para resolver correctamente?" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Crear Escenario</button>
+        </form>
+    </div>
+
+    <!-- Existing Scenarios -->
+    <h2>Escenarios Existentes</h2>
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr><th>Título</th><th>Categoría</th><th>Dificultad</th><th>Sesiones</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+                {% for s in scenarios %}
+                <tr>
+                    <td><strong>{{ s.title }}</strong><br><small style="color:#888">{{ s.description or '' }}</small></td>
+                    <td>{{ s.category or '-' }}</td>
+                    <td><span class="badge-difficulty badge-{{ s.difficulty }}">{{ s.difficulty }}</span></td>
+                    <td>{{ s.sessions|length }}</td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-primary" onclick="editScenario({{ s.id }}, '{{ s.title|e }}', '{{ s.description|e if s.description else '' }}', `{{ s.client_persona|e }}`, `{{ s.expected_response|e }}`, '{{ s.difficulty }}', '{{ s.category|e if s.category else '' }}')">Editar</button>
+                        <form method="POST" action="{{ url_for('training.admin_scenario_delete', s_id=s.id) }}" style="display:inline" onsubmit="return confirm('¿Desactivar este escenario?')">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:700px">
+        <h2>Editar Escenario</h2>
+        <form method="POST" action="{{ url_for('training.admin_scenario_save') }}">
+            <input type="hidden" name="id" id="editId">
+            <div class="form-group"><label>Título</label><input type="text" name="title" id="editTitle" required></div>
+            <div class="form-group"><label>Categoría</label><input type="text" name="category" id="editCategory"></div>
+            <div class="form-group"><label>Dificultad</label>
+                <select name="difficulty" id="editDiff"><option value="facil">Fácil</option><option value="medio">Medio</option><option value="dificil">Difícil</option></select>
+            </div>
+            <div class="form-group"><label>Descripción</label><input type="text" name="description" id="editDesc"></div>
+            <div class="form-group"><label>Persona del Cliente</label><textarea name="client_persona" id="editPersona" rows="4" required style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;resize:vertical"></textarea></div>
+            <div class="form-group"><label>Respuesta Esperada</label><textarea name="expected_response" id="editExpected" rows="3" required style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;resize:vertical"></textarea></div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+function editScenario(id, title, desc, persona, expected, diff, cat) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editDesc').value = desc;
+    document.getElementById('editPersona').value = persona;
+    document.getElementById('editExpected').value = expected;
+    document.getElementById('editDiff').value = diff;
+    document.getElementById('editCategory').value = cat;
+    document.getElementById('editModal').style.display = 'flex';
+}
+</script>
+{% endblock %}
+{% endblock %}

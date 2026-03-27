@@ -36,6 +36,7 @@
                 {% for cat in nav_categories %}
                 <a href="{{ url_for('view_category', slug=cat.slug) }}">{{ cat.name }}</a>
                 {% endfor %}
+                <a href="{{ url_for('training.index') }}" style="background:rgba(255,102,0,0.15)">🎯 Entrenamiento</a>
                 {% if current_user.is_superadmin %}
                 <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Admin</a>
                 {% endif %}

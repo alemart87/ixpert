@@ -71,10 +71,12 @@ def init_superadmin():
 from admin import admin_bp
 from analytics import analytics_bp
 from chat import chat_bp
+from training import training_bp
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(chat_bp)
+app.register_blueprint(training_bp)
 
 
 # ===== Auth routes directly in app (no blueprint) =====

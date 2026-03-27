@@ -127,3 +127,72 @@ class ChatMessage(db.Model):
     content = db.Column(db.Text, nullable=False)
     tokens_used = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ===== Training Module =====
+
+class TrainingScenario(db.Model):
+    __tablename__ = 'training_scenarios'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    client_persona = db.Column(db.Text, nullable=False)
+    expected_response = db.Column(db.Text, nullable=False)
+    difficulty = db.Column(db.String(20), default='medio')  # facil, medio, dificil
+    category = db.Column(db.String(100))
+    is_active = db.Column(db.Boolean, default=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    sessions = db.relationship('TrainingSession', backref='scenario', lazy=True)
+    creator = db.relationship('User', foreign_keys=[created_by])
+
+
+class TrainingSession(db.Model):
+    __tablename__ = 'training_sessions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    scenario_id = db.Column(db.Integer, db.ForeignKey('training_scenarios.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(20), default='active')  # active, completed, abandoned
+    started_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    ended_at = db.Column(db.DateTime)
+    duration_seconds = db.Column(db.Integer, default=0)
+    total_messages = db.Column(db.Integer, default=0)
+    total_words_user = db.Column(db.Integer, default=0)
+    total_chars_user = db.Column(db.Integer, default=0)
+    spelling_errors = db.Column(db.Integer, default=0)
+    words_per_minute = db.Column(db.Float, default=0)
+    nps_score = db.Column(db.Integer)  # 0-10
+    ai_feedback = db.Column(db.Text)
+    response_correct = db.Column(db.Boolean)
+    tokens_used = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    messages = db.relationship('TrainingMessage', backref='session', lazy=True,
+                               order_by='TrainingMessage.created_at')
+    user = db.relationship('User', backref='training_sessions')
+
+
+class TrainingMessage(db.Model):
+    __tablename__ = 'training_messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('training_sessions.id'), nullable=False)
+    role = db.Column(db.String(20), nullable=False)  # 'user' or 'client'
+    content = db.Column(db.Text, nullable=False)
+    word_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class TrainingViewPermission(db.Model):
+    __tablename__ = 'training_view_permissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    supervisor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    granted_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    supervisor = db.relationship('User', foreign_keys=[supervisor_id])
+    granter = db.relationship('User', foreign_keys=[granted_by])

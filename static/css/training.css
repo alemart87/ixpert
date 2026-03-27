@@ -1,0 +1,188 @@
+/* ===== Training Module ===== */
+
+/* Scenario Cards */
+.scenario-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.scenario-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #004080;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.scenario-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.scenario-card h3 { margin: 0 0 6px; color: #004080; font-size: 16px; }
+.scenario-card p { margin: 0 0 12px; color: #666; font-size: 13px; line-height: 1.5; }
+
+.badge-difficulty {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.badge-facil { background: #e8f5e9; color: #2e7d32; }
+.badge-medio { background: #fff3e0; color: #e65100; }
+.badge-dificil { background: #fce4ec; color: #c62828; }
+
+/* Training Session (fullscreen chat) */
+.training-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px);
+    min-height: 500px;
+}
+
+.training-header {
+    background: #004080;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.training-header h2 { margin: 0; font-size: 16px; }
+.training-metrics {
+    display: flex; gap: 16px; font-size: 13px;
+}
+.training-metric {
+    display: flex; flex-direction: column; align-items: center;
+}
+.training-metric .metric-value {
+    font-size: 20px; font-weight: 700; color: #ff9500;
+}
+.training-metric .metric-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; }
+
+.training-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f5f6f8;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.training-msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    animation: msgFadeIn 0.25s ease-out;
+}
+.training-msg.client {
+    align-self: flex-start;
+    background: #fff;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-bottom-left-radius: 4px;
+}
+.training-msg.client::before { content: '👤 Cliente'; display: block; font-size: 10px; color: #888; margin-bottom: 4px; font-weight: 600; }
+.training-msg.user {
+    align-self: flex-end;
+    background: #004080;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.training-input-area {
+    padding: 14px 16px;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+    align-items: center;
+}
+.training-input-area input {
+    flex: 1; padding: 12px 18px; border: 2px solid #e0e0e0;
+    border-radius: 24px; font-size: 15px; outline: none;
+    font-family: inherit; transition: border-color 0.3s;
+}
+.training-input-area input:focus { border-color: #ff6600; }
+.training-input-area .btn-send {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #ff6600; color: #fff; border: none;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: background 0.2s;
+}
+.training-input-area .btn-send:hover { background: #e55c00; }
+.training-input-area .btn-send:disabled { background: #ccc; }
+.training-input-area .btn-end {
+    padding: 10px 20px; background: #dc3545; color: #fff;
+    border: none; border-radius: 24px; cursor: pointer;
+    font-weight: 600; font-size: 13px; transition: background 0.2s;
+    white-space: nowrap;
+}
+.training-input-area .btn-end:hover { background: #b02a37; }
+
+/* Typing */
+.training-typing { display: none; align-self: flex-start; padding: 10px 16px; background: #fff; border-radius: 16px; border: 1px solid #e0e0e0; }
+.training-typing.active { display: flex; gap: 5px; align-items: center; }
+.training-typing span { width: 8px; height: 8px; border-radius: 50%; background: #ff6600; animation: loaderBounce 1.4s ease-in-out infinite; }
+.training-typing span:nth-child(2) { animation-delay: 0.16s; }
+.training-typing span:nth-child(3) { animation-delay: 0.32s; }
+
+/* Result Page */
+.result-container { max-width: 800px; margin: 0 auto; }
+
+.result-nps {
+    text-align: center; padding: 30px; background: #fff;
+    border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.result-nps .nps-number {
+    font-size: 72px; font-weight: 800; line-height: 1;
+}
+.nps-promoter { color: #2e7d32; }
+.nps-passive { color: #e65100; }
+.nps-detractor { color: #c62828; }
+.result-nps .nps-label { font-size: 14px; color: #888; margin-top: 4px; }
+
+.result-metrics {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;
+}
+.result-metric {
+    background: #fff; padding: 16px; border-radius: 12px;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.result-metric .rm-value { font-size: 28px; font-weight: 700; color: #004080; }
+.result-metric .rm-label { font-size: 12px; color: #888; margin-top: 2px; }
+
+.result-feedback {
+    background: #fff; padding: 24px; border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;
+}
+.result-feedback h3 { color: #004080; margin: 0 0 12px; }
+.result-feedback p { font-size: 14px; line-height: 1.6; color: #444; }
+
+.result-correct { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-bottom: 16px; }
+.result-correct.yes { background: #e8f5e9; color: #2e7d32; }
+.result-correct.no { background: #fce4ec; color: #c62828; }
+
+/* Session History */
+.session-history { margin-top: 30px; }
+.session-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; background: #fff; border-radius: 10px;
+    margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.session-item .si-info { font-size: 13px; color: #333; }
+.session-item .si-nps { font-size: 18px; font-weight: 700; }
+
+@keyframes msgFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+    .result-metrics { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1024px) {
+    .scenario-grid { grid-template-columns: repeat(3, 1fr); }
+}
