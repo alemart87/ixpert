@@ -7,6 +7,18 @@ from models import (db, User, TrainingScenario, TrainingSession, TrainingMessage
                     TrainingViewPermission)
 from datetime import datetime, timezone
 from functools import wraps
+
+
+def utcnow():
+    return datetime.utcnow()
+
+
+def safe_elapsed(start_dt):
+    """Calculate elapsed seconds handling naive/aware datetime mix."""
+    now = datetime.utcnow()
+    if start_dt and start_dt.tzinfo:
+        start_dt = start_dt.replace(tzinfo=None)
+    return (now - start_dt).total_seconds() if start_dt else 0
 from chat import call_openai
 
 training_bp = Blueprint('training', __name__)
@@ -158,7 +170,7 @@ def send_message():
     session.total_chars_user = (session.total_chars_user or 0) + len(message)
 
     # Calculate WPM
-    elapsed = (datetime.now(timezone.utc) - session.started_at).total_seconds()
+    elapsed = safe_elapsed(session.started_at)
     if elapsed > 0:
         session.words_per_minute = round(session.total_words_user / (elapsed / 60), 1)
 
@@ -216,11 +228,11 @@ def end_session(session_id):
         return jsonify({'error': 'Sesión no encontrada'}), 404
 
     scenario = session.scenario
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
 
     # Calculate final metrics
     session.ended_at = now
-    session.duration_seconds = int((now - session.started_at).total_seconds())
+    session.duration_seconds = int(safe_elapsed(session.started_at))
     if session.duration_seconds > 0 and session.total_words_user:
         session.words_per_minute = round(session.total_words_user / (session.duration_seconds / 60), 1)
 
