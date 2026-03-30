@@ -11,14 +11,14 @@
     var addInterval = null;
     var spawnedCount = 0;
 
-    // DOM
-    var chatList = document.getElementById('chatList');
-    var chatMessages = document.getElementById('chatMessages');
-    var chatHeader = document.getElementById('chatHeader');
-    var chatInput = document.getElementById('chatInput');
-    var chatSend = document.getElementById('chatSend');
-    var chatEnd = document.getElementById('chatEnd');
-    var chatTyping = document.getElementById('chatTyping');
+    // DOM — use train* IDs to avoid conflict with chat widget
+    var chatList = document.getElementById('trainList');
+    var chatMessages = document.getElementById('trainChatMessages');
+    var chatHeader = document.getElementById('trainHeader');
+    var chatInput = document.getElementById('trainInput');
+    var chatSend = document.getElementById('trainSend');
+    var chatEnd = document.getElementById('trainEnd');
+    var chatTyping = document.getElementById('trainTyping');
     var emojiBtn = document.getElementById('emojiBtn');
     var emojiPicker = document.getElementById('emojiPicker');
 
@@ -97,7 +97,7 @@
             clearInterval(addInterval);
             chatHeader.textContent = '¡Todas las interacciones completadas!';
             chatMessages.innerHTML = '<div style="text-align:center;padding:40px;color:#888"><h3>Sesión finalizada</h3><p>Redirigiendo a resultados...</p></div>';
-            document.getElementById('chatInputArea').style.display = 'none';
+            document.getElementById('trainInputArea').style.display = 'none';
             setTimeout(function() {
                 window.location.href = '/training/batch/' + batchId + '/result';
             }, 2000);
@@ -112,16 +112,16 @@
         renderChat(sid);
 
         if (i.status === 'completed') {
-            document.getElementById('chatInputArea').style.display = 'none';
+            document.getElementById('trainInputArea').style.display = 'none';
         } else {
-            document.getElementById('chatInputArea').style.display = 'flex';
+            document.getElementById('trainInputArea').style.display = 'flex';
             chatInput.focus();
         }
         renderSidebar();
     }
 
     function addMsgToDOM(role, content) {
-        var typing = document.getElementById('chatTyping');
+        var typing = document.getElementById('trainTyping');
         var div = document.createElement('div');
         div.className = 'training-msg ' + role;
         div.textContent = content;
@@ -136,7 +136,7 @@
         var i = interactions[sid];
         if (!i) return;
         // Remove all messages but keep typing indicator
-        var typing = document.getElementById('chatTyping');
+        var typing = document.getElementById('trainTyping');
         chatMessages.innerHTML = '';
         if (typing) chatMessages.appendChild(typing);
         // Re-add all messages from state
@@ -208,7 +208,7 @@
             var data = await res.json();
             if (data.ok) {
                 interactions[activeSessionId].status = 'completed';
-                document.getElementById('chatInputArea').style.display = 'none';
+                document.getElementById('trainInputArea').style.display = 'none';
                 chatHeader.textContent = 'Chat ' + interactions[activeSessionId].number + ' ✅ Completado';
                 renderSidebar();
                 // If batch is fully complete, redirect to results

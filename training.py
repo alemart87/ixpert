@@ -320,6 +320,47 @@ def end_session(session_id):
     if session.duration_seconds > 0 and session.total_words_user:
         session.words_per_minute = round(session.total_words_user / (session.duration_seconds / 60), 1)
 
+    # Count user messages
+    user_msg_count = sum(1 for m in session.messages if m.role == 'user')
+
+    # If agent barely interacted, auto-fail without calling OpenAI
+    if user_msg_count < 3 or (session.total_words_user or 0) < 15:
+        session.nps_score = 1
+        session.response_correct = False
+        session.spelling_errors = 0
+        session.ai_feedback = json.dumps({
+            'feedback': f'El asesor envió solo {user_msg_count} mensaje(s) con {session.total_words_user or 0} palabras. No se puede evaluar una interacción sin respuesta sustancial al cliente.',
+            'strengths': 'No se identificaron fortalezas debido a la falta de interacción.',
+            'improvements': '1. Responder al cliente de forma completa. 2. Seguir el procedimiento indicado para el caso. 3. Dedicar tiempo a cada interacción.'
+        }, ensure_ascii=False)
+        session.status = 'completed'
+        db.session.commit()
+
+        batch_complete = False
+        batch_id = session.batch_id
+        if batch_id:
+            batch = TrainingBatch.query.get(batch_id)
+            if batch:
+                all_sessions = TrainingSession.query.filter_by(batch_id=batch_id).all()
+                all_done = all(s.status == 'completed' for s in all_sessions)
+                all_spawned = len(all_sessions) >= batch.max_concurrent
+                if all_done and all_spawned:
+                    batch.status = 'completed'
+                    batch.ended_at = now
+                    batch.duration_seconds = int(safe_elapsed(batch.started_at))
+                    nps_scores = [s.nps_score for s in all_sessions if s.nps_score is not None]
+                    batch.overall_nps = round(sum(nps_scores) / len(nps_scores), 1) if nps_scores else 0
+                    correct = sum(1 for s in all_sessions if s.response_correct)
+                    batch.overall_correct_rate = round(correct / len(all_sessions) * 100, 1)
+                    batch.tokens_used = sum(s.tokens_used or 0 for s in all_sessions)
+                    db.session.commit()
+                    batch_complete = True
+                    calculate_vex_profile(current_user.id)
+        else:
+            calculate_vex_profile(current_user.id)
+
+        return jsonify({'ok': True, 'session_id': session.id, 'batch_id': batch_id, 'batch_complete': batch_complete})
+
     # Build full conversation text for evaluation
     conversation_text = ""
     for msg in session.messages:
@@ -330,17 +371,30 @@ def end_session(session_id):
     user_texts = ' '.join(m.content for m in session.messages if m.role == 'user')
 
     # Evaluate with OpenAI
-    eval_prompt = f"""Evalúa la siguiente conversación entre un asesor bancario y un cliente simulado.
+    eval_prompt = f"""Evalúa ESTRICTAMENTE la siguiente conversación entre un asesor bancario y un cliente simulado.
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
 RESPUESTA ESPERADA DEL ASESOR: {scenario.expected_response}
+
+DATOS DEL ASESOR:
+- Mensajes enviados: {user_msg_count}
+- Palabras totales: {session.total_words_user or 0}
+- Duración: {session.duration_seconds} segundos
 
 CONVERSACIÓN:
 {conversation_text}
 
 TEXTO DEL ASESOR (para revisar ortografía):
 {user_texts}
+
+CRITERIOS DE EVALUACIÓN ESTRICTOS:
+- Si el asesor NO siguió los pasos de la RESPUESTA ESPERADA, response_correct DEBE ser false
+- Si el asesor respondió con monosílabos, frases sin sentido, o no abordó el problema, NPS debe ser 0-3
+- Si el asesor no verificó identidad cuando era necesario, penalizar fuertemente
+- Si el asesor fue genérico y no resolvió nada concreto, NPS debe ser 4-5 máximo
+- NPS 8-10 SOLO si el asesor siguió el procedimiento completo y resolvió el caso
+- Sé ESTRICTO. No regales puntaje por cortesía sin resolución
 
 Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 {{
@@ -353,7 +407,7 @@ Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 }}"""
 
     eval_messages = [
-        {'role': 'system', 'content': 'Eres un evaluador experto en calidad de atención al cliente bancario. Evaluás con criterio CX profesional.'},
+        {'role': 'system', 'content': 'Eres un evaluador EXIGENTE de calidad de atención al cliente bancario. Evaluás con criterio CX profesional y estricto. NO regalás puntos. Si el asesor no resolvió el caso según el procedimiento esperado, el NPS debe ser bajo.'},
         {'role': 'user', 'content': eval_prompt}
     ]
 
