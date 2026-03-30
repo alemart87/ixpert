@@ -632,7 +632,8 @@ def enhance_text():
 
     if field_type == 'persona':
         prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente bancario.
-Debe ser más detallada, incluir nombre del cliente, estado emocional claro, datos específicos (CI, número de tarjeta ficticio, etc.), y situación concreta.
+Debe ser más detallada, incluir nombre del cliente (INVENTÁ un nombre paraguayo realista y variado, NUNCA uses "Juan Pérez"), estado emocional claro, datos específicos ficticios (CI con números aleatorios, número de tarjeta ficticio terminado en 4 dígitos aleatorios, etc.), y situación concreta.
+Usá nombres diversos: María Fernanda, Carlos Ramírez, Lucía Benítez, Roberto Villalba, Ana Giménez, etc. Sé creativo con los nombres.
 Mantené el español paraguayo natural.
 
 TEXTO ORIGINAL:

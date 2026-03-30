@@ -55,7 +55,7 @@
             <div style="background:#f8f9fa;border-radius:12px;padding:20px;margin:16px 0;border:2px dashed #ddd">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
                     <h3 style="margin:0;color:#004080">Casos del Escenario</h3>
-                    <button type="button" class="btn btn-primary" onclick="addCase()" style="font-size:13px">+ Agregar Caso</button>
+                    <button type="button" class="btn-add-case" onclick="addCase()">+ Agregar Caso</button>
                 </div>
                 <p style="color:#888;font-size:12px;margin-top:-8px;margin-bottom:16px">Crea la cantidad de casos que necesites. Cada interacción del entrenamiento recibirá un caso diferente. Abajo de cada caso aparece el campo para la resolución esperada.</p>
 
@@ -188,6 +188,19 @@
 }
 .btn-enhance:hover { opacity: 0.85; }
 .btn-enhance:disabled { opacity: 0.5; cursor: wait; }
+.btn-add-case {
+    background: linear-gradient(135deg, #ff6600, #ff9500);
+    color: #fff; border: none; border-radius: 25px;
+    padding: 12px 24px; font-size: 15px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
+    animation: btnPulse 2s ease-in-out infinite;
+    transition: transform 0.2s;
+}
+.btn-add-case:hover { transform: scale(1.05); }
+@keyframes btnPulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(255, 102, 0, 0.7), 0 0 40px rgba(255, 102, 0, 0.2); }
+}
 </style>
 
 {% block extra_scripts %}
