@@ -30,6 +30,7 @@ MIGRATIONS = [
     # TrainingSession: batch_id + interaction_number
     "ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS batch_id INTEGER REFERENCES training_batches(id)",
     "ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS interaction_number INTEGER DEFAULT 1",
+    "ALTER TABLE training_sessions ADD COLUMN IF NOT EXISTS case_index INTEGER DEFAULT 0",
 
     # VexProfile table
     """CREATE TABLE IF NOT EXISTS vex_profiles (

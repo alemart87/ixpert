@@ -20,8 +20,38 @@ def safe_elapsed(start_dt):
         start_dt = start_dt.replace(tzinfo=None)
     return (now - start_dt).total_seconds() if start_dt else 0
 from chat import call_openai
+import random
 
 training_bp = Blueprint('training', __name__)
+
+
+def parse_cases(scenario):
+    """Parse cases from scenario. Returns list of {persona, expected_response}."""
+    try:
+        personas = json.loads(scenario.client_persona)
+        responses = json.loads(scenario.expected_response)
+        if isinstance(personas, list) and isinstance(responses, list):
+            cases = []
+            for i, p in enumerate(personas):
+                resp = responses[i] if i < len(responses) else {}
+                cases.append({
+                    'persona': p.get('text', '') if isinstance(p, dict) else str(p),
+                    'expected': resp.get('text', '') if isinstance(resp, dict) else str(resp),
+                    'label': p.get('label', f'Caso {i+1}') if isinstance(p, dict) else f'Caso {i+1}'
+                })
+            return cases if cases else [{'persona': scenario.client_persona, 'expected': scenario.expected_response, 'label': 'Caso 1'}]
+    except (json.JSONDecodeError, TypeError):
+        pass
+    # Legacy: single text fields
+    return [{'persona': scenario.client_persona, 'expected': scenario.expected_response, 'label': 'Caso 1'}]
+
+
+def get_case(scenario, index):
+    """Get a specific case by index."""
+    cases = parse_cases(scenario)
+    if index < len(cases):
+        return cases[index]
+    return cases[0]
 
 
 def superadmin_required(f):
@@ -74,9 +104,15 @@ def index():
 
 def _create_interaction(batch, scenario, interaction_num):
     """Create a single interaction (TrainingSession) within a batch."""
+    # Pick a case from the scenario (round-robin or random)
+    cases = parse_cases(scenario)
+    case_idx = (interaction_num - 1) % len(cases)
+    case = cases[case_idx]
+
     session = TrainingSession(
         batch_id=batch.id,
         interaction_number=interaction_num,
+        case_index=case_idx,
         scenario_id=scenario.id,
         user_id=batch.user_id,
         status='active',
@@ -85,14 +121,14 @@ def _create_interaction(batch, scenario, interaction_num):
     db.session.add(session)
     db.session.flush()
 
-    # Generate client message with slight persona variation
+    # Generate client message using the specific case's persona
     variation = ""
     if interaction_num > 1:
-        variation = f"\nNota: Sos el cliente #{interaction_num} distinto. Variá ligeramente tu tono y nombre. Usá un nombre diferente."
+        variation = f"\nNota: Sos un cliente diferente al anterior. Usá un nombre distinto y variá ligeramente tu tono."
 
     system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
 
-{scenario.client_persona}{variation}
+{case['persona']}{variation}
 
 REGLAS:
 - Actúa como un cliente REAL en un chat del banco
@@ -375,7 +411,7 @@ def end_session(session_id):
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
-RESPUESTA ESPERADA DEL ASESOR: {scenario.expected_response}
+RESPUESTA ESPERADA DEL ASESOR: {get_case(scenario, session.case_index or 0)['expected']}
 
 DATOS DEL ASESOR:
 - Mensajes enviados: {user_msg_count}
@@ -581,6 +617,43 @@ def admin_scenario_toggle(s_id):
     db.session.commit()
     flash('Escenario ' + ('visible' if s.is_active else 'ocultado') + '.', 'success')
     return redirect(url_for('training.admin_scenarios'))
+
+
+@training_bp.route('/admin/api/training/enhance', methods=['POST'])
+@superadmin_required
+def enhance_text():
+    """Use AI to improve a scenario instruction text."""
+    data = request.get_json(silent=True) or {}
+    text = data.get('text', '').strip()
+    field_type = data.get('type', 'persona')  # 'persona' or 'response'
+
+    if not text or len(text) < 10:
+        return jsonify({'error': 'Texto muy corto para mejorar'}), 400
+
+    if field_type == 'persona':
+        prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente bancario.
+Debe ser más detallada, incluir nombre del cliente, estado emocional claro, datos específicos (CI, número de tarjeta ficticio, etc.), y situación concreta.
+Mantené el español paraguayo natural.
+
+TEXTO ORIGINAL:
+{text}
+
+Devolvé SOLO el texto mejorado, sin explicaciones."""
+    else:
+        prompt = f"""Mejora la siguiente descripción de respuesta esperada para evaluar a un asesor bancario.
+Debe incluir pasos claros y numerados que el asesor debe seguir, criterios específicos de resolución, y qué información debe verificar.
+
+TEXTO ORIGINAL:
+{text}
+
+Devolvé SOLO el texto mejorado, sin explicaciones."""
+
+    messages = [
+        {'role': 'system', 'content': 'Sos un experto en diseño de escenarios de entrenamiento para contact centers bancarios.'},
+        {'role': 'user', 'content': prompt}
+    ]
+    result, tokens = call_openai(messages)
+    return jsonify({'enhanced': result, 'tokens': tokens})
 
 
 @training_bp.route('/admin/training/permissions', methods=['POST'])

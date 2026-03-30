@@ -81,6 +81,33 @@ app.register_blueprint(training_bp)
 
 # ===== Auth routes directly in app (no blueprint) =====
 from flask_login import login_user, logout_user
+import json as json_module
+
+
+@app.template_filter('count_cases')
+def count_cases_filter(text):
+    """Count cases in a scenario's client_persona field."""
+    try:
+        data = json_module.loads(text)
+        if isinstance(data, list):
+            return len(data)
+    except (json_module.JSONDecodeError, TypeError):
+        pass
+    return 1
+
+
+@app.template_filter('scenario_json')
+def scenario_json_filter(scenario):
+    """Convert scenario to JSON for edit modal."""
+    from training import parse_cases
+    cases = parse_cases(scenario)
+    return json_module.dumps({
+        'title': scenario.title,
+        'description': scenario.description or '',
+        'difficulty': scenario.difficulty,
+        'category': scenario.category or '',
+        'cases': cases
+    }, ensure_ascii=False)
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -177,6 +177,7 @@ class TrainingSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     batch_id = db.Column(db.Integer, db.ForeignKey('training_batches.id'), nullable=True)
     interaction_number = db.Column(db.Integer, default=1)
+    case_index = db.Column(db.Integer, default=0)  # Which case from scenario was assigned
     scenario_id = db.Column(db.Integer, db.ForeignKey('training_scenarios.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     status = db.Column(db.String(20), default='active')  # active, completed, abandoned
