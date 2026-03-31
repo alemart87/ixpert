@@ -55,6 +55,29 @@
             </tbody>
         </table>
     </div>
+
+    {% if pagination.pages > 1 %}
+    <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:24px;flex-wrap:wrap">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('training.vex_dashboard', page=pagination.prev_num) }}" class="btn btn-sm btn-secondary">&larr; Anterior</a>
+        {% endif %}
+
+        {% for p_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p_num %}
+                <a href="{{ url_for('training.vex_dashboard', page=p_num) }}" class="btn btn-sm {{ 'btn-primary' if p_num == pagination.page else 'btn-secondary' }}" style="min-width:36px;text-align:center">{{ p_num }}</a>
+            {% else %}
+                <span style="color:#888">...</span>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <a href="{{ url_for('training.vex_dashboard', page=pagination.next_num) }}" class="btn btn-sm btn-secondary">Siguiente &rarr;</a>
+        {% endif %}
+
+        <span style="color:#888;font-size:13px;margin-left:12px">{{ pagination.total }} perfiles</span>
+    </div>
+    {% endif %}
+
     {% endif %}
 </div>
 {% endblock %}
