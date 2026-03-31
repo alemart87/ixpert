@@ -104,9 +104,26 @@ def index():
 
 def _create_interaction(batch, scenario, interaction_num):
     """Create a single interaction (TrainingSession) within a batch."""
-    # Pick a case from the scenario (round-robin or random)
+    # Pick a random case, avoiding repeats within the same batch
     cases = parse_cases(scenario)
-    case_idx = (interaction_num - 1) % len(cases)
+    if len(cases) == 1:
+        case_idx = 0
+    else:
+        # Get case indices already used in this batch
+        used_indices = [
+            s.case_index for s in
+            TrainingSession.query.filter_by(batch_id=batch.id).all()
+            if s.case_index is not None
+        ]
+        # Available cases not yet used in this batch
+        available = [i for i in range(len(cases)) if i not in used_indices]
+        if not available:
+            # All cases used, reset pool but exclude the most recent one
+            last_used = used_indices[-1] if used_indices else -1
+            available = [i for i in range(len(cases)) if i != last_used]
+            if not available:
+                available = list(range(len(cases)))
+        case_idx = random.choice(available)
     case = cases[case_idx]
 
     session = TrainingSession(
