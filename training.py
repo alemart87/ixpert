@@ -143,12 +143,12 @@ def _create_interaction(batch, scenario, interaction_num):
     if interaction_num > 1:
         variation = f"\nNota: Sos un cliente diferente al anterior. Usá un nombre distinto y variá ligeramente tu tono."
 
-    system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
 {case['persona']}{variation}
 
 REGLAS:
-- Actúa como un cliente REAL en un chat del banco
+- Actúa como un cliente REAL en un chat de atención
 - NO reveles que eres IA
 - Reaccioná naturalmente al asesor
 - Respuestas cortas (1-3 oraciones)
@@ -306,18 +306,15 @@ def send_message():
     session.total_words_user = (session.total_words_user or 0) + word_count
     session.total_chars_user = (session.total_chars_user or 0) + len(message)
 
-    # Calculate WPM
-    elapsed = safe_elapsed(session.started_at)
-    if elapsed > 0:
-        session.words_per_minute = round(session.total_words_user / (elapsed / 60), 1)
+    # WPM is recalculated accurately at session end using message timestamps
 
     # Build conversation for OpenAI
-    system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
 {scenario.client_persona}
 
 REGLAS:
-- Actúa como un cliente REAL
+- Actúa como un cliente REAL en un chat de atención
 - NO reveles que sos IA
 - Reaccioná naturalmente al asesor
 - Respuestas cortas (1-3 oraciones) como un cliente real en chat
@@ -370,14 +367,34 @@ def end_session(session_id):
     # Calculate final metrics
     session.ended_at = now
     session.duration_seconds = int(safe_elapsed(session.started_at))
-    if session.duration_seconds > 0 and session.total_words_user:
+
+    # WPM: estimate active typing time from user message timestamps
+    user_messages = [m for m in session.messages if m.role == 'user']
+    if user_messages and session.total_words_user:
+        # Estimate typing time: for each user message, count ~3 seconds base
+        # plus the gap between the previous client message and this user message
+        typing_seconds = 0
+        prev_time = None
+        for msg in session.messages:
+            if msg.role == 'client':
+                prev_time = msg.created_at
+            elif msg.role == 'user':
+                if prev_time and msg.created_at:
+                    gap = (msg.created_at.replace(tzinfo=None) - prev_time.replace(tzinfo=None)).total_seconds()
+                    # Cap per-message thinking+typing time at 120s to avoid idle inflation
+                    typing_seconds += min(gap, 120)
+                else:
+                    typing_seconds += 10  # fallback estimate for first message
+        typing_minutes = max(typing_seconds / 60, 0.1)  # at least 6 seconds
+        session.words_per_minute = round(session.total_words_user / typing_minutes, 1)
+    elif session.duration_seconds > 0 and session.total_words_user:
         session.words_per_minute = round(session.total_words_user / (session.duration_seconds / 60), 1)
 
     # Count user messages
-    user_msg_count = sum(1 for m in session.messages if m.role == 'user')
+    user_msg_count = len(user_messages)
 
     # If agent barely interacted, auto-fail without calling OpenAI
-    if user_msg_count < 3 or (session.total_words_user or 0) < 15:
+    if user_msg_count < 2 or (session.total_words_user or 0) < 8:
         session.nps_score = 1
         session.response_correct = False
         session.spelling_errors = 0
@@ -424,11 +441,11 @@ def end_session(session_id):
     user_texts = ' '.join(m.content for m in session.messages if m.role == 'user')
 
     # Evaluate with OpenAI
-    eval_prompt = f"""Evalúa ESTRICTAMENTE la siguiente conversación entre un asesor bancario y un cliente simulado.
+    eval_prompt = f"""Evalúa la siguiente conversación entre un asesor y un cliente simulado.
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
-RESPUESTA ESPERADA DEL ASESOR: {get_case(scenario, session.case_index or 0)['expected']}
+RESPUESTA ESPERADA DEL ASESOR (referencia): {get_case(scenario, session.case_index or 0)['expected']}
 
 DATOS DEL ASESOR:
 - Mensajes enviados: {user_msg_count}
@@ -441,26 +458,46 @@ CONVERSACIÓN:
 TEXTO DEL ASESOR (para revisar ortografía):
 {user_texts}
 
-CRITERIOS DE EVALUACIÓN ESTRICTOS:
-- Si el asesor NO siguió los pasos de la RESPUESTA ESPERADA, response_correct DEBE ser false
-- Si el asesor respondió con monosílabos, frases sin sentido, o no abordó el problema, NPS debe ser 0-3
-- Si el asesor no verificó identidad cuando era necesario, penalizar fuertemente
-- Si el asesor fue genérico y no resolvió nada concreto, NPS debe ser 4-5 máximo
-- NPS 8-10 SOLO si el asesor siguió el procedimiento completo y resolvió el caso
-- Sé ESTRICTO. No regales puntaje por cortesía sin resolución
+NPS - ANÁLISIS DE SENTIMIENTO DEL CLIENTE (escala 0-10):
+El NPS se determina desde la PERSPECTIVA DEL CLIENTE. Analizá cómo se habría sentido el cliente durante la conversación:
+- NPS 9-10 (Promotor): El cliente se sintió escuchado, atendido con calidez, y su problema fue abordado. Se iría satisfecho y recomendaría el servicio.
+- NPS 7-8 (Promotor leve): El cliente tuvo una buena experiencia general, se sintió bien atendido aunque faltaron algunos detalles.
+- NPS 5-6 (Pasivo): El cliente fue atendido pero sin que la experiencia sea memorable. Ni muy satisfecho ni insatisfecho.
+- NPS 3-4 (Detractor leve): El cliente se sintió poco escuchado, las respuestas fueron frías, genéricas, o no abordaron su necesidad.
+- NPS 0-2 (Detractor): El cliente se sintió ignorado, frustrado o mal atendido. Experiencia negativa.
+
+Factores que MEJORAN el NPS del cliente:
+- Saludo cálido y personalizado
+- Empatía (entender la situación del cliente)
+- Respuestas claras y útiles
+- Seguimiento y preocupación genuina
+- Despedida amable
+
+Factores que BAJAN el NPS del cliente:
+- Respuestas frías o robóticas
+- Ignorar lo que el cliente dice
+- No ofrecer soluciones concretas
+- Monosílabos o respuestas sin esfuerzo
+- Falta de empatía ante la situación del cliente
+
+CRITERIO DE CORRECCIÓN (response_correct):
+- true: El asesor cubrió la esencia del procedimiento esperado (no necesita ser textual, pero debe haber abordado los puntos clave).
+- false: El asesor ignoró el procedimiento o no abordó los puntos principales del caso.
+
+ORTOGRAFÍA: Contá solo errores claros de ortografía/gramática. No contés tildes omitidas en chat informal ni abreviaciones comunes.
 
 Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 {{
     "nps_score": <número del 0 al 10>,
     "response_correct": <true o false>,
-    "spelling_errors": <número de errores ortográficos encontrados>,
-    "feedback": "<retroalimentación detallada: qué hizo bien, qué debe mejorar, recomendaciones específicas>",
-    "strengths": "<2-3 fortalezas observadas>",
-    "improvements": "<2-3 áreas de mejora concretas>"
+    "spelling_errors": <número de errores ortográficos claros>,
+    "feedback": "<retroalimentación constructiva: cómo se habría sentido el cliente, qué hizo bien el asesor, qué puede mejorar>",
+    "strengths": "<2-3 fortalezas observadas desde la perspectiva del cliente>",
+    "improvements": "<2-3 áreas de mejora concretas para mejorar la experiencia del cliente>"
 }}"""
 
     eval_messages = [
-        {'role': 'system', 'content': 'Eres un evaluador EXIGENTE de calidad de atención al cliente bancario. Evaluás con criterio CX profesional y estricto. NO regalás puntos. Si el asesor no resolvió el caso según el procedimiento esperado, el NPS debe ser bajo.'},
+        {'role': 'system', 'content': 'Eres un analista de experiencia del cliente (CX). Tu rol es evaluar conversaciones de atención poniéndote en el lugar del cliente. Analizás el sentimiento del cliente a lo largo de la conversación: ¿se sintió escuchado? ¿atendido con empatía? ¿le resolvieron su necesidad? El NPS refleja cómo se fue el cliente, no la perfección técnica del asesor. Aplicás a cualquier industria: banca, telefonía, seguros, servicios generales, etc.'},
         {'role': 'user', 'content': eval_prompt}
     ]
 
@@ -648,17 +685,16 @@ def enhance_text():
         return jsonify({'error': 'Texto muy corto para mejorar'}), 400
 
     if field_type == 'persona':
-        prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente bancario.
-Debe ser más detallada, incluir nombre del cliente (INVENTÁ un nombre paraguayo realista y variado, NUNCA uses "Juan Pérez"), estado emocional claro, datos específicos ficticios (CI con números aleatorios, número de tarjeta ficticio terminado en 4 dígitos aleatorios, etc.), y situación concreta.
-Usá nombres diversos: María Fernanda, Carlos Ramírez, Lucía Benítez, Roberto Villalba, Ana Giménez, etc. Sé creativo con los nombres.
-Mantené el español paraguayo natural.
+        prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente.
+Debe ser más detallada, incluir nombre del cliente (INVENTÁ un nombre realista y variado, NUNCA uses "Juan Pérez"), estado emocional claro, datos específicos ficticios (documento con números aleatorios, número de cuenta/línea ficticio, etc.), y situación concreta.
+Usá nombres diversos y creativos. Mantené el español natural.
 
 TEXTO ORIGINAL:
 {text}
 
 Devolvé SOLO el texto mejorado, sin explicaciones."""
     else:
-        prompt = f"""Mejora la siguiente descripción de respuesta esperada para evaluar a un asesor bancario.
+        prompt = f"""Mejora la siguiente descripción de respuesta esperada para evaluar a un asesor de atención al cliente.
 Debe incluir pasos claros y numerados que el asesor debe seguir, criterios específicos de resolución, y qué información debe verificar.
 
 TEXTO ORIGINAL:
@@ -667,7 +703,7 @@ TEXTO ORIGINAL:
 Devolvé SOLO el texto mejorado, sin explicaciones."""
 
     messages = [
-        {'role': 'system', 'content': 'Sos un experto en diseño de escenarios de entrenamiento para contact centers bancarios.'},
+        {'role': 'system', 'content': 'Sos un experto en diseño de escenarios de entrenamiento para contact centers y atención al cliente en general.'},
         {'role': 'user', 'content': prompt}
     ]
     result, tokens = call_openai(messages)
