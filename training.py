@@ -837,12 +837,12 @@ def api_training_insights():
                 'desc': f'NPS promedio de {best["avg_nps"]}/10. Considerar como mentor para el equipo.'
             })
 
-    low_wpm = [r for r in rankings if r['avg_wpm'] < 20 and r['sessions'] >= 2]
+    low_wpm = [r for r in rankings if r['avg_wpm'] < 10 and r['sessions'] >= 2]
     if low_wpm:
         recommendations.append({
             'icon': '⚡', 'priority': 'media',
             'title': f'{len(low_wpm)} usuario(s) con velocidad baja',
-            'desc': 'WPM menor a 20. Practicar velocidad de tipeo y familiarización con procedimientos.'
+            'desc': 'WPM menor a 10. Practicar velocidad de tipeo y familiarización con procedimientos.'
         })
 
     if correct_rate < 60 and total >= 3:
@@ -986,8 +986,8 @@ def calculate_vex_profile(user_id):
     # 3. Resolution: correct rate is king
     resolution_raw = correct_rate * 70 + (avg_nps / 10) * 30
 
-    # 4. Speed: WPM normalized to 50 WPM benchmark + duration
-    speed_wpm = min(100, (avg_wpm / 50) * 100)
+    # 4. Speed: WPM normalized to 30 WPM benchmark (realistic for chat support) + duration
+    speed_wpm = min(100, (avg_wpm / 30) * 100)
     speed_dur = min(100, max(0, (600 - avg_duration) / 600 * 100))  # 600s = 10min benchmark
     speed_raw = speed_wpm * 0.6 + speed_dur * 0.4
 
