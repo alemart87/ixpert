@@ -158,7 +158,8 @@
 
     async function sendMsg() {
         if (!activeSessionId) return;
-        var i = interactions[activeSessionId];
+        var sendingSid = activeSessionId;  // Capture which chat we're sending from
+        var i = interactions[sendingSid];
         if (i.status !== 'active') return;
         var text = chatInput.value.trim();
         if (!text) return;
@@ -174,23 +175,28 @@
             var res = await fetch('/api/training/message', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({session_id: parseInt(activeSessionId), message: text})
+                body: JSON.stringify({session_id: parseInt(sendingSid), message: text})
             });
             var data = await res.json();
             chatTyping.classList.remove('active');
             if (data.response) {
                 i.messages.push({role: 'client', content: data.response});
                 // Only add to DOM if this chat is still the active one
-                if (activeSessionId == activeSessionId) {
+                if (activeSessionId == sendingSid) {
                     addMsgToDOM('client', data.response);
+                } else {
+                    // User switched chats; sidebar preview will update
+                    renderSidebar();
                 }
             }
         } catch(e) {
             chatTyping.classList.remove('active');
-            addMsgToDOM('client', 'Error de conexión.');
+            if (activeSessionId == sendingSid) {
+                addMsgToDOM('client', 'Error de conexión.');
+            }
         }
         chatSend.disabled = false;
-        chatInput.focus();
+        if (activeSessionId == sendingSid) chatInput.focus();
         renderSidebar();
     }
 
