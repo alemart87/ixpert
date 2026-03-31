@@ -143,12 +143,12 @@ def _create_interaction(batch, scenario, interaction_num):
     if interaction_num > 1:
         variation = f"\nNota: Sos un cliente diferente al anterior. Usá un nombre distinto y variá ligeramente tu tono."
 
-    system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
 {case['persona']}{variation}
 
 REGLAS:
-- Actúa como un cliente REAL en un chat del banco
+- Actúa como un cliente REAL en un chat de atención
 - NO reveles que eres IA
 - Reaccioná naturalmente al asesor
 - Respuestas cortas (1-3 oraciones)
@@ -309,12 +309,12 @@ def send_message():
     # WPM is recalculated accurately at session end using message timestamps
 
     # Build conversation for OpenAI
-    system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
 {scenario.client_persona}
 
 REGLAS:
-- Actúa como un cliente REAL
+- Actúa como un cliente REAL en un chat de atención
 - NO reveles que sos IA
 - Reaccioná naturalmente al asesor
 - Respuestas cortas (1-3 oraciones) como un cliente real en chat
@@ -441,11 +441,11 @@ def end_session(session_id):
     user_texts = ' '.join(m.content for m in session.messages if m.role == 'user')
 
     # Evaluate with OpenAI
-    eval_prompt = f"""Evalúa la siguiente conversación entre un asesor bancario y un cliente simulado.
+    eval_prompt = f"""Evalúa la siguiente conversación entre un asesor y un cliente simulado.
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
-RESPUESTA ESPERADA DEL ASESOR (referencia, no debe ser textual): {get_case(scenario, session.case_index or 0)['expected']}
+RESPUESTA ESPERADA DEL ASESOR (referencia): {get_case(scenario, session.case_index or 0)['expected']}
 
 DATOS DEL ASESOR:
 - Mensajes enviados: {user_msg_count}
@@ -458,31 +458,46 @@ CONVERSACIÓN:
 TEXTO DEL ASESOR (para revisar ortografía):
 {user_texts}
 
-CRITERIOS DE EVALUACIÓN (escala NPS 0-10):
-- NPS 9-10: El asesor resolvió el caso correctamente, fue empático, claro y profesional. Siguió el procedimiento esperado o una alternativa igualmente válida.
-- NPS 7-8: El asesor abordó bien el caso con pequeñas omisiones. Buena atención general, faltaron algunos detalles menores.
-- NPS 5-6: El asesor intentó resolver pero le faltaron pasos importantes o fue demasiado genérico. Atención aceptable pero mejorable.
-- NPS 3-4: El asesor no abordó correctamente el problema, respuestas muy vagas o incompletas.
-- NPS 0-2: El asesor no interactuó de forma útil, monosílabos o respuestas sin sentido.
+NPS - ANÁLISIS DE SENTIMIENTO DEL CLIENTE (escala 0-10):
+El NPS se determina desde la PERSPECTIVA DEL CLIENTE. Analizá cómo se habría sentido el cliente durante la conversación:
+- NPS 9-10 (Promotor): El cliente se sintió escuchado, atendido con calidez, y su problema fue abordado. Se iría satisfecho y recomendaría el servicio.
+- NPS 7-8 (Promotor leve): El cliente tuvo una buena experiencia general, se sintió bien atendido aunque faltaron algunos detalles.
+- NPS 5-6 (Pasivo): El cliente fue atendido pero sin que la experiencia sea memorable. Ni muy satisfecho ni insatisfecho.
+- NPS 3-4 (Detractor leve): El cliente se sintió poco escuchado, las respuestas fueron frías, genéricas, o no abordaron su necesidad.
+- NPS 0-2 (Detractor): El cliente se sintió ignorado, frustrado o mal atendido. Experiencia negativa.
+
+Factores que MEJORAN el NPS del cliente:
+- Saludo cálido y personalizado
+- Empatía (entender la situación del cliente)
+- Respuestas claras y útiles
+- Seguimiento y preocupación genuina
+- Despedida amable
+
+Factores que BAJAN el NPS del cliente:
+- Respuestas frías o robóticas
+- Ignorar lo que el cliente dice
+- No ofrecer soluciones concretas
+- Monosílabos o respuestas sin esfuerzo
+- Falta de empatía ante la situación del cliente
 
 CRITERIO DE CORRECCIÓN (response_correct):
-- true: El asesor cubrió la ESENCIA del procedimiento esperado (no necesita ser textual ni perfecto, pero debe haber abordado los puntos clave del caso).
+- true: El asesor cubrió la esencia del procedimiento esperado (no necesita ser textual, pero debe haber abordado los puntos clave).
 - false: El asesor ignoró el procedimiento o no abordó los puntos principales del caso.
 
-ORTOGRAFÍA: Contá solo errores claros de ortografía/gramática. No contés errores de tildes en chat informal ni abreviaciones comunes de chat.
+ORTOGRAFÍA: Contá solo errores claros de ortografía/gramática. No contés tildes omitidas en chat informal ni abreviaciones comunes.
 
 Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 {{
     "nps_score": <número del 0 al 10>,
     "response_correct": <true o false>,
     "spelling_errors": <número de errores ortográficos claros>,
-    "feedback": "<retroalimentación constructiva: qué hizo bien, qué puede mejorar, recomendaciones específicas>",
-    "strengths": "<2-3 fortalezas observadas>",
-    "improvements": "<2-3 áreas de mejora concretas>"
+    "feedback": "<retroalimentación constructiva: cómo se habría sentido el cliente, qué hizo bien el asesor, qué puede mejorar>",
+    "strengths": "<2-3 fortalezas observadas desde la perspectiva del cliente>",
+    "improvements": "<2-3 áreas de mejora concretas para mejorar la experiencia del cliente>"
 }}"""
 
     eval_messages = [
-        {'role': 'system', 'content': 'Eres un evaluador profesional de calidad de atención al cliente bancario. Evaluás con criterio CX justo y equilibrado. Valorás tanto la resolución del caso como la empatía, claridad y profesionalismo del asesor. Reconocés el esfuerzo y das crédito parcial cuando corresponde.'},
+        {'role': 'system', 'content': 'Eres un analista de experiencia del cliente (CX). Tu rol es evaluar conversaciones de atención poniéndote en el lugar del cliente. Analizás el sentimiento del cliente a lo largo de la conversación: ¿se sintió escuchado? ¿atendido con empatía? ¿le resolvieron su necesidad? El NPS refleja cómo se fue el cliente, no la perfección técnica del asesor. Aplicás a cualquier industria: banca, telefonía, seguros, servicios generales, etc.'},
         {'role': 'user', 'content': eval_prompt}
     ]
 
@@ -670,17 +685,16 @@ def enhance_text():
         return jsonify({'error': 'Texto muy corto para mejorar'}), 400
 
     if field_type == 'persona':
-        prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente bancario.
-Debe ser más detallada, incluir nombre del cliente (INVENTÁ un nombre paraguayo realista y variado, NUNCA uses "Juan Pérez"), estado emocional claro, datos específicos ficticios (CI con números aleatorios, número de tarjeta ficticio terminado en 4 dígitos aleatorios, etc.), y situación concreta.
-Usá nombres diversos: María Fernanda, Carlos Ramírez, Lucía Benítez, Roberto Villalba, Ana Giménez, etc. Sé creativo con los nombres.
-Mantené el español paraguayo natural.
+        prompt = f"""Mejora la siguiente instrucción para un simulador de cliente de IA en un entrenamiento de atención al cliente.
+Debe ser más detallada, incluir nombre del cliente (INVENTÁ un nombre realista y variado, NUNCA uses "Juan Pérez"), estado emocional claro, datos específicos ficticios (documento con números aleatorios, número de cuenta/línea ficticio, etc.), y situación concreta.
+Usá nombres diversos y creativos. Mantené el español natural.
 
 TEXTO ORIGINAL:
 {text}
 
 Devolvé SOLO el texto mejorado, sin explicaciones."""
     else:
-        prompt = f"""Mejora la siguiente descripción de respuesta esperada para evaluar a un asesor bancario.
+        prompt = f"""Mejora la siguiente descripción de respuesta esperada para evaluar a un asesor de atención al cliente.
 Debe incluir pasos claros y numerados que el asesor debe seguir, criterios específicos de resolución, y qué información debe verificar.
 
 TEXTO ORIGINAL:
@@ -689,7 +703,7 @@ TEXTO ORIGINAL:
 Devolvé SOLO el texto mejorado, sin explicaciones."""
 
     messages = [
-        {'role': 'system', 'content': 'Sos un experto en diseño de escenarios de entrenamiento para contact centers bancarios.'},
+        {'role': 'system', 'content': 'Sos un experto en diseño de escenarios de entrenamiento para contact centers y atención al cliente en general.'},
         {'role': 'user', 'content': prompt}
     ]
     result, tokens = call_openai(messages)
