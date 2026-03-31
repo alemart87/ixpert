@@ -306,10 +306,7 @@ def send_message():
     session.total_words_user = (session.total_words_user or 0) + word_count
     session.total_chars_user = (session.total_chars_user or 0) + len(message)
 
-    # Calculate WPM
-    elapsed = safe_elapsed(session.started_at)
-    if elapsed > 0:
-        session.words_per_minute = round(session.total_words_user / (elapsed / 60), 1)
+    # WPM is recalculated accurately at session end using message timestamps
 
     # Build conversation for OpenAI
     system_prompt = f"""Eres un cliente de Itaú Paraguay. Tu personalidad y situación:
@@ -370,14 +367,34 @@ def end_session(session_id):
     # Calculate final metrics
     session.ended_at = now
     session.duration_seconds = int(safe_elapsed(session.started_at))
-    if session.duration_seconds > 0 and session.total_words_user:
+
+    # WPM: estimate active typing time from user message timestamps
+    user_messages = [m for m in session.messages if m.role == 'user']
+    if user_messages and session.total_words_user:
+        # Estimate typing time: for each user message, count ~3 seconds base
+        # plus the gap between the previous client message and this user message
+        typing_seconds = 0
+        prev_time = None
+        for msg in session.messages:
+            if msg.role == 'client':
+                prev_time = msg.created_at
+            elif msg.role == 'user':
+                if prev_time and msg.created_at:
+                    gap = (msg.created_at.replace(tzinfo=None) - prev_time.replace(tzinfo=None)).total_seconds()
+                    # Cap per-message thinking+typing time at 120s to avoid idle inflation
+                    typing_seconds += min(gap, 120)
+                else:
+                    typing_seconds += 10  # fallback estimate for first message
+        typing_minutes = max(typing_seconds / 60, 0.1)  # at least 6 seconds
+        session.words_per_minute = round(session.total_words_user / typing_minutes, 1)
+    elif session.duration_seconds > 0 and session.total_words_user:
         session.words_per_minute = round(session.total_words_user / (session.duration_seconds / 60), 1)
 
     # Count user messages
-    user_msg_count = sum(1 for m in session.messages if m.role == 'user')
+    user_msg_count = len(user_messages)
 
     # If agent barely interacted, auto-fail without calling OpenAI
-    if user_msg_count < 3 or (session.total_words_user or 0) < 15:
+    if user_msg_count < 2 or (session.total_words_user or 0) < 8:
         session.nps_score = 1
         session.response_correct = False
         session.spelling_errors = 0
@@ -424,11 +441,11 @@ def end_session(session_id):
     user_texts = ' '.join(m.content for m in session.messages if m.role == 'user')
 
     # Evaluate with OpenAI
-    eval_prompt = f"""Evalúa ESTRICTAMENTE la siguiente conversación entre un asesor bancario y un cliente simulado.
+    eval_prompt = f"""Evalúa la siguiente conversación entre un asesor bancario y un cliente simulado.
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
-RESPUESTA ESPERADA DEL ASESOR: {get_case(scenario, session.case_index or 0)['expected']}
+RESPUESTA ESPERADA DEL ASESOR (referencia, no debe ser textual): {get_case(scenario, session.case_index or 0)['expected']}
 
 DATOS DEL ASESOR:
 - Mensajes enviados: {user_msg_count}
@@ -441,26 +458,31 @@ CONVERSACIÓN:
 TEXTO DEL ASESOR (para revisar ortografía):
 {user_texts}
 
-CRITERIOS DE EVALUACIÓN ESTRICTOS:
-- Si el asesor NO siguió los pasos de la RESPUESTA ESPERADA, response_correct DEBE ser false
-- Si el asesor respondió con monosílabos, frases sin sentido, o no abordó el problema, NPS debe ser 0-3
-- Si el asesor no verificó identidad cuando era necesario, penalizar fuertemente
-- Si el asesor fue genérico y no resolvió nada concreto, NPS debe ser 4-5 máximo
-- NPS 8-10 SOLO si el asesor siguió el procedimiento completo y resolvió el caso
-- Sé ESTRICTO. No regales puntaje por cortesía sin resolución
+CRITERIOS DE EVALUACIÓN (escala NPS 0-10):
+- NPS 9-10: El asesor resolvió el caso correctamente, fue empático, claro y profesional. Siguió el procedimiento esperado o una alternativa igualmente válida.
+- NPS 7-8: El asesor abordó bien el caso con pequeñas omisiones. Buena atención general, faltaron algunos detalles menores.
+- NPS 5-6: El asesor intentó resolver pero le faltaron pasos importantes o fue demasiado genérico. Atención aceptable pero mejorable.
+- NPS 3-4: El asesor no abordó correctamente el problema, respuestas muy vagas o incompletas.
+- NPS 0-2: El asesor no interactuó de forma útil, monosílabos o respuestas sin sentido.
+
+CRITERIO DE CORRECCIÓN (response_correct):
+- true: El asesor cubrió la ESENCIA del procedimiento esperado (no necesita ser textual ni perfecto, pero debe haber abordado los puntos clave del caso).
+- false: El asesor ignoró el procedimiento o no abordó los puntos principales del caso.
+
+ORTOGRAFÍA: Contá solo errores claros de ortografía/gramática. No contés errores de tildes en chat informal ni abreviaciones comunes de chat.
 
 Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 {{
     "nps_score": <número del 0 al 10>,
     "response_correct": <true o false>,
-    "spelling_errors": <número de errores ortográficos encontrados>,
-    "feedback": "<retroalimentación detallada: qué hizo bien, qué debe mejorar, recomendaciones específicas>",
+    "spelling_errors": <número de errores ortográficos claros>,
+    "feedback": "<retroalimentación constructiva: qué hizo bien, qué puede mejorar, recomendaciones específicas>",
     "strengths": "<2-3 fortalezas observadas>",
     "improvements": "<2-3 áreas de mejora concretas>"
 }}"""
 
     eval_messages = [
-        {'role': 'system', 'content': 'Eres un evaluador EXIGENTE de calidad de atención al cliente bancario. Evaluás con criterio CX profesional y estricto. NO regalás puntos. Si el asesor no resolvió el caso según el procedimiento esperado, el NPS debe ser bajo.'},
+        {'role': 'system', 'content': 'Eres un evaluador profesional de calidad de atención al cliente bancario. Evaluás con criterio CX justo y equilibrado. Valorás tanto la resolución del caso como la empatía, claridad y profesionalismo del asesor. Reconocés el esfuerzo y das crédito parcial cuando corresponde.'},
         {'role': 'user', 'content': eval_prompt}
     ]
 
