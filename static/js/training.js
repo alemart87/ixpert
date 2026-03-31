@@ -158,7 +158,8 @@
 
     async function sendMsg() {
         if (!activeSessionId) return;
-        var i = interactions[activeSessionId];
+        var sendingSid = activeSessionId;  // Capture which chat we're sending from
+        var i = interactions[sendingSid];
         if (i.status !== 'active') return;
         var text = chatInput.value.trim();
         if (!text) return;
@@ -174,42 +175,52 @@
             var res = await fetch('/api/training/message', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({session_id: parseInt(activeSessionId), message: text})
+                body: JSON.stringify({session_id: parseInt(sendingSid), message: text})
             });
             var data = await res.json();
             chatTyping.classList.remove('active');
             if (data.response) {
                 i.messages.push({role: 'client', content: data.response});
                 // Only add to DOM if this chat is still the active one
-                if (activeSessionId == activeSessionId) {
+                if (activeSessionId == sendingSid) {
                     addMsgToDOM('client', data.response);
+                } else {
+                    // User switched chats; sidebar preview will update
+                    renderSidebar();
                 }
             }
         } catch(e) {
             chatTyping.classList.remove('active');
-            addMsgToDOM('client', 'Error de conexión.');
+            if (activeSessionId == sendingSid) {
+                addMsgToDOM('client', 'Error de conexión.');
+            }
         }
         chatSend.disabled = false;
-        chatInput.focus();
+        if (activeSessionId == sendingSid) chatInput.focus();
         renderSidebar();
     }
 
     // End individual interaction
     chatEnd.addEventListener('click', async function() {
         if (!activeSessionId || interactions[activeSessionId].status !== 'active') return;
-        if (!confirm('¿Cerrar esta interacción? Se evaluará individualmente.')) return;
+        var closingSid = activeSessionId;  // Capture BEFORE confirm/async
+        var closingNum = interactions[closingSid].number;
+        if (!confirm('¿Cerrar Chat ' + closingNum + '? Se evaluará individualmente.')) return;
 
         chatEnd.disabled = true;
-        chatEnd.textContent = 'Evaluando...';
+        chatEnd.textContent = 'Evaluando Chat ' + closingNum + '...';
         chatSend.disabled = true;
 
         try {
-            var res = await fetch('/api/training/end/' + activeSessionId, {method: 'POST'});
+            var res = await fetch('/api/training/end/' + closingSid, {method: 'POST'});
             var data = await res.json();
             if (data.ok) {
-                interactions[activeSessionId].status = 'completed';
-                document.getElementById('trainInputArea').style.display = 'none';
-                chatHeader.textContent = 'Chat ' + interactions[activeSessionId].number + ' ✅ Completado';
+                interactions[closingSid].status = 'completed';
+                // Only update UI if user is still viewing the closed chat
+                if (activeSessionId == closingSid) {
+                    document.getElementById('trainInputArea').style.display = 'none';
+                    chatHeader.textContent = 'Chat ' + closingNum + ' ✅ Completado';
+                }
                 renderSidebar();
                 // If batch is fully complete, redirect to results
                 if (data.batch_complete) {
@@ -218,7 +229,7 @@
                     }, 1500);
                 }
             }
-        } catch(e) { alert('Error al cerrar'); }
+        } catch(e) { alert('Error al cerrar Chat ' + closingNum); }
         chatEnd.disabled = false;
         chatEnd.textContent = 'Cerrar Interacción';
         chatSend.disabled = false;
