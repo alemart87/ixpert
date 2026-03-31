@@ -1063,8 +1063,12 @@ def calculate_vex_profile(user_id):
 @training_bp.route('/admin/vex')
 @superadmin_required
 def vex_dashboard():
-    profiles = VexProfile.query.join(User).order_by(VexProfile.overall_score.desc()).all()
-    return render_template('admin/vex_dashboard.html', profiles=profiles)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    pagination = VexProfile.query.join(User).order_by(
+        VexProfile.overall_score.desc()
+    ).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template('admin/vex_dashboard.html', profiles=pagination.items, pagination=pagination)
 
 
 @training_bp.route('/admin/vex/profile/<int:user_id>')
@@ -1073,10 +1077,12 @@ def vex_profile(user_id):
     # Recalculate before showing
     calculate_vex_profile(user_id)
     profile = VexProfile.query.filter_by(user_id=user_id).first_or_404()
-    sessions = TrainingSession.query.filter_by(
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    pagination = TrainingSession.query.filter_by(
         user_id=user_id, status='completed'
-    ).order_by(TrainingSession.created_at.desc()).all()
-    return render_template('admin/vex_profile.html', profile=profile, sessions=sessions)
+    ).order_by(TrainingSession.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template('admin/vex_profile.html', profile=profile, sessions=pagination.items, pagination=pagination)
 
 
 @training_bp.route('/admin/vex/methodology')
