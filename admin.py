@@ -174,7 +174,7 @@ def user_save():
         return redirect(url_for('admin.user_list'))
 
     if not email or not name:
-        flash('Email y nombre son obligatorios.', 'error')
+        flash('Usuario/email y nombre son obligatorios.', 'error')
         return redirect(url_for('admin.user_list'))
 
     if user_id:
@@ -194,7 +194,7 @@ def user_save():
             flash('La contraseña es obligatoria para nuevos usuarios.', 'error')
             return redirect(url_for('admin.user_list'))
         if User.query.filter_by(email=email).first():
-            flash('Ya existe un usuario con ese email.', 'error')
+            flash('Ya existe un usuario con ese email/usuario.', 'error')
             return redirect(url_for('admin.user_list'))
         user = User(email=email, name=name, role=role, is_active_user=is_active,
                     max_concurrent_training=max(1, min(10, max_concurrent)))
