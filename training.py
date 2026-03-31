@@ -347,7 +347,7 @@ REGLAS:
             'messages': session.total_messages,
             'words': session.total_words_user,
             'wpm': session.words_per_minute,
-            'elapsed_seconds': int(elapsed)
+            'elapsed_seconds': int(safe_elapsed(session.started_at))
         }
     })
 
