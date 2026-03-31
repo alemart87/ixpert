@@ -203,19 +203,24 @@
     // End individual interaction
     chatEnd.addEventListener('click', async function() {
         if (!activeSessionId || interactions[activeSessionId].status !== 'active') return;
-        if (!confirm('¿Cerrar esta interacción? Se evaluará individualmente.')) return;
+        var closingSid = activeSessionId;  // Capture BEFORE confirm/async
+        var closingNum = interactions[closingSid].number;
+        if (!confirm('¿Cerrar Chat ' + closingNum + '? Se evaluará individualmente.')) return;
 
         chatEnd.disabled = true;
-        chatEnd.textContent = 'Evaluando...';
+        chatEnd.textContent = 'Evaluando Chat ' + closingNum + '...';
         chatSend.disabled = true;
 
         try {
-            var res = await fetch('/api/training/end/' + activeSessionId, {method: 'POST'});
+            var res = await fetch('/api/training/end/' + closingSid, {method: 'POST'});
             var data = await res.json();
             if (data.ok) {
-                interactions[activeSessionId].status = 'completed';
-                document.getElementById('trainInputArea').style.display = 'none';
-                chatHeader.textContent = 'Chat ' + interactions[activeSessionId].number + ' ✅ Completado';
+                interactions[closingSid].status = 'completed';
+                // Only update UI if user is still viewing the closed chat
+                if (activeSessionId == closingSid) {
+                    document.getElementById('trainInputArea').style.display = 'none';
+                    chatHeader.textContent = 'Chat ' + closingNum + ' ✅ Completado';
+                }
                 renderSidebar();
                 // If batch is fully complete, redirect to results
                 if (data.batch_complete) {
@@ -224,7 +229,7 @@
                     }, 1500);
                 }
             }
-        } catch(e) { alert('Error al cerrar'); }
+        } catch(e) { alert('Error al cerrar Chat ' + closingNum); }
         chatEnd.disabled = false;
         chatEnd.textContent = 'Cerrar Interacción';
         chatSend.disabled = false;
