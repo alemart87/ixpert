@@ -121,20 +121,44 @@
 
         <div class="dim-card" style="border-left-color:#e65100">
             <h4>4. Velocidad & Productividad</h4>
-            <div class="dim-meta">Base: Tezcan & Zhang (2014) · ICMI Benchmarks · Forrester (2019)</div>
+            <div class="dim-meta">Base: Tezcan & Zhang (2014) · LiveChat (2025) · Wonderlic (2025) · Call Centre Helper · Chatway (2025)</div>
             <p><strong>Qué evalúa:</strong> Rapidez de respuesta medida en palabras por minuto (WPM) y tiempo total de resolución del caso.</p>
-            <p><strong>Por qué importa:</strong> En canales digitales, la investigación de Forrester (2019) establece que la tolerancia del cliente es de aproximadamente <strong>60 segundos para la respuesta inicial</strong> y 90 segundos para respuestas subsiguientes. Sin embargo, investigación de Aksin et al. (2007) demostró que <strong>velocidad sin calidad no mejora la satisfacción</strong> — es un trade-off que los mejores agentes resuelven efectivamente.</p>
-            <p><strong>Cómo se calcula:</strong></p>
-            <div class="formula-box">Velocidad = WPM_normalizado_contra_30WPM × 60% + duración_inversa × 40%</div>
-            <p><strong>Nota sobre el cálculo de WPM:</strong> El sistema calcula las palabras por minuto usando el <strong>tiempo activo de tipeo</strong>, no el tiempo total de la sesión. Para cada mensaje del asesor, se mide el intervalo entre la respuesta del cliente y el envío del mensaje del asesor (con un tope de 120 segundos por mensaje para evitar inflación por inactividad). Esto refleja con mayor precisión la velocidad real de escritura en contexto de chat.</p>
-            <p><strong>Benchmarks contextualizados para chat de atención:</strong></p>
-            <p>El benchmark de 30 WPM refleja la realidad del soporte por chat: el asesor lee el mensaje del cliente, analiza la situación, consulta procedimientos y redacta una respuesta cuidada. Esto es significativamente diferente a la velocidad de tipeo puro (40-60 WPM promedio), ya que incluye tiempo de procesamiento cognitivo.</p>
+            <p><strong>Por qué importa:</strong> En canales digitales, la tolerancia del cliente es de aproximadamente <strong>60 segundos para la respuesta inicial</strong> y 90 segundos para respuestas subsiguientes. Sin embargo, investigación de Aksin et al. (2007) demostró que <strong>velocidad sin calidad no mejora la satisfacción</strong> — es un trade-off que los mejores agentes resuelven efectivamente.</p>
+
+            <h4 style="margin-top:18px;color:#e65100">⚠ Distinción clave: WPM de tipeo puro vs. WPM efectivo</h4>
+            <p>Es fundamental entender que existen <strong>dos métricas diferentes</strong> de palabras por minuto:</p>
+
             <table class="doc-table">
-                <tr><th>WPM</th><th>Nivel</th><th>Interpretación</th></tr>
-                <tr><td>&lt; 10</td><td>Bajo</td><td>Necesita mejorar velocidad de respuesta</td></tr>
-                <tr><td>10-20</td><td>Aceptable</td><td>Cumple mínimo operativo</td></tr>
-                <tr><td>20-30</td><td>Proficiente</td><td>Buen nivel para canales digitales</td></tr>
-                <tr><td>30+</td><td>Experto</td><td>Velocidad óptima</td></tr>
+                <tr><th>Concepto</th><th>WPM de Tipeo Puro</th><th>WPM Efectivo (usado por Vex)</th></tr>
+                <tr><td><strong>Qué mide</strong></td><td>Velocidad de escritura en un test de tipeo (copiar texto)</td><td>Palabras producidas por minuto incluyendo lectura, análisis y composición de respuesta</td></tr>
+                <tr><td><strong>Benchmark industria</strong></td><td>40-80 WPM para agentes de chat</td><td>~25-35 WPM en contexto real de atención</td></tr>
+                <tr><td><strong>Qué incluye</strong></td><td>Solo el acto de escribir</td><td>Leer mensaje del cliente + analizar situación + consultar procedimiento + redactar respuesta</td></tr>
+            </table>
+
+            <p><strong>Benchmarks de tipeo puro de la industria</strong> (fuentes verificables):</p>
+            <table class="doc-table">
+                <tr><th>Fuente</th><th>WPM recomendado</th><th>Contexto</th></tr>
+                <tr><td><a href="https://www.livechat.com/success/what-is-a-good-typing-speed/" target="_blank">LiveChat.com</a></td><td>50-70 WPM</td><td>Agentes de live chat, tipeo puro esperado</td></tr>
+                <tr><td><a href="https://wonderlic.com/blog/assessments/skills/what-is-a-good-typing-speed-by-profession/" target="_blank">Wonderlic</a></td><td>50-70 WPM</td><td>Customer service & admin roles</td></tr>
+                <tr><td><a href="https://www.wecreateproblems.com/blog/good-typing-speed" target="_blank">WeCP</a></td><td>60-80 WPM</td><td>Customer support agents (live chat/email)</td></tr>
+                <tr><td><a href="https://www.callcentrehelper.com/should-we-teach-contact-centre-staff-to-touch-type-92128.htm" target="_blank">Call Centre Helper</a></td><td>40 WPM (promedio), 65-75 (touch typing)</td><td>Contact centre staff general</td></tr>
+                <tr><td><a href="https://chatway.app/blog/strategies-for-improving-writing-speed-in-live-chat-free-tools" target="_blank">Chatway</a></td><td>55-70 WPM (intermedio), 75-90+ (avanzado)</td><td>Live chat agents, noting agents must "read, think, and type at the same time"</td></tr>
+            </table>
+
+            <p><strong>Por qué Vex usa 30 WPM como benchmark (WPM efectivo):</strong></p>
+            <p>Nuestro sistema mide el <strong>WPM efectivo</strong>: el intervalo entre que el cliente envía su mensaje y el asesor envía su respuesta. Este tiempo incluye lectura, comprensión, análisis y redacción. Como señala <a href="https://chatway.app/blog/strategies-for-improving-writing-speed-in-live-chat-free-tools" target="_blank">Chatway</a>: <em>"Live chat requires agents to read, think, and type at the same time while the customer waits on the screen"</em>. Si un agente tiene 50 WPM de tipeo puro pero dedica ~40-50% de su tiempo de respuesta a leer y pensar, su WPM efectivo será de ~25-30 WPM. El benchmark de 30 WPM refleja esta realidad operativa.</p>
+
+            <p><strong>Cómo se calcula:</strong></p>
+            <div class="formula-box">Velocidad = WPM_efectivo_normalizado_contra_30WPM × 60% + duración_inversa × 40%</div>
+            <p><strong>Cálculo técnico del WPM efectivo:</strong> Para cada mensaje del asesor, se mide el intervalo entre la respuesta del cliente (timestamp) y el envío del mensaje del asesor. Se aplica un tope de 120 segundos por mensaje para evitar inflación por inactividad (el asesor dejó la sesión abierta sin responder). El WPM se calcula como: <code>total_palabras_asesor / tiempo_activo_total_minutos</code>.</p>
+
+            <p><strong>Escala de WPM Efectivo (Vex):</strong></p>
+            <table class="doc-table">
+                <tr><th>WPM Efectivo</th><th>Nivel</th><th>Interpretación</th><th>Equivalente tipeo puro aprox.</th></tr>
+                <tr><td>&lt; 10</td><td>Bajo</td><td>Necesita mejorar velocidad de respuesta</td><td>&lt; 20 WPM</td></tr>
+                <tr><td>10-20</td><td>Aceptable</td><td>Cumple mínimo operativo</td><td>20-40 WPM</td></tr>
+                <tr><td>20-30</td><td>Proficiente</td><td>Buen nivel para canales digitales</td><td>40-60 WPM</td></tr>
+                <tr><td>30+</td><td>Experto</td><td>Velocidad óptima</td><td>60+ WPM</td></tr>
             </table>
         </div>
 
@@ -260,7 +284,7 @@
             <li><strong>Simulación vs. Realidad:</strong> Los resultados se basan en entrenamiento simulado. El rendimiento real puede variar por factores como presión del volumen, multitasking, y complejidad de casos reales.</li>
             <li><strong>Tamaño de muestra:</strong> Con pocas sesiones (&lt;4), el perfil es preliminar. Se recomienda un mínimo de 7 sesiones para decisiones de incorporación.</li>
             <li><strong>Evaluación IA:</strong> La calificación NPS y el feedback son generados por IA (GPT-4o-mini). Aunque consistentes, pueden no capturar matices que un evaluador humano detectaría.</li>
-            <li><strong>Contexto de WPM:</strong> El benchmark de 30 WPM está calibrado para chat de atención al cliente, donde el asesor lee, analiza y redacta. No es comparable con velocidad de tipeo puro. El cálculo usa tiempo activo de tipeo (gap entre respuesta del cliente y envío del asesor, con tope de 120s por mensaje).</li>
+            <li><strong>Contexto de WPM:</strong> El sistema mide <strong>WPM efectivo</strong> (incluye lectura + análisis + redacción), no WPM de tipeo puro. Los benchmarks de la industria para tipeo puro en chat son de 40-80 WPM (<a href="https://www.livechat.com/success/what-is-a-good-typing-speed/" target="_blank">LiveChat</a>, <a href="https://wonderlic.com/blog/assessments/skills/what-is-a-good-typing-speed-by-profession/" target="_blank">Wonderlic</a>). Nuestro benchmark de 30 WPM efectivo equivale aproximadamente a 50-60 WPM de tipeo puro, alineado con el estándar de la industria. El cálculo usa tiempo activo de tipeo (gap entre respuesta del cliente y envío del asesor, con tope de 120s por mensaje).</li>
             <li><strong>Complementariedad:</strong> Este sistema es una herramienta de apoyo, no un sustituto de entrevistas, evaluaciones presenciales, u otros métodos de selección.</li>
         </ul>
     </div>
@@ -285,6 +309,13 @@
         <div class="ref-item">Spreng, R.N., McKinnon, M.C., Mar, R.A. & Levine, B. (2009). "The Toronto Empathy Questionnaire: Scale development and initial validation." <em>Journal of Personality Assessment</em>, 91(1), 62-71.</div>
         <div class="ref-item">SQM Group (2019). <em>First Call Resolution: The Performance Driver and Metric</em>. Coeur d'Alene, ID: SQM Group Inc.</div>
         <div class="ref-item">Tezcan, T. & Zhang, J. (2014). "Routing and Staffing in Customer Service Chat Systems with Impatient Customers." <em>Operations Research</em>, 62(4), 943-956.</div>
+
+        <h3 style="margin-top:20px;color:#004080">Fuentes de Benchmarks de WPM en la Industria</h3>
+        <div class="ref-item">LiveChat (2025). "What Is a Good Typing Speed and Average WPM for Employees?" <em>LiveChat Success</em>. Disponible en: <a href="https://www.livechat.com/success/what-is-a-good-typing-speed/" target="_blank">livechat.com/success/what-is-a-good-typing-speed</a> — Benchmark: 50-70 WPM para agentes de chat (tipeo puro).</div>
+        <div class="ref-item">Wonderlic (2025). "What's a Good Typing Speed? Average WPM by Profession." <em>Wonderlic Blog</em>. Disponible en: <a href="https://wonderlic.com/blog/assessments/skills/what-is-a-good-typing-speed-by-profession/" target="_blank">wonderlic.com/blog/assessments/skills/what-is-a-good-typing-speed-by-profession</a> — Benchmark: 50-70 WPM para customer service & admin roles.</div>
+        <div class="ref-item">WeCP - We Create Problems (2025). "What is a Good Typing Speed for Employees & Why?" Disponible en: <a href="https://www.wecreateproblems.com/blog/good-typing-speed" target="_blank">wecreateproblems.com/blog/good-typing-speed</a> — Benchmark: 60-80 WPM para customer support agents.</div>
+        <div class="ref-item">Call Centre Helper. "Should We Teach Contact Centre Staff to Touch Type?" Disponible en: <a href="https://www.callcentrehelper.com/should-we-teach-contact-centre-staff-to-touch-type-92128.htm" target="_blank">callcentrehelper.com/should-we-teach-contact-centre-staff-to-touch-type</a> — Promedio: 35-42 WPM (sin touch typing), 65-75 WPM (con touch typing).</div>
+        <div class="ref-item">Chatway (2025). "12+ Strategies to Improve Writing Speed in Live Chat." <em>Chatway Blog</em>. Disponible en: <a href="https://chatway.app/blog/strategies-for-improving-writing-speed-in-live-chat-free-tools" target="_blank">chatway.app/blog/strategies-for-improving-writing-speed-in-live-chat</a> — Nota clave: "Live chat requires agents to read, think, and type at the same time while the customer waits." Benchmark: 55-70 WPM (intermedio), 75-90+ WPM (avanzado).</div>
     </div>
 
     <!-- 8. Disclaimer -->
