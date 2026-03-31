@@ -130,7 +130,7 @@ def login():
                 print(f"[AUTH] Login SUCCESS for {email}", flush=True)
                 return redirect(url_for('index'))
 
-        flash('Email o contraseña incorrectos.', 'error')
+        flash('Usuario o contraseña incorrectos.', 'error')
         print(f"[AUTH] Login FAILED for {email}", flush=True)
 
     return render_template('login.html')
