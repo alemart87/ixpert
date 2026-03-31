@@ -125,14 +125,16 @@
             <p><strong>Qué evalúa:</strong> Rapidez de respuesta medida en palabras por minuto (WPM) y tiempo total de resolución del caso.</p>
             <p><strong>Por qué importa:</strong> En canales digitales, la investigación de Forrester (2019) establece que la tolerancia del cliente es de aproximadamente <strong>60 segundos para la respuesta inicial</strong> y 90 segundos para respuestas subsiguientes. Sin embargo, investigación de Aksin et al. (2007) demostró que <strong>velocidad sin calidad no mejora la satisfacción</strong> — es un trade-off que los mejores agentes resuelven efectivamente.</p>
             <p><strong>Cómo se calcula:</strong></p>
-            <div class="formula-box">Velocidad = WPM_normalizado_contra_50WPM × 60% + duración_inversa × 40%</div>
-            <p><strong>Benchmarks de la industria (ICMI):</strong></p>
+            <div class="formula-box">Velocidad = WPM_normalizado_contra_30WPM × 60% + duración_inversa × 40%</div>
+            <p><strong>Nota sobre el cálculo de WPM:</strong> El sistema calcula las palabras por minuto usando el <strong>tiempo activo de tipeo</strong>, no el tiempo total de la sesión. Para cada mensaje del asesor, se mide el intervalo entre la respuesta del cliente y el envío del mensaje del asesor (con un tope de 120 segundos por mensaje para evitar inflación por inactividad). Esto refleja con mayor precisión la velocidad real de escritura en contexto de chat.</p>
+            <p><strong>Benchmarks contextualizados para chat de atención:</strong></p>
+            <p>El benchmark de 30 WPM refleja la realidad del soporte por chat: el asesor lee el mensaje del cliente, analiza la situación, consulta procedimientos y redacta una respuesta cuidada. Esto es significativamente diferente a la velocidad de tipeo puro (40-60 WPM promedio), ya que incluye tiempo de procesamiento cognitivo.</p>
             <table class="doc-table">
                 <tr><th>WPM</th><th>Nivel</th><th>Interpretación</th></tr>
-                <tr><td>&lt; 20</td><td>Bajo</td><td>Necesita mejorar velocidad de respuesta</td></tr>
-                <tr><td>20-35</td><td>Aceptable</td><td>Cumple mínimo operativo</td></tr>
-                <tr><td>35-50</td><td>Proficiente</td><td>Buen nivel para canales digitales</td></tr>
-                <tr><td>50+</td><td>Experto</td><td>Velocidad óptima</td></tr>
+                <tr><td>&lt; 10</td><td>Bajo</td><td>Necesita mejorar velocidad de respuesta</td></tr>
+                <tr><td>10-20</td><td>Aceptable</td><td>Cumple mínimo operativo</td></tr>
+                <tr><td>20-30</td><td>Proficiente</td><td>Buen nivel para canales digitales</td></tr>
+                <tr><td>30+</td><td>Experto</td><td>Velocidad óptima</td></tr>
             </table>
         </div>
 
@@ -168,7 +170,7 @@
             <li>Cada mensaje enviado por el asesor y la IA-cliente, con timestamp</li>
             <li>Conteo de palabras por mensaje</li>
             <li>Tiempo total de la sesión (en segundos)</li>
-            <li>Palabras por minuto (WPM) calculadas en tiempo real</li>
+            <li>Palabras por minuto (WPM) calculadas al finalizar la sesión usando tiempo activo de tipeo</li>
             <li>Evaluación de IA al finalizar: NPS (0-10), respuesta correcta (sí/no), errores ortográficos detectados, feedback cualitativo con fortalezas y áreas de mejora</li>
         </ul>
 
@@ -186,7 +188,7 @@
         <p>Con muestras pequeñas (&lt;50 usuarios), se utilizan <strong>puntos de referencia criteriales</strong> (criterion-referenced) basados en benchmarks de la industria (ICMI, COPC) en lugar de normas poblacionales. A medida que la muestra crece, las normas se actualizan automáticamente.</p>
 
         <h3>Paso 4 — Scoring por Dimensión</h3>
-        <p>Cada dimensión combina métricas cuantitativas (WPM, errores, duración) con evaluaciones cualitativas de IA (NPS, feedback) mediante <strong>fórmulas ponderadas</strong>. Los pesos dentro de cada dimensión se asignan según la relevancia teórica de cada componente.</p>
+        <p>Cada dimensión combina métricas cuantitativas (WPM, errores, duración) con evaluaciones cualitativas de IA (NPS, feedback) mediante <strong>fórmulas ponderadas</strong>. Los pesos dentro de cada dimensión se asignan según la relevancia teórica de cada componente. El WPM se normaliza contra un benchmark de <strong>30 WPM</strong>, calibrado para el contexto real de chat de atención al cliente.</p>
 
         <h3>Paso 5 — Índice Predictivo de Incorporación</h3>
         <p>Score compuesto ponderado que integra las 6 dimensiones. Los pesos se fundamentan en investigación de <strong>validez criterial</strong> (Dawes, 1979; Feinberg et al., 2000):</p>
@@ -258,7 +260,7 @@
             <li><strong>Simulación vs. Realidad:</strong> Los resultados se basan en entrenamiento simulado. El rendimiento real puede variar por factores como presión del volumen, multitasking, y complejidad de casos reales.</li>
             <li><strong>Tamaño de muestra:</strong> Con pocas sesiones (&lt;4), el perfil es preliminar. Se recomienda un mínimo de 7 sesiones para decisiones de incorporación.</li>
             <li><strong>Evaluación IA:</strong> La calificación NPS y el feedback son generados por IA (GPT-4o-mini). Aunque consistentes, pueden no capturar matices que un evaluador humano detectaría.</li>
-            <li><strong>Contexto cultural:</strong> Los benchmarks de WPM se basan en datos globales. Ajustar según el mercado local si es necesario.</li>
+            <li><strong>Contexto de WPM:</strong> El benchmark de 30 WPM está calibrado para chat de atención al cliente, donde el asesor lee, analiza y redacta. No es comparable con velocidad de tipeo puro. El cálculo usa tiempo activo de tipeo (gap entre respuesta del cliente y envío del asesor, con tope de 120s por mensaje).</li>
             <li><strong>Complementariedad:</strong> Este sistema es una herramienta de apoyo, no un sustituto de entrevistas, evaluaciones presenciales, u otros métodos de selección.</li>
         </ul>
     </div>
