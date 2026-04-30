@@ -316,6 +316,29 @@
         </table>
     </div>
 
+    <!-- 5.5 Manejo de sesiones auto-fail -->
+    <div class="doc-section">
+        <h2>5.5 Manejo de Sesiones Auto-Fail (Anti-abandono)</h2>
+        <p>Una sesión se marca <strong>auto-fail</strong> cuando el asesor envió menos de 2 mensajes o escribió menos de 8 palabras totales. Estas sesiones reciben <code>nps_score = 1</code> automáticamente sin llamar a la IA (ahorra tokens) y no tienen breakdown de empatía ni ART medible.</p>
+
+        <p><strong>El problema histórico:</strong> 1 sesión buena + 4 auto-fails podía generar un perfil "Recomendado" porque las auto-fails se ignoraban del cálculo en varias dimensiones. La sesión buena dominaba el promedio.</p>
+
+        <h3>Reglas anti-abandono aplicadas</h3>
+        <table class="doc-table">
+            <tr><th>Dimensión</th><th>Tratamiento de auto-fails</th></tr>
+            <tr><td><strong>Empatía</strong></td><td>Cuentan como "los 4 pilares en false" (denominador = total de sesiones, no solo las que tienen breakdown).</td></tr>
+            <tr><td><strong>Velocidad</strong></td><td>Sin ART medible → entran al promedio del ART como <code>slow_max</code> (cap del modo). Penalizan como "muy lento".</td></tr>
+            <tr><td><strong>Adaptabilidad</strong></td><td><code>variety</code> solo cuenta escenarios donde <code>response_correct=true</code> o <code>nps_score ≥ 6</code>. Abandonar 3 escenarios distintos NO suma variedad.</td></tr>
+        </table>
+
+        <h3>Hard cap de seguridad</h3>
+        <p>Como red de protección independiente de la fórmula:</p>
+        <div class="formula-box">abandonment_rate = autofails / total_sessions<br><br>si abandonment_rate &gt; 0.4:<br>&nbsp;&nbsp;si categoria ∈ {Elite, Alto} → categoria = Desarrollo<br>&nbsp;&nbsp;si recomendacion = Recomendado → recomendacion = Observaciones</div>
+        <p>Aplica <strong>después</strong> del cálculo de PI/categoría/recomendación, asegurando que un asesor con más del 40% de sesiones abandonadas no pueda calificar como Recomendado/Alto/Elite, sin importar qué tan bien le haya ido en las que sí completó.</p>
+
+        <p><strong>Sesiones legacy genuinas</strong> (anteriores a la migración v5, sin ART por antigüedad pero <em>no</em> auto-fails) siguen recibiendo el puntaje neutro del modo. Solo las auto-fails sin ART penalizan.</p>
+    </div>
+
     <!-- 6. Limitations -->
     <div class="doc-section">
         <h2>6. Limitaciones y Consideraciones</h2>

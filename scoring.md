@@ -248,6 +248,38 @@ Umbrales del modo **Standard** (más alcanzables que la versión inicial):
 
 Antes era 70% / 50%. Bajamos 5 puntos para alinear con la curva más generosa. **Flexible** los relaja a 55% / 35%; **Exigente** los endurece a 75% / 55%.
 
+### 2.8 Manejo de sesiones auto-fail (anti-abandono)
+
+Una sesión es **auto-fail** cuando el asesor no llegó al mínimo de interacción real:
+
+```
+is_autofail(s) = (s.total_words_user < 8) OR (s.total_messages < 2)
+```
+
+Las auto-fails reciben `nps_score = 1` automáticamente sin gastar tokens en evaluación IA. Pero eso no alcanza: si no se las trata bien, **distorsionan las dimensiones agregadas** porque carecen de breakdown de empatía, ART medible, etc. Histórico: 1 sesión buena + 4 auto-fails podía salir "Recomendado".
+
+**Reglas anti-abandono:**
+
+| Dimensión | Antes | Ahora |
+|-----------|-------|-------|
+| **Empatía** | Auto-fails se ignoraban del cálculo (denominador = `pillar_count`) | Auto-fails cuentan como "los 4 pilares en false" (denominador = `total_sessions`) |
+| **Velocidad** | Sin ART medible → `art_curve.no_data_score` (65, neutro) | Auto-fails sin ART → entran al promedio como `art_curve.slow_max` (penalizan como "muy lento") |
+| **Adaptabilidad** | `variety` contaba cualquier escenario abierto | `variety` solo cuenta escenarios donde `response_correct=True` o `nps_score >= 6` |
+
+**Hard cap de seguridad:**
+
+```
+abandonment_rate = autofail_count / total_sessions
+
+si abandonment_rate > 0.4:
+    si category in ('elite', 'alto') → category = 'desarrollo'
+    si rec == 'recomendado'           → rec = 'observaciones'
+```
+
+Esta regla actúa **después** del cálculo de PI/categoría/recomendación, como red de seguridad por si alguna combinación de overrides lograra igual producir un PI alto.
+
+**Sesiones legacy genuinas** (sin ART por venir de antes de la migración v5, pero **no** auto-fails) siguen recibiendo el `no_data_score` del modo. Solo las auto-fails sin ART penalizan.
+
 ---
 
 ## 3. ART — Average Response Time
@@ -301,6 +333,10 @@ Sesiones existentes tienen `avg_response_time = 0` (default DB) y reciben puntaj
 | Recomendado | PI ≥ 70% | PI ≥ 65% (Standard) |
 | Observaciones | 50–70% | 45–65% (Standard) |
 | Modos | único (implícito) | 3 modos (Flexible / Standard / Exigente) + overrides editables |
+| Sesiones auto-fail (empatía) | excluidas del promedio | cuentan como pilares en false |
+| Sesiones auto-fail (velocidad) | puntaje neutro (65) | entran como `slow_max` (penalizan) |
+| Variety (adaptabilidad) | cualquier escenario abierto | solo escenarios resueltos bien o NPS ≥ 6 |
+| Hard cap por abandono | sin tope | si abandonment > 40% → max Desarrollo / Observaciones |
 
 ---
 

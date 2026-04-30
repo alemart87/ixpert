@@ -1171,6 +1171,16 @@ def calculate_vex_profile(user_id):
 
     # --- Raw metric aggregation ---
     total_sessions = len(sessions)
+
+    # Auto-fail proxy: misma logica que end_session usa para auto-marcar la sesion.
+    # Una sesion donde el asesor no llego a 2 mensajes o 8 palabras es un abandono
+    # de hecho, sin importar el NPS (que la IA pone en 1 sin evaluar).
+    def _is_autofail(s):
+        return (s.total_words_user or 0) < 8 or (s.total_messages or 0) < 2
+
+    autofail_count = sum(1 for s in sessions if _is_autofail(s))
+    abandonment_rate = autofail_count / total_sessions if total_sessions else 0
+
     total_words = sum(s.total_words_user or 0 for s in sessions)
     total_spelling = sum(s.spelling_errors or 0 for s in sessions)
     avg_nps = sum(s.nps_score or 0 for s in sessions) / total_sessions
@@ -1180,17 +1190,38 @@ def calculate_vex_profile(user_id):
     # Spelling rate: errores por palabra. Solo contamos errores que afectan
     # comprension (el prompt de IA ya filtra tildes/abreviaciones).
     spelling_rate = total_spelling / max(total_words, 1)
-    unique_scenarios = len(set(s.scenario_id for s in sessions))
+    # Variedad: solo cuentan escenarios donde el asesor obtuvo response_correct=True
+    # o un NPS razonable (>=6). Intentar y abandonar NO suma variedad — sino, basta
+    # con abrir y cerrar 3 escenarios distintos para sacar 100% de variety.
+    successful_scenarios = set(
+        s.scenario_id for s in sessions
+        if s.response_correct or (s.nps_score is not None and s.nps_score >= 6)
+    )
+    unique_scenarios = len(successful_scenarios)
     total_scenarios = TrainingScenario.query.filter_by(is_active=True).count() or 1
 
-    # ART (Average Response Time) — promedio del tiempo medio de respuesta
-    # del asesor en cada sesion. Solo considera sesiones con ART medible.
-    art_values = [s.avg_response_time for s in sessions if s.avg_response_time and s.avg_response_time > 0]
-    avg_art = sum(art_values) / len(art_values) if art_values else 0  # segundos
+    # ART (Average Response Time) — promedio del tiempo de respuesta del asesor.
+    # Las sesiones auto-fail no tienen ART medible (abandonaron sin chatear), pero
+    # NO podemos darles el "no_data_score" neutro: eso premiaria abandonar. Las
+    # contamos al promedio como si su ART fuera el cap de "lento" (slow_max), para
+    # que efectivamente penalicen como sesion muy lenta.
+    art_for_avg = []
+    for s in sessions:
+        if s.avg_response_time and s.avg_response_time > 0:
+            art_for_avg.append(s.avg_response_time)
+        elif _is_autofail(s):
+            # Abandono sin ART medible -> penalizar como muy lento (cap del modo).
+            art_for_avg.append(float(art_curve['slow_max']))
+        # else: sesion legacy genuina sin ART, se omite y cae al no_data_score.
+    avg_art = sum(art_for_avg) / len(art_for_avg) if art_for_avg else 0  # segundos
 
-    # Empathy breakdown agregado: promedio del cumplimiento de cada pilar.
+    # Empathy breakdown agregado: dividimos por TOTAL de sesiones, no solo por las
+    # que tienen breakdown. Asi una auto-fail (que no llamo a la IA y por ende no
+    # tiene breakdown) cuenta como "los 4 pilares en false" y arrastra el promedio
+    # hacia abajo, en vez de quedar fuera del calculo y dejar que las pocas sesiones
+    # buenas dominen.
     empathy_pillars = {'nombre': 0, 'contexto': 0, 'calidez': 0, 'resolucion': 0}
-    pillar_count = 0
+    pillar_count = 0  # sesiones con breakdown real (para detectar legacy puro)
     for s in sessions:
         if not s.ai_feedback:
             continue
@@ -1205,7 +1236,7 @@ def calculate_vex_profile(user_id):
         except (json.JSONDecodeError, TypeError):
             pass
     empathy_pillar_rate = {
-        k: (v / pillar_count) if pillar_count else 0 for k, v in empathy_pillars.items()
+        k: (v / total_sessions) if total_sessions else 0 for k, v in empathy_pillars.items()
     }
 
     # Improvement trend (NPS slope across sessions ordered by date)
@@ -1315,6 +1346,17 @@ def calculate_vex_profile(user_id):
         rec = 'observaciones'
     else:
         rec = 'no_recomendado'
+
+    # --- Hard cap por tasa de abandono ---
+    # Regla de seguridad independiente de la formula: si el asesor abandono mas
+    # del 40% de sus sesiones, no puede ser Elite/Alto ni "Recomendado", sin
+    # importar lo bien que le haya ido en las que si completo. Esto bloquea el
+    # caso donde 1 sesion buena + 4 auto-fails generan un PI artificialmente alto.
+    if abandonment_rate > 0.4:
+        if category in ('elite', 'alto'):
+            category = 'desarrollo'
+        if rec == 'recomendado':
+            rec = 'observaciones'
 
     # --- Save/Update ---
     profile = VexProfile.query.filter_by(user_id=user_id).first()
