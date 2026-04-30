@@ -37,10 +37,13 @@ DEFAULT_MODES = {
             'empathy': 0.25, 'resolution': 0.20, 'communication': 0.20,
             'speed': 0.15, 'adaptability': 0.10, 'compliance': 0.10
         },
-        # Pisos por dimension (raw 0-100)
+        # Pisos por dimension (raw 0-100). Antes eran 35/35/35/35/75 — demasiado
+        # altos: cualquier sesion no auto-fail arrancaba en Sten 4 y casi cualquier
+        # perfil terminaba en Sten 6+ ignorando el NPS. Bajamos para que el modo
+        # siga siendo indulgente sin anular la evaluacion.
         'floors': {
-            'communication': 35, 'resolution': 35, 'adaptability': 35,
-            'compliance': 35, 'empathy': 0, 'speed_no_data': 75
+            'communication': 25, 'resolution': 25, 'adaptability': 25,
+            'compliance': 25, 'empathy': 0, 'speed_no_data': 60
         },
         'spelling_multiplier': 35,        # Saturacion al 2.85% de errores
         'empathy_pillars_weight': 0.6,    # 60% pilares + 40% NPS
