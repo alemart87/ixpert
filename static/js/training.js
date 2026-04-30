@@ -105,10 +105,13 @@
     }
 
     function selectChat(sid) {
+        // Limpiar indicador de "cliente leyendo" del chat que estamos dejando
+        var prev = document.getElementById('clientWaiting');
+        if (prev) prev.remove();
+
         activeSessionId = sid;
         var i = interactions[sid];
         chatHeader.textContent = 'Chat ' + i.number + (i.status === 'completed' ? ' ✅ Completado' : '');
-        // Re-render from state (prevents message mixing)
         renderChat(sid);
 
         if (i.status === 'completed') {
@@ -117,6 +120,14 @@
             document.getElementById('trainInputArea').style.display = 'flex';
             chatInput.focus();
         }
+
+        // Si el chat al que entramos tiene countdown activo, mostrar el indicador
+        var t = flushTimers && flushTimers[sid];
+        if (t && t.deadline) {
+            var remaining = Math.max(0, Math.ceil((t.deadline - Date.now()) / 1000));
+            updateClientWaitingUI(sid, remaining);
+        }
+
         renderSidebar();
     }
 
@@ -167,9 +178,15 @@
         }
     });
 
+    // ===== Debounce flow: encolar -> esperar N segundos -> flush =====
+    var DEFAULT_DELAY = (window.CLIENT_DELAY_SECONDS && window.CLIENT_DELAY_SECONDS > 0)
+        ? window.CLIENT_DELAY_SECONDS : 30;
+    var flushTimers = {};      // sid -> { intervalId, deadline, remaining }
+    var flushInFlight = {};    // sid -> bool
+
     async function sendMsg() {
         if (!activeSessionId) return;
-        var sendingSid = activeSessionId;  // Capture which chat we're sending from
+        var sendingSid = activeSessionId;
         var i = interactions[sendingSid];
         if (i.status !== 'active') return;
         var text = chatInput.value.trim();
@@ -180,36 +197,125 @@
         chatSend.disabled = true;
         i.messages.push({role: 'user', content: text});
         addMsgToDOM('user', text);
-        chatTyping.classList.add('active');
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
+        // 1) Persistir en backend (sin disparar IA)
+        var delayUsed = DEFAULT_DELAY;
         try {
-            var res = await fetch('/api/training/message', {
+            var res = await fetch('/api/training/queue', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({session_id: parseInt(sendingSid), message: text})
             });
             var data = await res.json();
-            chatTyping.classList.remove('active');
-            if (data.response) {
-                i.messages.push({role: 'client', content: data.response});
-                // Only add to DOM if this chat is still the active one
-                if (activeSessionId == sendingSid) {
-                    addMsgToDOM('client', data.response);
-                } else {
-                    // User switched chats; sidebar preview will update
-                    renderSidebar();
+            if (data && data.client_response_delay_seconds) {
+                delayUsed = parseInt(data.client_response_delay_seconds, 10) || DEFAULT_DELAY;
+            }
+        } catch(e) { /* el mensaje ya esta en UI; el flush volvera a intentar */ }
+
+        chatSend.disabled = false;
+        if (activeSessionId == sendingSid) chatInput.focus();
+
+        // 2) (Re)iniciar countdown para esta sesion
+        startFlushCountdown(sendingSid, delayUsed);
+        renderSidebar();
+        return;
+    }
+
+    // Inicia o reinicia el countdown de "cliente leyendo" para una sesion.
+    // Cada nuevo mensaje del asesor lo reinicia (debounce).
+    function startFlushCountdown(sid, delaySeconds) {
+        cancelFlushCountdown(sid);
+        var deadline = Date.now() + delaySeconds * 1000;
+        var entry = { deadline: deadline, intervalId: null };
+        flushTimers[sid] = entry;
+
+        function tick() {
+            var remaining = Math.max(0, Math.ceil((entry.deadline - Date.now()) / 1000));
+            updateClientWaitingUI(sid, remaining);
+            if (remaining <= 0) {
+                clearInterval(entry.intervalId);
+                delete flushTimers[sid];
+                triggerFlush(sid);
+            }
+        }
+        tick(); // pinta inmediato
+        entry.intervalId = setInterval(tick, 1000);
+    }
+
+    function cancelFlushCountdown(sid) {
+        var t = flushTimers[sid];
+        if (t && t.intervalId) clearInterval(t.intervalId);
+        delete flushTimers[sid];
+        hideClientWaitingUI(sid);
+    }
+
+    async function triggerFlush(sid) {
+        if (flushInFlight[sid]) {
+            // Si ya hay un flush en vuelo, reprogramar para despues.
+            // Cuando termine el flush en curso, el JS volvera a evaluar pendientes.
+            startFlushCountdown(sid, 2);
+            return;
+        }
+        flushInFlight[sid] = true;
+        hideClientWaitingUI(sid);
+        // Mostrar typing solo si el chat activo es este
+        if (activeSessionId == sid) chatTyping.classList.add('active');
+
+        try {
+            var res = await fetch('/api/training/flush', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({session_id: parseInt(sid)})
+            });
+            var data = await res.json();
+            if (activeSessionId == sid) chatTyping.classList.remove('active');
+
+            if (data && data.response) {
+                var i = interactions[sid];
+                if (i) {
+                    i.messages.push({role: 'client', content: data.response});
+                    if (activeSessionId == sid) {
+                        addMsgToDOM('client', data.response);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
                 }
             }
         } catch(e) {
-            chatTyping.classList.remove('active');
-            if (activeSessionId == sendingSid) {
-                addMsgToDOM('client', 'Error de conexión.');
+            if (activeSessionId == sid) {
+                chatTyping.classList.remove('active');
+                addMsgToDOM('client', 'Error de conexión. Probá enviar otro mensaje.');
             }
+        } finally {
+            flushInFlight[sid] = false;
+            renderSidebar();
         }
-        chatSend.disabled = false;
-        if (activeSessionId == sendingSid) chatInput.focus();
-        renderSidebar();
+    }
+
+    // UI auxiliar: indicador "💭 Cliente leyendo... 28s"
+    function getOrCreateWaitingEl(sid) {
+        if (activeSessionId != sid) return null;
+        var el = document.getElementById('clientWaiting');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'clientWaiting';
+            el.className = 'client-waiting';
+            el.innerHTML = '<span class="cw-dot"></span><span class="cw-text"></span>';
+            chatMessages.appendChild(el);
+        }
+        return el;
+    }
+    function updateClientWaitingUI(sid, remaining) {
+        var el = getOrCreateWaitingEl(sid);
+        if (!el) return;
+        var txt = el.querySelector('.cw-text');
+        txt.textContent = 'Cliente está leyendo y respondiendo… ' + remaining + 's';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    function hideClientWaitingUI(sid) {
+        if (activeSessionId != sid) return;
+        var el = document.getElementById('clientWaiting');
+        if (el) el.remove();
     }
 
     // End individual interaction
@@ -218,6 +324,9 @@
         var closingSid = activeSessionId;  // Capture BEFORE confirm/async
         var closingNum = interactions[closingSid].number;
         if (!confirm('¿Cerrar Chat ' + closingNum + '? Se evaluará individualmente.')) return;
+
+        // Si habia un countdown corriendo, cancelarlo: la sesion se va a evaluar.
+        cancelFlushCountdown(closingSid);
 
         chatEnd.disabled = true;
         chatEnd.textContent = 'Evaluando Chat ' + closingNum + '...';
