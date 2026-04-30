@@ -172,6 +172,7 @@
         <a href="#art">⏱ Tiempo de respuesta (ART)</a>
         <a href="#delay">⏳ Espera del cliente simulado</a>
         <a href="#empatia">💛 Rúbrica de empatía</a>
+        <a href="#abandono">🛡 Fix abandonos</a>
         <a href="#ortografia">📝 Ortografía más justa</a>
         <a href="#ia">🤖 Nuevo motor de IA</a>
         <a href="#chat">💬 Chat más cómodo</a>
@@ -391,6 +392,36 @@
             </ul>
 
             <p>Mismo comportamiento en los textareas de creación de escenarios: la "persona del cliente" y la "respuesta esperada" crecen automáticamente con el contenido pegado.</p>
+        </div>
+    </article>
+
+    <!-- 🛡 Fix anti-abandono -->
+    <article class="nov-card featured" id="abandono">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🛡</div>
+            <div class="nov-card-title">
+                <h2>Las sesiones abandonadas ya no inflan el perfil</h2>
+                <p class="subtitle">Si el asesor abandonó muchas sesiones, el sistema lo refleja en el resultado.</p>
+            </div>
+            <span class="nov-card-tag">Importante</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Detectamos un caso donde un asesor con <strong>1 sesión buena + 4 abandonos</strong> (auto-fail por enviar menos de 2 mensajes o 8 palabras) salía como <strong>"Recomendado"</strong>. Las sesiones abandonadas no aportan datos a varias dimensiones, y eso hacía que las pocas sesiones reales dominaran el promedio.</p>
+
+            <p>Ajustamos el cálculo en tres frentes:</p>
+            <ul>
+                <li><strong>Empatía:</strong> antes solo contábamos las sesiones donde la IA evaluaba los 4 pilares. Ahora las sesiones abandonadas <strong>cuentan como "los 4 pilares en cero"</strong> — porque el asesor no demostró empatía, no porque "no haya datos".</li>
+                <li><strong>Velocidad:</strong> antes una sesión sin ART medido recibía un puntaje neutro (65). Eso premiaba abandonar. Ahora un abandono <strong>cuenta como sesión muy lenta</strong> en el promedio del ART y baja el puntaje.</li>
+                <li><strong>Adaptabilidad:</strong> antes "variedad de escenarios" contaba cualquier escenario que el asesor hubiera abierto. Abrir 3 escenarios y abandonar los 3 daba 100% de variedad. Ahora <strong>solo cuentan los escenarios donde el asesor resolvió bien o el cliente quedó satisfecho</strong> (NPS ≥ 6).</li>
+            </ul>
+
+            <div class="nov-highlight">
+                <strong>Tope de seguridad:</strong> si el asesor abandonó <strong>más del 40%</strong> de sus sesiones, el perfil <strong>no puede</strong> ser Elite ni Alto (máximo Desarrollo) y <strong>no puede</strong> ser Recomendado (máximo Observaciones), independientemente del PI calculado. Es una red de protección por si alguna combinación rara igual dejara pasar un caso.
+            </div>
+
+            <p><strong>¿Qué pasa con los perfiles existentes?</strong> Se recalculan automáticamente la próxima vez que el asesor cierra una sesión. Si la operación tiene asesores con muchos abandonos, se les van a corregir las categorías y recomendaciones en cuanto vuelvan a entrenar.</p>
+
+            <p><strong>¿Qué cuenta como "abandono"?</strong> Una sesión donde el asesor envió <strong>menos de 2 mensajes</strong> o escribió <strong>menos de 8 palabras</strong> en total. Es la misma regla que ya usábamos para marcar la sesión con NPS=1 sin gastar tokens en evaluarla.</p>
         </div>
     </article>
 
