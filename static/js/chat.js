@@ -20,6 +20,17 @@
 
     var userName = (window.IXPERT_USER && window.IXPERT_USER.name) ? window.IXPERT_USER.name.split(' ')[0] : '';
 
+    // Auto-resize textarea (texto se envuelve verticalmente)
+    function autoResizeInput() {
+        if (!inputEl) return;
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+    }
+    if (inputEl) {
+        inputEl.addEventListener('input', autoResizeInput);
+        autoResizeInput();
+    }
+
     // Toggle chat
     mascot.addEventListener('click', function() {
         isOpen = true;
@@ -100,6 +111,7 @@
         messagesEl.querySelectorAll('.chat-welcome-topic').forEach(function(el) {
             el.addEventListener('click', function() {
                 inputEl.value = el.dataset.q;
+                autoResizeInput();
                 sendMessage();
             });
         });
@@ -130,6 +142,7 @@
         if (activeTab !== 'chat') switchTab('chat');
 
         inputEl.value = '';
+        autoResizeInput();
         sendBtn.disabled = true;
         addMessage('user', text);
 
