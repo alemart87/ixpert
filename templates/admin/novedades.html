@@ -170,6 +170,7 @@
     <div class="nov-quicknav">
         <a href="#modos">🎯 Modos de evaluación</a>
         <a href="#art">⏱ Tiempo de respuesta (ART)</a>
+        <a href="#delay">⏳ Espera del cliente simulado</a>
         <a href="#empatia">💛 Rúbrica de empatía</a>
         <a href="#ortografia">📝 Ortografía más justa</a>
         <a href="#ia">🤖 Nuevo motor de IA</a>
@@ -246,6 +247,47 @@
             </ul>
 
             <p><strong>¿Y los entrenamientos viejos?</strong> Sesiones que se hicieron antes de este cambio no tienen ART medido. Reciben un puntaje neutro y no se ven perjudicadas.</p>
+        </div>
+    </article>
+
+    <!-- ⏳ Tiempo de respuesta del cliente -->
+    <article class="nov-card featured" id="delay">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">⏳</div>
+            <div class="nov-card-title">
+                <h2>El cliente simulado ahora espera antes de responder</h2>
+                <p class="subtitle">Configurable por escenario, entre 10 y 60 segundos. Más realista, sin afectar al asesor.</p>
+            </div>
+            <span class="nov-card-tag">Nuevo</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Antes el cliente simulado contestaba al instante. En la realidad, un cliente <strong>lee, piensa y tipea</strong>. Eso le daba al entrenamiento un ritmo poco realista — y a veces el asesor enviaba un solo mensaje porque no le daba tiempo a desarrollar la respuesta.</p>
+
+            <p>Ahora cada escenario tiene un parámetro nuevo: <strong>"Tiempo de respuesta del cliente"</strong> (10 a 60 segundos, por defecto 30). Después del último mensaje del asesor, el cliente espera ese tiempo antes de responder. Si el asesor envía otro mensaje en el medio, el contador se reinicia y todos los mensajes llegan a la IA <strong>en orden</strong> como un solo turno.</p>
+
+            <div class="nov-highlight">
+                <strong>⚠ Lo más importante:</strong> esta espera <strong>NO afecta el ART ni el WPM del asesor</strong>. ART mide solo cuánto tarda el asesor en responder al cliente — la espera del cliente es del lado opuesto y no se cuenta. Las métricas del asesor están protegidas.
+            </div>
+
+            <p><strong>¿Qué ve el asesor?</strong></p>
+            <ul>
+                <li>Después de enviar un mensaje, aparece un cartelito naranja: "Cliente está leyendo y respondiendo… 28s" con un contador en vivo.</li>
+                <li>Si envía otro mensaje, el contador se reinicia.</li>
+                <li>Al llegar a 0, aparecen los tres puntitos (cliente tipeando) y luego la respuesta.</li>
+            </ul>
+
+            <p><strong>¿Cómo se configura?</strong></p>
+            <ul>
+                <li>Al crear o editar un escenario, hay un slider de 10s a 60s con la etiqueta "Tiempo de respuesta del cliente".</li>
+                <li>Al iniciar un entrenamiento, el batch toma una "foto" del valor del escenario. Si lo cambiás después, los entrenamientos en curso siguen con el valor original.</li>
+            </ul>
+
+            <p><strong>Recomendaciones:</strong></p>
+            <ul>
+                <li><strong>10–20s:</strong> chat ágil — clientes que ya tienen claro lo que quieren.</li>
+                <li><strong>30s:</strong> realista para la mayoría de los casos (default).</li>
+                <li><strong>45–60s:</strong> clientes que tardan, casos complejos, o si querés que el asesor maneje varios chats simultáneos sin saturarse.</li>
+            </ul>
         </div>
     </article>
 
