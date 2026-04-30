@@ -280,6 +280,46 @@ Esta regla actúa **después** del cálculo de PI/categoría/recomendación, com
 
 **Sesiones legacy genuinas** (sin ART por venir de antes de la migración v5, pero **no** auto-fails) siguen recibiendo el `no_data_score` del modo. Solo las auto-fails sin ART penalizan.
 
+### 2.9 Hard caps universales (barrera de competencia básica)
+
+Tres reglas independientes del modo que actúan **después** del cálculo de `pi`, `category` y `rec`. Son una barrera mínima que ningún modo puede aflojar.
+
+```
+si abandonment_rate > 0.4:
+    si category in {elite, alto}   → category = desarrollo
+    si rec == recomendado          → rec = observaciones
+
+si correct_rate < 0.5:
+    si rec == recomendado          → rec = observaciones
+
+si avg_nps < 4:
+    si rec == recomendado          → rec = observaciones
+```
+
+Cada cap activado se registra en `profile._cap_reasons` (lista de dicts con `key`, `label` y `desc`). La vista `/admin/vex/profile/<id>` muestra un bloque "Hard caps activados" cuando la lista no está vacía.
+
+### 2.10 Variety: piso mínimo de 3 escenarios
+
+```
+variety = min(1, unique_successful_scenarios / max(total_active_scenarios * 0.5, 3))
+```
+
+Antes el divisor era `max(total * 0.4, 1)`. Cuando el catálogo activo era pequeño (1-2 escenarios), el divisor caía a 1 y un solo escenario aprobado daba `variety = 1.0`, inflando la dimensión Adaptabilidad. El piso de 3 obliga a que el asesor haya tenido éxito en al menos 3 escenarios distintos para llegar al 100% de variedad, independientemente del tamaño del catálogo.
+
+### 2.11 Recalibración del modo Flexible
+
+Los pisos del modo Flexible bajaron porque eran demasiado altos:
+
+| Dimensión | Piso anterior | Piso nuevo |
+|-----------|---------------|------------|
+| communication | 35 | **25** |
+| resolution | 35 | **25** |
+| adaptability | 35 | **25** |
+| compliance | 35 | **25** |
+| speed_no_data | 75 | **60** |
+
+Con `floor=35` y `(NPS/10)*40` sumando, casi cualquier sesión arrancaba en Sten 4 y la mayoría terminaba en Sten 6+ aún con NPS bajo. El modo era para "indulgencia con principiantes", no para "anular la evaluación". Los modos Standard y Exigente quedan iguales.
+
 ---
 
 ## 3. ART — Average Response Time
@@ -337,6 +377,11 @@ Sesiones existentes tienen `avg_response_time = 0` (default DB) y reciben puntaj
 | Sesiones auto-fail (velocidad) | puntaje neutro (65) | entran como `slow_max` (penalizan) |
 | Variety (adaptabilidad) | cualquier escenario abierto | solo escenarios resueltos bien o NPS ≥ 6 |
 | Hard cap por abandono | sin tope | si abandonment > 40% → max Desarrollo / Observaciones |
+| Hard cap correct_rate | inexistente | si `correct_rate < 0.5` → max Observaciones |
+| Hard cap NPS | inexistente | si `avg_nps < 4` → max Observaciones |
+| Variety divisor | `max(total*0.4, 1)` | `max(total*0.5, 3)` (piso de 3 escenarios) |
+| Pisos modo Flexible | 35 / 35 / 35 / 35 / 75 | 25 / 25 / 25 / 25 / 60 |
+| Transparencia en perfil | sin info | distribución de modos + baremo aplicado + caps disparados |
 
 ---
 
