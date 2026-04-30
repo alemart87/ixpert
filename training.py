@@ -1268,17 +1268,30 @@ def vex_modos_save():
         return redirect(url_for('training.vex_modos'))
 
     try:
+        # Pesos PI: el template los manda como porcentajes enteros (5-50).
+        # Si vienen ya como decimales (0-1), los aceptamos igual.
+        raw_weights = {
+            'empathy': float(request.form.get('w_empathy', 0)),
+            'resolution': float(request.form.get('w_resolution', 0)),
+            'communication': float(request.form.get('w_communication', 0)),
+            'speed': float(request.form.get('w_speed', 0)),
+            'adaptability': float(request.form.get('w_adaptability', 0)),
+            'compliance': float(request.form.get('w_compliance', 0))
+        }
+        # Si parecen porcentajes (suma > 2 o algun valor > 1), normalizamos /100.
+        if sum(raw_weights.values()) > 2 or any(v > 1 for v in raw_weights.values()):
+            raw_weights = {k: v / 100.0 for k, v in raw_weights.items()}
+
+        # empathy_pillars_weight: template lo manda 0-100; si viene 0-1 lo dejamos.
+        empathy_pw = float(request.form.get('empathy_pillars_weight', 0.7))
+        if empathy_pw > 1:
+            empathy_pw = empathy_pw / 100.0
+        empathy_pw = max(0.0, min(1.0, empathy_pw))
+
         cfg = {
-            'pi_weights': {
-                'empathy': float(request.form.get('w_empathy', 0)),
-                'resolution': float(request.form.get('w_resolution', 0)),
-                'communication': float(request.form.get('w_communication', 0)),
-                'speed': float(request.form.get('w_speed', 0)),
-                'adaptability': float(request.form.get('w_adaptability', 0)),
-                'compliance': float(request.form.get('w_compliance', 0))
-            },
+            'pi_weights': raw_weights,
             'spelling_multiplier': float(request.form.get('spelling_multiplier', 25)),
-            'empathy_pillars_weight': float(request.form.get('empathy_pillars_weight', 0.7)),
+            'empathy_pillars_weight': empathy_pw,
             'art_curve': {
                 'excellent_max': float(request.form.get('art_excellent', 120)),
                 'healthy_max': float(request.form.get('art_healthy', 180)),
@@ -1310,10 +1323,10 @@ def vex_modos_save():
         flash('Algun valor numerico es invalido.', 'error')
         return redirect(url_for('training.vex_modos'))
 
-    # Validacion: pesos PI deben sumar ~1
+    # Validacion: pesos PI deben sumar ~1 (post-normalizacion).
     total_w = sum(cfg['pi_weights'].values())
     if abs(total_w - 1.0) > 0.02:
-        flash(f'Los pesos del Predictive Index deben sumar 1.00 (actualmente {total_w:.2f}).', 'error')
+        flash(f'Los pesos del Predictive Index deben sumar 100% (actualmente {total_w*100:.0f}%).', 'error')
         return redirect(url_for('training.vex_modos'))
 
     override = ScoringModeOverride.query.filter_by(mode=mode).first()
