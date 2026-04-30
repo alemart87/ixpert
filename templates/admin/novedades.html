@@ -173,6 +173,7 @@
         <a href="#delay">⏳ Espera del cliente simulado</a>
         <a href="#empatia">💛 Rúbrica de empatía</a>
         <a href="#abandono">🛡 Fix abandonos</a>
+        <a href="#caps">🚨 Barreras + transparencia</a>
         <a href="#ortografia">📝 Ortografía más justa</a>
         <a href="#ia">🤖 Nuevo motor de IA</a>
         <a href="#chat">💬 Chat más cómodo</a>
@@ -422,6 +423,43 @@
             <p><strong>¿Qué pasa con los perfiles existentes?</strong> Se recalculan automáticamente la próxima vez que el asesor cierra una sesión. Si la operación tiene asesores con muchos abandonos, se les van a corregir las categorías y recomendaciones en cuanto vuelvan a entrenar.</p>
 
             <p><strong>¿Qué cuenta como "abandono"?</strong> Una sesión donde el asesor envió <strong>menos de 2 mensajes</strong> o escribió <strong>menos de 8 palabras</strong> en total. Es la misma regla que ya usábamos para marcar la sesión con NPS=1 sin gastar tokens en evaluarla.</p>
+        </div>
+    </article>
+
+    <!-- 🚨 Corrección crítica: barreras + transparencia -->
+    <article class="nov-card featured" id="caps">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🚨</div>
+            <div class="nov-card-title">
+                <h2>Barreras de competencia básica + transparencia en el perfil</h2>
+                <p class="subtitle">El sistema ahora explica claramente qué baremo se aplicó y por qué un perfil puede ser limitado.</p>
+            </div>
+            <span class="nov-card-tag">Corrección crítica</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Encontramos <strong>4 puntos donde el sistema podía dar resultados engañosos</strong> incluso con los modos bien configurados. Lo arreglamos y, además, hicimos visible el porqué de cada resultado.</p>
+
+            <div class="nov-highlight">
+                <strong>3 barreras nuevas independientes del modo:</strong>
+                <ul style="margin:8px 0 0">
+                    <li>Si el asesor <strong>resuelve menos de la mitad de los casos</strong> (<code>correct_rate &lt; 50%</code>) → no puede ser "Recomendado", máximo "Con Observaciones".</li>
+                    <li>Si el <strong>NPS promedio del cliente es menor a 4/10</strong> → no puede ser "Recomendado".</li>
+                    <li>Si <strong>abandonó más del 40% de las sesiones</strong> (ya estaba) → categoría máxima Desarrollo y recomendación máxima Observaciones.</li>
+                </ul>
+            </div>
+
+            <p><strong>Modo Flexible recalibrado.</strong> Los pisos eran tan altos (35 puntos en 4 dimensiones) que casi cualquier perfil terminaba en Sten 6+ ignorando el NPS. Bajamos a 25 puntos. El modo sigue siendo indulgente con principiantes pero ya no anula la evaluación.</p>
+
+            <p><strong>Variedad de escenarios:</strong> antes, si el catálogo activo tenía 1 o 2 escenarios, aprobar 1 daba 100% de variedad. Ahora hay un piso: el asesor debe tener éxito en al menos <strong>3 escenarios distintos</strong> para llegar al 100% de variedad.</p>
+
+            <p><strong>Transparencia visible en cada perfil VEX:</strong></p>
+            <ul>
+                <li><strong>Distribución de sesiones por modo:</strong> contadores 🟢🔵🔴⚪ con cuántas sesiones tuvo el asesor en cada modo.</li>
+                <li><strong>Baremo de medición aplicado:</strong> qué modo se usó, los umbrales para Elite/Alto, los cortes para Recomendado/Observaciones.</li>
+                <li><strong>Hard caps activados:</strong> si alguno se disparó, aparece un bloque amarillo arriba con la lista de qué se aplicó y por qué. El admin entiende inmediatamente por qué un PI numéricamente alto no se tradujo en "Recomendado".</li>
+            </ul>
+
+            <p><strong>¿Qué pasa con los perfiles ya cargados?</strong> Se recalculan automáticamente la próxima vez que el asesor cierre una sesión. Si querés forzar el recálculo de un asesor en particular, basta con entrar a su perfil VEX desde el dashboard — la página los recalcula al abrirla.</p>
         </div>
     </article>
 

@@ -331,10 +331,29 @@
             <tr><td><strong>Adaptabilidad</strong></td><td><code>variety</code> solo cuenta escenarios donde <code>response_correct=true</code> o <code>nps_score ≥ 6</code>. Abandonar 3 escenarios distintos NO suma variedad.</td></tr>
         </table>
 
-        <h3>Hard cap de seguridad</h3>
-        <p>Como red de protección independiente de la fórmula:</p>
-        <div class="formula-box">abandonment_rate = autofails / total_sessions<br><br>si abandonment_rate &gt; 0.4:<br>&nbsp;&nbsp;si categoria ∈ {Elite, Alto} → categoria = Desarrollo<br>&nbsp;&nbsp;si recomendacion = Recomendado → recomendacion = Observaciones</div>
-        <p>Aplica <strong>después</strong> del cálculo de PI/categoría/recomendación, asegurando que un asesor con más del 40% de sesiones abandonadas no pueda calificar como Recomendado/Alto/Elite, sin importar qué tan bien le haya ido en las que sí completó.</p>
+        <h3>Hard caps universales (independientes del modo)</h3>
+        <p>Tres reglas de seguridad que actúan <strong>después</strong> del cálculo del PI / categoría / recomendación. Aseguran un piso de competencia básica que ningún modo puede aflojar.</p>
+
+        <table class="doc-table">
+            <tr><th>Regla</th><th>Disparador</th><th>Efecto</th></tr>
+            <tr>
+                <td><strong>Abandono alto</strong></td>
+                <td><code>autofails / total &gt; 40%</code></td>
+                <td>Categoría máxima: Desarrollo. Recomendación máxima: Observaciones.</td>
+            </tr>
+            <tr>
+                <td><strong>Tasa de aciertos baja</strong></td>
+                <td><code>correct_rate &lt; 0.5</code></td>
+                <td>Recomendación máxima: Observaciones.</td>
+            </tr>
+            <tr>
+                <td><strong>NPS promedio bajo</strong></td>
+                <td><code>avg_nps &lt; 4</code></td>
+                <td>Recomendación máxima: Observaciones.</td>
+            </tr>
+        </table>
+
+        <p>Si se dispara cualquiera de las tres, el perfil agrega un bloque visible <strong>"Hard caps activados"</strong> en la vista del usuario, listando qué se aplicó y por qué. Es transparencia: el evaluador entiende exactamente por qué un PI numéricamente alto puede no traducirse en "Recomendado".</p>
 
         <p><strong>Sesiones legacy genuinas</strong> (anteriores a la migración v5, sin ART por antigüedad pero <em>no</em> auto-fails) siguen recibiendo el puntaje neutro del modo. Solo las auto-fails sin ART penalizan.</p>
     </div>
