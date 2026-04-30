@@ -169,6 +169,29 @@ def inject_nav_categories():
     return {'nav_categories': []}
 
 
+@app.context_processor
+def inject_mode_badge_helper():
+    """Expose a helper to render scoring mode labels uniformly."""
+    def mode_badge_label(mode):
+        m = (mode or 'legacy').lower()
+        return {
+            'flexible': '🟢 Flexible',
+            'standard': '🔵 Standard',
+            'exigente': '🔴 Exigente',
+        }.get(m, '⚪ Legacy')
+
+    def mode_badge_class(mode):
+        m = (mode or 'legacy').lower()
+        if m not in ('flexible', 'standard', 'exigente'):
+            return 'legacy'
+        return m
+
+    return {
+        'mode_badge_label': mode_badge_label,
+        'mode_badge_class': mode_badge_class,
+    }
+
+
 @app.route('/')
 @login_required
 def index():

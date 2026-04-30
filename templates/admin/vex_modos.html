@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% block title %}Modos de Scoring - Vex Predictive{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Modos de Scoring</h1>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('training.vex_dashboard') }}" class="btn btn-secondary">Resultados</a>
+        <a href="{{ url_for('training.vex_methodology') }}" class="btn btn-secondary">Metodología</a>
+        <a href="{{ url_for('training.vex_modos') }}" class="btn btn-primary">Modos</a>
+    </div>
+
+    <!-- Intro -->
+    <div class="modos-intro">
+        <p>Cada escenario se evalúa con uno de tres modos. El modo afecta los <strong>pesos</strong> del Predictive Index, los <strong>pisos mínimos</strong> por dimensión, la <strong>tolerancia ortográfica</strong>, la <strong>curva de ART</strong>, los <strong>umbrales</strong> de categoría/recomendación y el <strong>hint</strong> que recibe la IA evaluadora.</p>
+        {% if is_superadmin %}
+        <p class="modos-intro-note"><strong>SuperAdmin:</strong> podés editar los parámetros internos de cada modo. Si no querés tocar nada, los valores de fábrica ya están afinados para la mayoría de los casos.</p>
+        {% endif %}
+    </div>
+
+    <!-- Tabs por modo -->
+    <div class="modos-tabs" id="modosTabs">
+        {% for m in modes_data %}
+        <button class="modo-tab{% if loop.first %} active{% endif %}"
+                data-target="modo-{{ m.key }}"
+                style="--mode-color: {{ m.config.color }}">
+            <span class="modo-tab-icon">{{ m.config.icon }}</span>
+            <span class="modo-tab-label">{{ m.config.label }}</span>
+            {% if m.is_overridden %}<span class="modo-tab-badge" title="Personalizado">●</span>{% endif %}
+        </button>
+        {% endfor %}
+    </div>
+
+    {% for m in modes_data %}
+    <section class="modo-panel{% if loop.first %} active{% endif %}" id="modo-{{ m.key }}">
+
+        <header class="modo-panel-head" style="--mode-color: {{ m.config.color }}">
+            <div class="modo-panel-title">
+                <span class="modo-panel-icon">{{ m.config.icon }}</span>
+                <h2>{{ m.config.label }}</h2>
+                {% if m.is_overridden %}
+                <span class="modo-customized-badge">Personalizado</span>
+                {% endif %}
+            </div>
+            <p class="modo-panel-when">{{ m.config.when_to_use }}</p>
+        </header>
+
+        <!-- Resumen amigable -->
+        <div class="modo-summary-card">
+            <h3>¿Qué cambia con este modo?</h3>
+            <ul>
+                {% for line in m.summary %}
+                <li>{{ line }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Hint a la IA -->
+        <div class="modo-hint-card">
+            <h3>📣 Instrucción a la IA evaluadora</h3>
+            <p>{{ m.config.ai_hint }}</p>
+        </div>
+
+        {% if is_superadmin %}
+        <form method="POST" action="{{ url_for('training.vex_modos_save') }}" class="modo-form">
+            <input type="hidden" name="mode" value="{{ m.key }}">
+
+            <!-- Pesos del Predictive Index -->
+            <details class="modo-fieldset" open>
+                <summary>
+                    <span class="fieldset-icon">📊</span>
+                    <span class="fieldset-title">{{ pedagogical_guide.pi_weights.title }}</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.pi_weights.desc }}</p>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.pi_weights.why }}</em></p>
+                <div class="form-grid">
+                    <label>Empatía<input type="number" step="0.01" min="0" max="1" name="w_empathy" value="{{ m.config.pi_weights.empathy }}" required></label>
+                    <label>Resolución<input type="number" step="0.01" min="0" max="1" name="w_resolution" value="{{ m.config.pi_weights.resolution }}" required></label>
+                    <label>Comunicación<input type="number" step="0.01" min="0" max="1" name="w_communication" value="{{ m.config.pi_weights.communication }}" required></label>
+                    <label>Velocidad<input type="number" step="0.01" min="0" max="1" name="w_speed" value="{{ m.config.pi_weights.speed }}" required></label>
+                    <label>Adaptabilidad<input type="number" step="0.01" min="0" max="1" name="w_adaptability" value="{{ m.config.pi_weights.adaptability }}" required></label>
+                    <label>Compliance<input type="number" step="0.01" min="0" max="1" name="w_compliance" value="{{ m.config.pi_weights.compliance }}" required></label>
+                </div>
+                <p class="fieldset-validate">Suma actual: <span class="weights-sum">—</span> (debe sumar 1.00)</p>
+            </details>
+
+            <!-- Pisos -->
+            <details class="modo-fieldset">
+                <summary>
+                    <span class="fieldset-icon">🛡️</span>
+                    <span class="fieldset-title">{{ pedagogical_guide.floors.title }}</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.floors.desc }}</p>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.floors.why }}</em></p>
+                <div class="form-grid">
+                    <label>Comunicación<input type="number" step="1" min="0" max="100" name="floor_communication" value="{{ m.config.floors.communication }}"></label>
+                    <label>Resolución<input type="number" step="1" min="0" max="100" name="floor_resolution" value="{{ m.config.floors.resolution }}"></label>
+                    <label>Adaptabilidad<input type="number" step="1" min="0" max="100" name="floor_adaptability" value="{{ m.config.floors.adaptability }}"></label>
+                    <label>Compliance<input type="number" step="1" min="0" max="100" name="floor_compliance" value="{{ m.config.floors.compliance }}"></label>
+                    <label>Velocidad sin datos<input type="number" step="1" min="0" max="100" name="floor_speed_no_data" value="{{ m.config.floors.speed_no_data }}"></label>
+                </div>
+            </details>
+
+            <!-- Ortografía / Empatía -->
+            <details class="modo-fieldset">
+                <summary>
+                    <span class="fieldset-icon">📝</span>
+                    <span class="fieldset-title">Tolerancia ortográfica y mezcla de empatía</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.spelling_multiplier.desc }}</p>
+                <div class="form-grid">
+                    <label>Multiplicador ortografía<input type="number" step="1" min="1" max="100" name="spelling_multiplier" value="{{ m.config.spelling_multiplier }}"></label>
+                    <label>Peso pilares en empatía (0-1)<input type="number" step="0.05" min="0" max="1" name="empathy_pillars_weight" value="{{ m.config.empathy_pillars_weight }}"></label>
+                </div>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.empathy_pillars_weight.why }}</em></p>
+            </details>
+
+            <!-- Curva ART -->
+            <details class="modo-fieldset">
+                <summary>
+                    <span class="fieldset-icon">⏱️</span>
+                    <span class="fieldset-title">{{ pedagogical_guide.art_curve.title }}</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.art_curve.desc }}</p>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.art_curve.why }}</em></p>
+                <div class="form-grid">
+                    <label>Excelente máx (s)<input type="number" step="1" min="0" name="art_excellent" value="{{ m.config.art_curve.excellent_max }}"></label>
+                    <label>Saludable máx (s)<input type="number" step="1" min="0" name="art_healthy" value="{{ m.config.art_curve.healthy_max }}"></label>
+                    <label>Aceptable máx (s)<input type="number" step="1" min="0" name="art_acceptable" value="{{ m.config.art_curve.acceptable_max }}"></label>
+                    <label>Lento máx (s)<input type="number" step="1" min="0" name="art_slow" value="{{ m.config.art_curve.slow_max }}"></label>
+                    <label>Sin datos (puntaje)<input type="number" step="1" min="0" max="100" name="art_no_data" value="{{ m.config.art_curve.no_data_score }}"></label>
+                </div>
+            </details>
+
+            <!-- Umbrales de categoría -->
+            <details class="modo-fieldset">
+                <summary>
+                    <span class="fieldset-icon">🏆</span>
+                    <span class="fieldset-title">{{ pedagogical_guide.thresholds.title }}</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.thresholds.desc }}</p>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.thresholds.why }}</em></p>
+                <div class="form-grid">
+                    <label>Elite — overall mín<input type="number" step="0.1" min="0" max="10" name="th_elite_overall" value="{{ m.config.thresholds.elite_overall }}"></label>
+                    <label>Elite — dimensión mín<input type="number" step="0.5" min="0" max="10" name="th_elite_min" value="{{ m.config.thresholds.elite_min_dim }}"></label>
+                    <label>Alto — overall mín<input type="number" step="0.1" min="0" max="10" name="th_alto_overall" value="{{ m.config.thresholds.alto_overall }}"></label>
+                    <label>Alto — dimensión mín<input type="number" step="0.5" min="0" max="10" name="th_alto_min" value="{{ m.config.thresholds.alto_min_dim }}"></label>
+                    <label>Desarrollo — overall mín<input type="number" step="0.1" min="0" max="10" name="th_desarrollo_overall" value="{{ m.config.thresholds.desarrollo_overall }}"></label>
+                </div>
+            </details>
+
+            <!-- Recomendación -->
+            <details class="modo-fieldset">
+                <summary>
+                    <span class="fieldset-icon">✅</span>
+                    <span class="fieldset-title">{{ pedagogical_guide.recommendation.title }}</span>
+                </summary>
+                <p class="fieldset-desc">{{ pedagogical_guide.recommendation.desc }}</p>
+                <p class="fieldset-why"><em>{{ pedagogical_guide.recommendation.why }}</em></p>
+                <div class="form-grid">
+                    <label>Recomendado (PI ≥ %)<input type="number" step="1" min="0" max="100" name="rec_recomendado" value="{{ m.config.recommendation.recomendado }}"></label>
+                    <label>Observaciones (PI ≥ %)<input type="number" step="1" min="0" max="100" name="rec_observaciones" value="{{ m.config.recommendation.observaciones }}"></label>
+                </div>
+            </details>
+
+            <div class="modo-form-actions">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                {% if m.is_overridden %}
+                <button type="submit" class="btn btn-reset"
+                        formaction="{{ url_for('training.vex_modos_reset', mode=m.key) }}"
+                        onclick="return confirm('¿Volver a los valores de fábrica de {{ m.config.label }}? Se perderá la personalización.');">
+                    ↺ Volver a valores de fábrica
+                </button>
+                {% endif %}
+            </div>
+        </form>
+        {% else %}
+        <!-- Vista read-only para no-superadmin -->
+        <div class="modo-readonly-note">
+            Los parámetros internos solo los puede editar un SuperAdmin.
+        </div>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+
+<style>
+.modos-intro {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    color: #444;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.modos-intro p { margin: 0 0 8px; }
+.modos-intro p:last-child { margin: 0; }
+.modos-intro-note {
+    background: #fff8e1;
+    border-left: 3px solid #ff9500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* Tabs */
+.modos-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e6eef8;
+    padding-bottom: 0;
+}
+.modo-tab {
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s, border-color 0.2s;
+}
+.modo-tab:hover { color: var(--mode-color, #ff6600); }
+.modo-tab.active {
+    color: var(--mode-color, #ff6600);
+    border-bottom-color: var(--mode-color, #ff6600);
+}
+.modo-tab-icon { font-size: 18px; }
+.modo-tab-badge {
+    color: #ff6600;
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+/* Panel */
+.modo-panel { display: none; }
+.modo-panel.active { display: block; }
+
+.modo-panel-head {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    border-left: 6px solid var(--mode-color, #ff6600);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.modo-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.modo-panel-icon { font-size: 28px; }
+.modo-panel-title h2 {
+    margin: 0;
+    color: var(--mode-color, #ff6600);
+    font-size: 22px;
+}
+.modo-customized-badge {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.modo-panel-when {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Resumen */
+.modo-summary-card, .modo-hint-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.modo-summary-card h3, .modo-hint-card h3 {
+    margin: 0 0 10px;
+    color: #004080;
+    font-size: 14px;
+}
+.modo-summary-card ul {
+    margin: 0;
+    padding-left: 22px;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.7;
+}
+.modo-hint-card {
+    background: #fff8f0;
+    border-left: 3px solid #ff9500;
+}
+.modo-hint-card p {
+    margin: 0;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Form */
+.modo-form { background: transparent; }
+
+.modo-fieldset {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s;
+}
+.modo-fieldset[open] { box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+.modo-fieldset summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #004080;
+    font-size: 14px;
+    padding: 6px 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.modo-fieldset summary::-webkit-details-marker { display: none; }
+.modo-fieldset summary::after {
+    content: "▾";
+    margin-left: auto;
+    color: #888;
+    transition: transform 0.2s;
+}
+.modo-fieldset[open] summary::after { transform: rotate(180deg); }
+.fieldset-icon { font-size: 16px; }
+.fieldset-desc {
+    color: #555;
+    font-size: 13px;
+    margin: 8px 0 4px;
+    line-height: 1.5;
+}
+.fieldset-why {
+    color: #888;
+    font-size: 12px;
+    margin: 0 0 12px;
+}
+.fieldset-validate {
+    margin: 8px 0 0;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #555;
+    text-align: right;
+}
+.fieldset-validate .weights-sum {
+    font-weight: 700;
+    color: #004080;
+    font-family: monospace;
+    font-size: 14px;
+}
+.fieldset-validate .weights-sum.error { color: #c62828; }
+.fieldset-validate .weights-sum.ok { color: #2e7d32; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+}
+.form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #555;
+    font-weight: 600;
+}
+.form-grid input {
+    padding: 8px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: monospace;
+    transition: border-color 0.2s;
+}
+.form-grid input:focus { outline: none; border-color: #ff6600; }
+
+.modo-form-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+}
+.btn-reset {
+    background: #fff;
+    color: #888;
+    border: 2px solid #ddd;
+    padding: 10px 18px;
+    border-radius: 22px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-reset:hover { border-color: #888; color: #555; }
+
+.modo-readonly-note {
+    background: #f8f9fa;
+    border-left: 3px solid #888;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #666;
+    font-size: 13px;
+}
+</style>
+
+<script>
+// Tabs
+document.querySelectorAll('.modo-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.modo-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.modo-panel').forEach(function(p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+    });
+});
+
+// Validación de pesos en vivo
+function recalcWeights(form) {
+    var sumEl = form.querySelector('.weights-sum');
+    if (!sumEl) return;
+    var keys = ['empathy', 'resolution', 'communication', 'speed', 'adaptability', 'compliance'];
+    var total = 0;
+    keys.forEach(function(k) {
+        var inp = form.querySelector('input[name="w_' + k + '"]');
+        if (inp) total += parseFloat(inp.value || 0);
+    });
+    sumEl.textContent = total.toFixed(2);
+    sumEl.classList.toggle('ok', Math.abs(total - 1.0) <= 0.02);
+    sumEl.classList.toggle('error', Math.abs(total - 1.0) > 0.02);
+}
+document.querySelectorAll('.modo-form').forEach(function(form) {
+    recalcWeights(form);
+    form.querySelectorAll('input[name^="w_"]').forEach(function(inp) {
+        inp.addEventListener('input', function() { recalcWeights(form); });
+    });
+});
+</script>
+{% endblock %}

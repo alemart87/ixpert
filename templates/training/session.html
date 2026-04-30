@@ -17,6 +17,7 @@
         <div>
             <h2>Sesión #{{ batch.id }} — {{ batch.scenario.title }}</h2>
             <span class="badge-difficulty badge-{{ batch.scenario.difficulty }}">{{ batch.scenario.difficulty }}</span>
+            <span class="mode-badge on-dark" style="margin-left:6px">{{ mode_badge_label(batch.scoring_mode) }}</span>
             <span style="color:rgba(255,255,255,0.7);font-size:13px;margin-left:8px">{{ batch.max_concurrent }} interacciones simultáneas</span>
         </div>
         <div class="training-metrics">
