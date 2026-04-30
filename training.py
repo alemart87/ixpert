@@ -181,12 +181,21 @@ def start_batch(scenario_id):
 
     max_c = current_user.max_concurrent_training or 1
 
+    # Snapshot del modo de scoring del escenario al crear el batch.
+    # Asi cambios futuros en el escenario no afectan evaluaciones ya iniciadas.
+    # null = legacy (se evalua con Standard pero se etiqueta diferente en UI).
+    # Snapshot del delay del cliente (10-60s, default 30 si el escenario es viejo).
+    delay_snap = getattr(scenario, 'client_response_delay_seconds', None) or 30
+    delay_snap = max(10, min(60, int(delay_snap)))
+
     batch = TrainingBatch(
         user_id=current_user.id,
         scenario_id=scenario.id,
         max_concurrent=max_c,
         status='active',
-        started_at=datetime.utcnow()
+        started_at=datetime.utcnow(),
+        scoring_mode=getattr(scenario, 'scoring_mode', None),
+        client_response_delay_seconds=delay_snap
     )
     db.session.add(batch)
     db.session.flush()
@@ -271,6 +280,132 @@ def batch_view(batch_id):
 @login_required
 def start_session(scenario_id):
     return start_batch(scenario_id)
+
+
+@training_bp.route('/api/training/queue', methods=['POST'])
+@login_required
+def queue_message():
+    """Persiste un mensaje del asesor SIN disparar la IA.
+
+    El JS llama a este endpoint cada vez que el asesor envia un mensaje, y
+    despues de N segundos sin actividad nueva (debounce per session) llama a
+    /flush para que el cliente simulado responda.
+
+    Importante: NO afecta ART/WPM porque solo registra timestamps reales del
+    asesor — la espera ocurre entre el ultimo agent_msg y el proximo client_msg
+    (que NO entra en el calculo de ART, que solo mide client->agent).
+    """
+    data = request.get_json(silent=True) or {}
+    session_id = data.get('session_id')
+    message = data.get('message', '').strip()
+
+    if not message or not session_id:
+        return jsonify({'error': 'Datos incompletos'}), 400
+
+    session = TrainingSession.query.filter_by(
+        id=session_id, user_id=current_user.id, status='active'
+    ).first()
+    if not session:
+        return jsonify({'error': 'Sesion no encontrada o finalizada'}), 404
+
+    word_count = len(message.split())
+    user_msg = TrainingMessage(
+        session_id=session.id,
+        role='user',
+        content=message,
+        word_count=word_count
+    )
+    db.session.add(user_msg)
+    session.total_messages = (session.total_messages or 0) + 1
+    session.total_words_user = (session.total_words_user or 0) + word_count
+    session.total_chars_user = (session.total_chars_user or 0) + len(message)
+    db.session.commit()
+
+    # Devolvemos el delay del batch para que el JS pueda usarlo si lo necesita
+    delay = 30
+    if session.batch_id:
+        batch_obj = TrainingBatch.query.get(session.batch_id)
+        if batch_obj and batch_obj.client_response_delay_seconds:
+            delay = max(10, min(60, batch_obj.client_response_delay_seconds))
+
+    return jsonify({
+        'ok': True,
+        'queued': True,
+        'client_response_delay_seconds': delay,
+        'metrics': {
+            'messages': session.total_messages,
+            'words': session.total_words_user,
+            'elapsed_seconds': int(safe_elapsed(session.started_at))
+        }
+    })
+
+
+@training_bp.route('/api/training/flush', methods=['POST'])
+@login_required
+def flush_session():
+    """Genera la respuesta del cliente simulado tomando todos los mensajes
+    pendientes del asesor (los que estan despues del ultimo client_msg).
+
+    Idempotente: si no hay mensajes del asesor pendientes desde el ultimo
+    mensaje del cliente, devuelve {no_pending: True} sin gastar tokens.
+    """
+    data = request.get_json(silent=True) or {}
+    session_id = data.get('session_id')
+
+    if not session_id:
+        return jsonify({'error': 'Datos incompletos'}), 400
+
+    session = TrainingSession.query.filter_by(
+        id=session_id, user_id=current_user.id, status='active'
+    ).first()
+    if not session:
+        return jsonify({'error': 'Sesion no encontrada o finalizada'}), 404
+
+    # Si no hay mensajes o el ultimo es del cliente, no hay nada que responder.
+    msgs = list(session.messages)
+    if not msgs or msgs[-1].role != 'user':
+        return jsonify({'ok': True, 'no_pending': True})
+
+    scenario = session.scenario
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
+
+{scenario.client_persona}
+
+REGLAS:
+- Actúa como un cliente REAL en un chat de atención
+- NO reveles que sos IA
+- Reaccioná naturalmente al asesor
+- El asesor puede haberte enviado VARIOS mensajes seguidos: leelos todos y respondé UNA sola vez con coherencia
+- Respuestas cortas (1-3 oraciones) como un cliente real en chat
+- Si el asesor te ayuda bien, mostrá satisfacción
+- Si no, mostrá frustración realista"""
+
+    ai_messages = [{'role': 'system', 'content': system_prompt}]
+    for msg in msgs:
+        role = 'assistant' if msg.role == 'client' else 'user'
+        ai_messages.append({'role': role, 'content': msg.content})
+
+    response_text, tokens = call_openai(ai_messages)
+
+    client_msg = TrainingMessage(
+        session_id=session.id,
+        role='client',
+        content=response_text,
+        word_count=len(response_text.split())
+    )
+    db.session.add(client_msg)
+    session.tokens_used = (session.tokens_used or 0) + tokens
+    db.session.commit()
+
+    return jsonify({
+        'ok': True,
+        'response': response_text,
+        'metrics': {
+            'messages': session.total_messages,
+            'words': session.total_words_user,
+            'elapsed_seconds': int(safe_elapsed(session.started_at))
+        }
+    })
 
 
 @training_bp.route('/api/training/message', methods=['POST'])
@@ -368,27 +503,35 @@ def end_session(session_id):
     session.ended_at = now
     session.duration_seconds = int(safe_elapsed(session.started_at))
 
-    # WPM: estimate active typing time from user message timestamps
+    # WPM + ART (Average Response Time): tiempo entre cada mensaje del cliente
+    # y la respuesta del asesor. ART NO mide la duracion total del chat — solo
+    # cuanto tarda el asesor en responder cada vez que el cliente le escribe.
     user_messages = [m for m in session.messages if m.role == 'user']
+    response_gaps = []  # segundos entre cliente -> asesor
     if user_messages and session.total_words_user:
-        # Estimate typing time: for each user message, count ~3 seconds base
-        # plus the gap between the previous client message and this user message
         typing_seconds = 0
-        prev_time = None
+        prev_client_time = None
         for msg in session.messages:
             if msg.role == 'client':
-                prev_time = msg.created_at
+                prev_client_time = msg.created_at
             elif msg.role == 'user':
-                if prev_time and msg.created_at:
-                    gap = (msg.created_at.replace(tzinfo=None) - prev_time.replace(tzinfo=None)).total_seconds()
-                    # Cap per-message thinking+typing time at 120s to avoid idle inflation
-                    typing_seconds += min(gap, 120)
+                if prev_client_time and msg.created_at:
+                    gap = (msg.created_at.replace(tzinfo=None) - prev_client_time.replace(tzinfo=None)).total_seconds()
+                    # Cap por mensaje a 600s (10min) para no castigar pausas extremas o idle del cliente
+                    capped = max(0, min(gap, 600))
+                    response_gaps.append(capped)
+                    # WPM usa los mismos gaps cap a 120s para estimar tiempo activo de tipeo
+                    typing_seconds += min(capped, 120)
                 else:
-                    typing_seconds += 10  # fallback estimate for first message
-        typing_minutes = max(typing_seconds / 60, 0.1)  # at least 6 seconds
+                    typing_seconds += 10  # primer mensaje sin contexto
+        typing_minutes = max(typing_seconds / 60, 0.1)
         session.words_per_minute = round(session.total_words_user / typing_minutes, 1)
     elif session.duration_seconds > 0 and session.total_words_user:
         session.words_per_minute = round(session.total_words_user / (session.duration_seconds / 60), 1)
+
+    # ART: promedio de tiempos de respuesta. Si no hay gaps medibles (ej: el
+    # asesor habla primero), ART queda en 0 y no penaliza.
+    session.avg_response_time = round(sum(response_gaps) / len(response_gaps), 1) if response_gaps else 0
 
     # Count user messages
     user_msg_count = len(user_messages)
@@ -440,8 +583,20 @@ def end_session(session_id):
     # Get user messages for spelling check
     user_texts = ' '.join(m.content for m in session.messages if m.role == 'user')
 
+    # Determinar modo de scoring del batch (snapshot al crear) y obtener su hint
+    # para la IA. Legacy/null -> standard.
+    from scoring_modes import get_effective_mode
+    batch_obj = TrainingBatch.query.get(session.batch_id) if session.batch_id else None
+    batch_mode = batch_obj.scoring_mode if batch_obj else None
+    eff_mode_name, _is_legacy, eff_mode_cfg = get_effective_mode(batch_mode)
+    mode_ai_hint = eff_mode_cfg.get('ai_hint', '')
+    mode_label = eff_mode_cfg.get('label', 'Standard')
+
     # Evaluate with OpenAI
     eval_prompt = f"""Evalúa la siguiente conversación entre un asesor y un cliente simulado.
+
+MODO DE EVALUACIÓN: {mode_label}
+{mode_ai_hint}
 
 ESCENARIO: {scenario.title}
 DESCRIPCIÓN: {scenario.description or ''}
@@ -459,41 +614,66 @@ TEXTO DEL ASESOR (para revisar ortografía):
 {user_texts}
 
 NPS - ANÁLISIS DE SENTIMIENTO DEL CLIENTE (escala 0-10):
-El NPS se determina desde la PERSPECTIVA DEL CLIENTE. Analizá cómo se habría sentido el cliente durante la conversación:
-- NPS 9-10 (Promotor): El cliente se sintió escuchado, atendido con calidez, y su problema fue abordado. Se iría satisfecho y recomendaría el servicio.
-- NPS 7-8 (Promotor leve): El cliente tuvo una buena experiencia general, se sintió bien atendido aunque faltaron algunos detalles.
-- NPS 5-6 (Pasivo): El cliente fue atendido pero sin que la experiencia sea memorable. Ni muy satisfecho ni insatisfecho.
-- NPS 3-4 (Detractor leve): El cliente se sintió poco escuchado, las respuestas fueron frías, genéricas, o no abordaron su necesidad.
-- NPS 0-2 (Detractor): El cliente se sintió ignorado, frustrado o mal atendido. Experiencia negativa.
+El NPS se determina desde la PERSPECTIVA DEL CLIENTE. Sé generoso con la evaluación:
+si el cliente fue atendido con un esfuerzo razonable y obtuvo respuesta a su necesidad, NPS alto.
+- NPS 9-10 (Promotor): El cliente se sintió escuchado y atendido con calidez. Su problema fue abordado.
+- NPS 7-8 (Promotor leve): Buena experiencia general, bien atendido aunque algún detalle podría mejorar.
+- NPS 5-6 (Pasivo): Atendido correctamente pero sin nada destacable. Experiencia neutra.
+- NPS 3-4 (Detractor leve): Respuestas frías o genéricas; el cliente sintió que no abordaron su necesidad.
+- NPS 0-2 (Detractor): El cliente se sintió ignorado o mal atendido. Solo aplicar en casos claros.
 
-Factores que MEJORAN el NPS del cliente:
-- Saludo cálido y personalizado
-- Empatía (entender la situación del cliente)
-- Respuestas claras y útiles
-- Seguimiento y preocupación genuina
+EMPATÍA — RÚBRICA JERÁRQUICA (evaluá EN ORDEN, cada paso vale):
+Esta rúbrica define cómo medimos la empatía. Mencionalas en el feedback.
+1. NOMBRE: ¿El asesor mencionó el nombre del cliente al menos una vez?
+2. CONTEXTO: ¿Demostró comprender el problema del cliente (parafrasear, reconocer la situación)?
+3. CALIDEZ: ¿Usó un tono amable, humano, o emojis adecuados (no robótico ni cortante)?
+4. RESOLUCIÓN: ¿Se enfocó genuinamente en ayudar al cliente, no en recitar un speech?
+Una conversación con los 4 pasos cumplidos es alta empatía. Faltar alguno no es necesariamente
+catastrófico — el orden indica prioridad: la resolución y la calidez pesan más que recitar el nombre.
+
+Factores que MEJORAN el NPS:
+- Saludo personalizado, uso del nombre del cliente
+- Comprensión del problema (parafraseo, reconocimiento)
+- Tono cálido y humano
+- Respuestas útiles y orientadas a resolver
 - Despedida amable
 
-Factores que BAJAN el NPS del cliente:
-- Respuestas frías o robóticas
+Factores que BAJAN el NPS:
+- Respuestas frías, robóticas o tipo speech
 - Ignorar lo que el cliente dice
 - No ofrecer soluciones concretas
-- Monosílabos o respuestas sin esfuerzo
-- Falta de empatía ante la situación del cliente
+- Monosílabos sistemáticos
+- Falta de calidez ante una situación delicada
 
 CRITERIO DE CORRECCIÓN (response_correct):
-- true: El asesor cubrió la esencia del procedimiento esperado (no necesita ser textual, pero debe haber abordado los puntos clave).
-- false: El asesor ignoró el procedimiento o no abordó los puntos principales del caso.
+- true: El asesor cubrió la esencia del procedimiento esperado. NO requiere texto literal; basta con
+  abordar la idea principal. Sé permisivo: si la solución es razonable y resuelve el problema, true.
+- false: El asesor ignoró el procedimiento o falló en abordar el caso.
 
-ORTOGRAFÍA: Contá solo errores claros de ortografía/gramática. No contés tildes omitidas en chat informal ni abreviaciones comunes.
+ORTOGRAFÍA — REGLAS LENIENTES (importante):
+- NO contar como errores: tildes omitidas, mayúsculas iniciales en chat informal, abreviaciones
+  comunes (xq, q, tmb, pq, gracias→graxs), uso de emojis, falta de signos de apertura ¿¡, errores
+  tipográficos menores que NO afectan la comprensión.
+- SÍ contar como error: solo faltas que CAMBIAN EL SIGNIFICADO o IMPIDEN ENTENDER el mensaje
+  (palabras mal escritas que cambian el sentido, conjugaciones incorrectas que confunden, frases
+  ilegibles). Si la duda es razonable, NO lo contés.
+- En la mayoría de chats bien escritos el resultado debe ser 0. Solo subir el conteo cuando
+  hay errores que un cliente real notaría con molestia.
 
 Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
 {{
     "nps_score": <número del 0 al 10>,
     "response_correct": <true o false>,
-    "spelling_errors": <número de errores ortográficos claros>,
-    "feedback": "<retroalimentación constructiva: cómo se habría sentido el cliente, qué hizo bien el asesor, qué puede mejorar>",
-    "strengths": "<2-3 fortalezas observadas desde la perspectiva del cliente>",
-    "improvements": "<2-3 áreas de mejora concretas para mejorar la experiencia del cliente>"
+    "spelling_errors": <número de errores ortográficos que afectan la comprensión>,
+    "empathy_breakdown": {{
+        "nombre": <true o false: ¿mencionó el nombre del cliente?>,
+        "contexto": <true o false: ¿demostró comprender el problema?>,
+        "calidez": <true o false: ¿tono amable/humano/emojis adecuados?>,
+        "resolucion": <true o false: ¿se enfocó en ayudar más que recitar speech?>
+    }},
+    "feedback": "<retroalimentación constructiva desde la perspectiva del cliente, mencionando los 4 pilares de empatía>",
+    "strengths": "<2-3 fortalezas observadas>",
+    "improvements": "<2-3 áreas de mejora concretas>"
 }}"""
 
     eval_messages = [
@@ -519,7 +699,8 @@ Respondé EXACTAMENTE en este formato JSON (sin markdown, solo JSON puro):
         session.ai_feedback = json.dumps({
             'feedback': evaluation.get('feedback', ''),
             'strengths': evaluation.get('strengths', ''),
-            'improvements': evaluation.get('improvements', '')
+            'improvements': evaluation.get('improvements', ''),
+            'empathy_breakdown': evaluation.get('empathy_breakdown', {})
         }, ensure_ascii=False)
     except (json.JSONDecodeError, ValueError) as e:
         print(f"[TRAINING] Eval parse error: {e}", flush=True)
@@ -611,8 +792,11 @@ def admin_dashboard():
 @training_bp.route('/admin/training/scenarios')
 @superadmin_required
 def admin_scenarios():
+    from scoring_modes import list_modes
     scenarios = TrainingScenario.query.order_by(TrainingScenario.is_active.desc(), TrainingScenario.created_at.desc()).all()
-    return render_template('admin/training_scenarios.html', scenarios=scenarios)
+    return render_template('admin/training_scenarios.html',
+                           scenarios=scenarios,
+                           scoring_modes=list_modes())
 
 
 @training_bp.route('/admin/training/scenarios/save', methods=['POST'])
@@ -625,6 +809,16 @@ def admin_scenario_save():
     expected_response = request.form.get('expected_response', '').strip()
     difficulty = request.form.get('difficulty', 'medio')
     category = request.form.get('category', '').strip()
+    scoring_mode = request.form.get('scoring_mode', 'standard')
+    if scoring_mode not in ('flexible', 'standard', 'exigente'):
+        scoring_mode = 'standard'
+
+    # Delay del cliente simulado: 10-60 segundos.
+    try:
+        client_delay = int(request.form.get('client_response_delay_seconds', 30))
+    except (ValueError, TypeError):
+        client_delay = 30
+    client_delay = max(10, min(60, client_delay))
 
     if not title or not client_persona or not expected_response:
         flash('Título, persona del cliente y respuesta esperada son obligatorios.', 'error')
@@ -638,11 +832,15 @@ def admin_scenario_save():
         s.expected_response = expected_response
         s.difficulty = difficulty
         s.category = category
+        s.scoring_mode = scoring_mode
+        s.client_response_delay_seconds = client_delay
     else:
         s = TrainingScenario(
             title=title, description=description,
             client_persona=client_persona, expected_response=expected_response,
             difficulty=difficulty, category=category,
+            scoring_mode=scoring_mode,
+            client_response_delay_seconds=client_delay,
             created_by=current_user.id
         )
         db.session.add(s)
@@ -941,7 +1139,15 @@ def api_training_live():
 # ===== Vex People Skill Predictive =====
 
 def calculate_vex_profile(user_id):
-    """Calculate and update VexProfile for a user based on ALL completed sessions."""
+    """Calculate and update VexProfile for a user based on ALL completed sessions.
+
+    El perfil agregado se calcula usando el modo del batch MAS RECIENTE del
+    usuario (Flexible/Standard/Exigente). Las dimensiones siguen siendo
+    objetivas pero los pisos, la curva ART y los umbrales de categoria/
+    recomendacion vienen del modo. Sesiones legacy sin modo -> Standard.
+    """
+    from scoring_modes import get_effective_mode
+
     sessions = TrainingSession.query.filter_by(
         user_id=user_id, status='completed'
     ).all()
@@ -949,18 +1155,58 @@ def calculate_vex_profile(user_id):
     if len(sessions) < 2:
         return None  # Minimum 2 sessions required
 
+    # Determinar modo a usar para el perfil: el del batch mas reciente.
+    sorted_for_mode = sorted(sessions, key=lambda s: s.created_at or datetime.min, reverse=True)
+    latest_session = sorted_for_mode[0]
+    latest_batch = TrainingBatch.query.get(latest_session.batch_id) if latest_session.batch_id else None
+    latest_mode_name = latest_batch.scoring_mode if latest_batch else None
+    _eff_mode_name, _is_legacy, mode_cfg = get_effective_mode(latest_mode_name)
+    floors = mode_cfg['floors']
+    art_curve = mode_cfg['art_curve']
+    pi_weights = mode_cfg['pi_weights']
+    thresholds = mode_cfg['thresholds']
+    rec_thresholds = mode_cfg['recommendation']
+    spell_mult = mode_cfg['spelling_multiplier']
+    empathy_pillars_w = mode_cfg['empathy_pillars_weight']
+
     # --- Raw metric aggregation ---
     total_sessions = len(sessions)
     total_words = sum(s.total_words_user or 0 for s in sessions)
     total_spelling = sum(s.spelling_errors or 0 for s in sessions)
     avg_nps = sum(s.nps_score or 0 for s in sessions) / total_sessions
     avg_wpm = sum(s.words_per_minute or 0 for s in sessions) / total_sessions
-    avg_duration = sum(s.duration_seconds or 0 for s in sessions) / total_sessions
     correct_count = sum(1 for s in sessions if s.response_correct)
     correct_rate = correct_count / total_sessions
+    # Spelling rate: errores por palabra. Solo contamos errores que afectan
+    # comprension (el prompt de IA ya filtra tildes/abreviaciones).
     spelling_rate = total_spelling / max(total_words, 1)
     unique_scenarios = len(set(s.scenario_id for s in sessions))
     total_scenarios = TrainingScenario.query.filter_by(is_active=True).count() or 1
+
+    # ART (Average Response Time) — promedio del tiempo medio de respuesta
+    # del asesor en cada sesion. Solo considera sesiones con ART medible.
+    art_values = [s.avg_response_time for s in sessions if s.avg_response_time and s.avg_response_time > 0]
+    avg_art = sum(art_values) / len(art_values) if art_values else 0  # segundos
+
+    # Empathy breakdown agregado: promedio del cumplimiento de cada pilar.
+    empathy_pillars = {'nombre': 0, 'contexto': 0, 'calidez': 0, 'resolucion': 0}
+    pillar_count = 0
+    for s in sessions:
+        if not s.ai_feedback:
+            continue
+        try:
+            fb = json.loads(s.ai_feedback)
+            br = fb.get('empathy_breakdown') or {}
+            if br:
+                pillar_count += 1
+                for k in empathy_pillars:
+                    if br.get(k):
+                        empathy_pillars[k] += 1
+        except (json.JSONDecodeError, TypeError):
+            pass
+    empathy_pillar_rate = {
+        k: (v / pillar_count) if pillar_count else 0 for k, v in empathy_pillars.items()
+    }
 
     # Improvement trend (NPS slope across sessions ordered by date)
     sorted_sessions = sorted(sessions, key=lambda s: s.created_at or datetime.min)
@@ -977,33 +1223,62 @@ def calculate_vex_profile(user_id):
         improvement_trend = 0.5
 
     # --- Dimension raw scores (0-100) ---
-    # 1. Communication: inverse spelling rate + message quality
-    comm_raw = (1 - min(spelling_rate * 10, 1)) * 50 + (avg_nps / 10) * 50
+    # Penalizacion ortografica segun modo (multiplicador del modo).
+    spelling_penalty = min(spelling_rate * spell_mult, 1)
 
-    # 2. Empathy: primarily NPS (NPS captures how well agent treated the client)
-    empathy_raw = avg_nps * 10  # 0-10 → 0-100
+    # 1. Comunicacion: piso del modo + ortografia + NPS.
+    comm_raw = floors['communication'] + (1 - spelling_penalty) * 30 + (avg_nps / 10) * 40
 
-    # 3. Resolution: correct rate is king
-    resolution_raw = correct_rate * 70 + (avg_nps / 10) * 30
+    # 2. Empatia: pilares (Nombre/Contexto/Calidez/Resolucion 15/25/25/35)
+    #    mezclados con NPS segun el peso del modo.
+    if pillar_count > 0:
+        empathy_pillars_score = (
+            empathy_pillar_rate['nombre'] * 15 +
+            empathy_pillar_rate['contexto'] * 25 +
+            empathy_pillar_rate['calidez'] * 25 +
+            empathy_pillar_rate['resolucion'] * 35
+        )  # 0-100
+        empathy_raw = empathy_pillars_score * empathy_pillars_w + (avg_nps * 10) * (1 - empathy_pillars_w)
+    else:
+        empathy_raw = avg_nps * 10  # fallback legacy
 
-    # 4. Speed: WPM normalized to 30 WPM benchmark (realistic for chat support) + duration
-    speed_wpm = min(100, (avg_wpm / 30) * 100)
-    speed_dur = min(100, max(0, (600 - avg_duration) / 600 * 100))  # 600s = 10min benchmark
-    speed_raw = speed_wpm * 0.6 + speed_dur * 0.4
+    # 3. Resolucion: piso del modo + correct_rate + NPS.
+    resolution_raw = floors['resolution'] + correct_rate * 50 + (avg_nps / 10) * 25
 
-    # 5. Adaptability: improvement + scenario variety
-    variety = min(1, unique_scenarios / max(total_scenarios * 0.5, 1))
-    adapt_raw = improvement_trend * 50 + variety * 50
+    # 4. Velocidad: curva ART del modo (4 cortes configurables).
+    if avg_art <= 0:
+        speed_art = art_curve['no_data_score']
+    elif avg_art <= art_curve['excellent_max']:
+        speed_art = 100
+    elif avg_art <= art_curve['healthy_max']:
+        span = art_curve['healthy_max'] - art_curve['excellent_max']
+        speed_art = 100 - ((avg_art - art_curve['excellent_max']) / max(span, 1)) * 20
+    elif avg_art <= art_curve['acceptable_max']:
+        span = art_curve['acceptable_max'] - art_curve['healthy_max']
+        speed_art = 80 - ((avg_art - art_curve['healthy_max']) / max(span, 1)) * 30
+    elif avg_art <= art_curve['slow_max']:
+        span = art_curve['slow_max'] - art_curve['acceptable_max']
+        speed_art = 50 - ((avg_art - art_curve['acceptable_max']) / max(span, 1)) * 30
+    else:
+        speed_art = 20
 
-    # 6. Compliance: correct rate + low errors
-    compliance_raw = correct_rate * 60 + (1 - min(spelling_rate * 10, 1)) * 40
+    speed_wpm = min(100, (avg_wpm / 25) * 100) if avg_wpm > 0 else 50
+    speed_raw = speed_art * 0.7 + speed_wpm * 0.3
+
+    # 5. Adaptabilidad: piso del modo + tendencia + variedad.
+    variety = min(1, unique_scenarios / max(total_scenarios * 0.4, 1))
+    adapt_raw = floors['adaptability'] + improvement_trend * 35 + variety * 35
+
+    # 6. Compliance: piso del modo + correct_rate + ortografia.
+    compliance_raw = floors['compliance'] + correct_rate * 45 + (1 - spelling_penalty) * 30
 
     raw_scores = [comm_raw, empathy_raw, resolution_raw, speed_raw, adapt_raw, compliance_raw]
 
     # --- Convert to Sten scale (1-10) ---
+    # Curva mas generosa: redondeo hacia arriba cuando el resto es >=4.
     def to_sten(raw):
-        """Convert 0-100 raw score to 1-10 Sten using criterion-referenced approach."""
-        sten = round(raw / 10)
+        """Convert 0-100 raw score to 1-10 Sten."""
+        sten = int(raw / 10) + (1 if (raw % 10) >= 4 else 0)
         return max(1, min(10, sten))
 
     scores = [to_sten(r) for r in raw_scores]
@@ -1012,25 +1287,31 @@ def calculate_vex_profile(user_id):
     # --- Overall score (simple average) ---
     overall = round(sum(scores) / 6, 1)
 
-    # --- Predictive Index (weighted composite) ---
-    pi = (resolution * 0.25 + empathy * 0.20 + comm * 0.20 +
-          speed * 0.15 + adapt * 0.10 + compliance * 0.10)
-    pi_pct = round(pi * 10, 1)  # Convert to percentage (1-10 → 10-100%)
+    # --- Predictive Index (pesos del modo) ---
+    pi = (
+        resolution * pi_weights['resolution'] +
+        empathy * pi_weights['empathy'] +
+        comm * pi_weights['communication'] +
+        speed * pi_weights['speed'] +
+        adapt * pi_weights['adaptability'] +
+        compliance * pi_weights['compliance']
+    )
+    pi_pct = round(pi * 10, 1)  # 1-10 -> 10-100%
 
-    # --- Profile Category ---
-    if all(s >= 8 for s in scores):
+    # --- Categoria de perfil (umbrales del modo) ---
+    if overall >= thresholds['elite_overall'] and all(s >= thresholds['elite_min_dim'] for s in scores):
         category = 'elite'
-    elif overall >= 7 and all(s >= 5 for s in scores):
+    elif overall >= thresholds['alto_overall'] and all(s >= thresholds['alto_min_dim'] for s in scores):
         category = 'alto'
-    elif overall >= 5:
+    elif overall >= thresholds['desarrollo_overall']:
         category = 'desarrollo'
     else:
         category = 'refuerzo'
 
-    # --- Recommendation ---
-    if pi_pct >= 70:
+    # --- Recomendacion (umbrales del modo) ---
+    if pi_pct >= rec_thresholds['recomendado']:
         rec = 'recomendado'
-    elif pi_pct >= 50:
+    elif pi_pct >= rec_thresholds['observaciones']:
         rec = 'observaciones'
     else:
         rec = 'no_recomendado'
@@ -1089,3 +1370,128 @@ def vex_profile(user_id):
 @superadmin_required
 def vex_methodology():
     return render_template('admin/vex_methodology.html')
+
+
+@training_bp.route('/admin/vex/modos')
+@superadmin_required
+def vex_modos():
+    """Vista y edicion de los 3 modos de scoring (solo SuperAdmin)."""
+    from scoring_modes import (DEFAULT_MODES, MODE_NAMES, PEDAGOGICAL_GUIDE,
+                               ADMIN_SUMMARY, get_mode_config)
+    modes_data = []
+    for name in MODE_NAMES:
+        cfg = get_mode_config(name)
+        default = DEFAULT_MODES[name]
+        is_overridden = (cfg != default)
+        modes_data.append({
+            'key': name,
+            'config': cfg,
+            'is_overridden': is_overridden,
+            'summary': ADMIN_SUMMARY[name]
+        })
+    return render_template('admin/vex_modos.html',
+                           modes_data=modes_data,
+                           pedagogical_guide=PEDAGOGICAL_GUIDE,
+                           is_superadmin=True)
+
+
+@training_bp.route('/admin/vex/modos/save', methods=['POST'])
+@superadmin_required
+def vex_modos_save():
+    """Guarda overrides de un modo. Solo SuperAdmin."""
+    from models import ScoringModeOverride
+    from scoring_modes import DEFAULT_MODES
+
+    mode = request.form.get('mode', '').strip()
+    if mode not in DEFAULT_MODES:
+        flash('Modo invalido.', 'error')
+        return redirect(url_for('training.vex_modos'))
+
+    try:
+        # Pesos PI: el template los manda como porcentajes enteros (5-50).
+        # Si vienen ya como decimales (0-1), los aceptamos igual.
+        raw_weights = {
+            'empathy': float(request.form.get('w_empathy', 0)),
+            'resolution': float(request.form.get('w_resolution', 0)),
+            'communication': float(request.form.get('w_communication', 0)),
+            'speed': float(request.form.get('w_speed', 0)),
+            'adaptability': float(request.form.get('w_adaptability', 0)),
+            'compliance': float(request.form.get('w_compliance', 0))
+        }
+        # Si parecen porcentajes (suma > 2 o algun valor > 1), normalizamos /100.
+        if sum(raw_weights.values()) > 2 or any(v > 1 for v in raw_weights.values()):
+            raw_weights = {k: v / 100.0 for k, v in raw_weights.items()}
+
+        # empathy_pillars_weight: template lo manda 0-100; si viene 0-1 lo dejamos.
+        empathy_pw = float(request.form.get('empathy_pillars_weight', 0.7))
+        if empathy_pw > 1:
+            empathy_pw = empathy_pw / 100.0
+        empathy_pw = max(0.0, min(1.0, empathy_pw))
+
+        cfg = {
+            'pi_weights': raw_weights,
+            'spelling_multiplier': float(request.form.get('spelling_multiplier', 25)),
+            'empathy_pillars_weight': empathy_pw,
+            'art_curve': {
+                'excellent_max': float(request.form.get('art_excellent', 120)),
+                'healthy_max': float(request.form.get('art_healthy', 180)),
+                'acceptable_max': float(request.form.get('art_acceptable', 300)),
+                'slow_max': float(request.form.get('art_slow', 600)),
+                'no_data_score': float(request.form.get('art_no_data', 65))
+            },
+            'thresholds': {
+                'elite_overall': float(request.form.get('th_elite_overall', 8.5)),
+                'elite_min_dim': float(request.form.get('th_elite_min', 7)),
+                'alto_overall': float(request.form.get('th_alto_overall', 6.5)),
+                'alto_min_dim': float(request.form.get('th_alto_min', 4)),
+                'desarrollo_overall': float(request.form.get('th_desarrollo_overall', 4.5))
+            },
+            'recommendation': {
+                'recomendado': float(request.form.get('rec_recomendado', 65)),
+                'observaciones': float(request.form.get('rec_observaciones', 45))
+            },
+            'floors': {
+                'communication': float(request.form.get('floor_communication', 30)),
+                'resolution': float(request.form.get('floor_resolution', 25)),
+                'adaptability': float(request.form.get('floor_adaptability', 30)),
+                'compliance': float(request.form.get('floor_compliance', 25)),
+                'empathy': 0,
+                'speed_no_data': float(request.form.get('floor_speed_no_data', 65))
+            }
+        }
+    except (ValueError, TypeError):
+        flash('Algun valor numerico es invalido.', 'error')
+        return redirect(url_for('training.vex_modos'))
+
+    # Validacion: pesos PI deben sumar ~1 (post-normalizacion).
+    total_w = sum(cfg['pi_weights'].values())
+    if abs(total_w - 1.0) > 0.02:
+        flash(f'Los pesos del Predictive Index deben sumar 100% (actualmente {total_w*100:.0f}%).', 'error')
+        return redirect(url_for('training.vex_modos'))
+
+    override = ScoringModeOverride.query.filter_by(mode=mode).first()
+    if not override:
+        override = ScoringModeOverride(mode=mode)
+        db.session.add(override)
+    override.config_json = json.dumps(cfg, ensure_ascii=False)
+    override.updated_by = current_user.id
+    db.session.commit()
+    flash(f'Modo "{mode}" actualizado.', 'success')
+    return redirect(url_for('training.vex_modos'))
+
+
+@training_bp.route('/admin/vex/modos/reset/<mode>', methods=['POST'])
+@superadmin_required
+def vex_modos_reset(mode):
+    """Borra el override de un modo: vuelve al default de fabrica."""
+    from models import ScoringModeOverride
+    from scoring_modes import DEFAULT_MODES
+    if mode not in DEFAULT_MODES:
+        flash('Modo invalido.', 'error')
+        return redirect(url_for('training.vex_modos'))
+    override = ScoringModeOverride.query.filter_by(mode=mode).first()
+    if override:
+        db.session.delete(override)
+        db.session.commit()
+    flash(f'Modo "{mode}" restaurado a valores de fabrica.', 'success')
+    return redirect(url_for('training.vex_modos'))

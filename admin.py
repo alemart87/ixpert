@@ -27,6 +27,13 @@ def dashboard():
     return render_template('admin/dashboard.html')
 
 
+@admin_bp.route('/novedades')
+@superadmin_required
+def novedades():
+    """Pagina de novedades para el SuperAdmin: cambios recientes en lenguaje claro."""
+    return render_template('admin/novedades.html')
+
+
 # --- Content Management ---
 @admin_bp.route('/contents')
 @superadmin_required

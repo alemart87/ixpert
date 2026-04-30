@@ -106,6 +106,8 @@ def scenario_json_filter(scenario):
         'description': scenario.description or '',
         'difficulty': scenario.difficulty,
         'category': scenario.category or '',
+        'scoring_mode': getattr(scenario, 'scoring_mode', None) or 'standard',
+        'client_response_delay_seconds': getattr(scenario, 'client_response_delay_seconds', None) or 30,
         'cases': cases
     }, ensure_ascii=False)
 
@@ -166,6 +168,29 @@ def inject_nav_categories():
         cats = Category.query.filter_by(is_active=True).order_by(Category.sort_order).all()
         return {'nav_categories': cats}
     return {'nav_categories': []}
+
+
+@app.context_processor
+def inject_mode_badge_helper():
+    """Expose a helper to render scoring mode labels uniformly."""
+    def mode_badge_label(mode):
+        m = (mode or 'legacy').lower()
+        return {
+            'flexible': '🟢 Flexible',
+            'standard': '🔵 Standard',
+            'exigente': '🔴 Exigente',
+        }.get(m, '⚪ Legacy')
+
+    def mode_badge_class(mode):
+        m = (mode or 'legacy').lower()
+        if m not in ('flexible', 'standard', 'exigente'):
+            return 'legacy'
+        return m
+
+    return {
+        'mode_badge_label': mode_badge_label,
+        'mode_badge_class': mode_badge_class,
+    }
 
 
 @app.route('/')

@@ -145,6 +145,10 @@ class TrainingScenario(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    scoring_mode = db.Column(db.String(20), nullable=True)  # flexible/standard/exigente, null=legacy
+    # Tiempo (s) que el cliente simulado espera antes de responder al asesor
+    # tras recibir su(s) mensaje(s). Range 10-60.
+    client_response_delay_seconds = db.Column(db.Integer, default=30)
 
     sessions = db.relationship('TrainingSession', backref='scenario', lazy=True)
     creator = db.relationship('User', foreign_keys=[created_by])
@@ -165,6 +169,11 @@ class TrainingBatch(db.Model):
     overall_correct_rate = db.Column(db.Float)
     ai_feedback_summary = db.Column(db.Text)
     tokens_used = db.Column(db.Integer, default=0)
+    # Snapshot del modo de scoring del escenario al crear el batch.
+    # null = legacy (se evalua con Standard pero se etiqueta diferente).
+    scoring_mode = db.Column(db.String(20), nullable=True)
+    # Snapshot del delay del escenario al crear el batch (segundos 10-60).
+    client_response_delay_seconds = db.Column(db.Integer, default=30)
 
     sessions = db.relationship('TrainingSession', backref='batch', lazy=True)
     user = db.relationship('User', backref='training_batches')
@@ -189,6 +198,7 @@ class TrainingSession(db.Model):
     total_chars_user = db.Column(db.Integer, default=0)
     spelling_errors = db.Column(db.Integer, default=0)
     words_per_minute = db.Column(db.Float, default=0)
+    avg_response_time = db.Column(db.Float, default=0)  # ART en segundos: tiempo medio cliente->asesor
     nps_score = db.Column(db.Integer)  # 0-10
     ai_feedback = db.Column(db.Text)
     response_correct = db.Column(db.Boolean)
@@ -242,3 +252,21 @@ class VexProfile(db.Model):
     last_updated = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship('User', backref=db.backref('vex_profile', uselist=False))
+
+
+class ScoringModeOverride(db.Model):
+    """
+    Override global de un modo de scoring. Solo el SuperAdmin puede editar.
+    Una fila por modo (flexible/standard/exigente). Si no existe la fila,
+    se usan los defaults de fabrica de scoring_modes.DEFAULT_MODES.
+    """
+    __tablename__ = 'scoring_mode_overrides'
+
+    id = db.Column(db.Integer, primary_key=True)
+    mode = db.Column(db.String(20), unique=True, nullable=False)  # flexible/standard/exigente
+    config_json = db.Column(db.Text)  # JSON con las claves a override
+    updated_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
+                           onupdate=lambda: datetime.now(timezone.utc))
+
+    editor = db.relationship('User', foreign_keys=[updated_by])

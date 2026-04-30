@@ -29,7 +29,10 @@
 <div style="background:#fff4e5;border:2px solid #ff6600;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
     <div>
         <strong style="color:#ff6600">Sesión activa en curso</strong>
-        <p style="margin:4px 0 0;font-size:13px;color:#666">{{ active_batch.scenario.title }} — {{ active_batch.max_concurrent }} interacciones</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#666">
+            {{ active_batch.scenario.title }} — {{ active_batch.max_concurrent }} interacciones
+            <span class="mode-badge {{ mode_badge_class(active_batch.scoring_mode) }}" style="margin-left:6px">{{ mode_badge_label(active_batch.scoring_mode) }}</span>
+        </p>
     </div>
     <a href="{{ url_for('training.batch_view', batch_id=active_batch.id) }}" class="btn btn-primary">Continuar</a>
 </div>
@@ -39,13 +42,15 @@
 <div class="scenario-grid">
     {% for s in scenarios %}
     <div class="scenario-card">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;gap:8px">
             <h3>{{ s.title }}</h3>
             <span class="badge-difficulty badge-{{ s.difficulty }}">{{ s.difficulty }}</span>
         </div>
         <p>{{ s.description or 'Escenario de práctica' }}</p>
-        {% if s.category %}<span class="badge" style="margin-bottom:10px">{{ s.category }}</span>{% endif %}
-        <br>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            {% if s.category %}<span class="badge">{{ s.category }}</span>{% endif %}
+            <span class="mode-badge {{ mode_badge_class(s.scoring_mode) }}">{{ mode_badge_label(s.scoring_mode) }}</span>
+        </div>
         <button class="btn btn-primary" onclick="startTraining({{ s.id }})" {% if active_batch %}disabled title="Finaliza tu sesión activa primero"{% endif %}>
             Iniciar Entrenamiento
         </button>
@@ -63,6 +68,7 @@
     <div class="session-item">
         <div class="si-info">
             <strong>Batch {{ b.id }}</strong> — {{ b.scenario.title }} ({{ b.max_concurrent }} chats)
+            <span class="mode-badge {{ mode_badge_class(b.scoring_mode) }}" style="margin-left:6px">{{ mode_badge_label(b.scoring_mode) }}</span>
             <br><small style="color:#888">{{ b.created_at.strftime('%d/%m/%Y %H:%M') if b.created_at else '' }}
             {% if b.status == 'active' %}<span style="color:#ff6600">● En curso</span>{% endif %}</small>
         </div>

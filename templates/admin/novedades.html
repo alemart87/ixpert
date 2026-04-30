@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+{% block title %}Novedades - iXpert{% endblock %}
+{% block extra_head %}
+<style>
+.nov-container { max-width: 960px; margin: 0 auto; }
+.nov-hero {
+    background: linear-gradient(135deg, #ff6600, #ff9500);
+    color: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(255, 102, 0, 0.3);
+}
+.nov-hero h1 { margin: 0 0 6px; font-size: 28px; }
+.nov-hero p { margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.6; }
+.nov-version-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+/* Card de cambio */
+.nov-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border-left: 5px solid #ff6600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.nov-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.nov-card.featured { border-left-color: #2e7d32; background: linear-gradient(135deg, #fff 0%, #f0fff4 100%); }
+.nov-card.feature-ai { border-left-color: #0277bd; }
+.nov-card.feature-ux { border-left-color: #7b1fa2; }
+.nov-card-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.nov-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #fff4e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+.nov-card.featured .nov-card-icon { background: #e8f5e9; }
+.nov-card.feature-ai .nov-card-icon { background: #e3f2fd; }
+.nov-card.feature-ux .nov-card-icon { background: #f3e5f5; }
+.nov-card-title { flex: 1; min-width: 200px; }
+.nov-card-title h2 { margin: 0; color: #002776; font-size: 19px; }
+.nov-card-title .subtitle { margin: 4px 0 0; color: #666; font-size: 13px; }
+.nov-card-tag {
+    background: #ff6600;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.nov-card.featured .nov-card-tag { background: #2e7d32; }
+.nov-card.feature-ai .nov-card-tag { background: #0277bd; }
+.nov-card.feature-ux .nov-card-tag { background: #7b1fa2; }
+
+.nov-card-body { color: #444; font-size: 14px; line-height: 1.7; }
+.nov-card-body p { margin: 0 0 10px; }
+.nov-card-body strong { color: #002776; }
+.nov-card-body ul { margin: 8px 0 12px; padding-left: 22px; }
+.nov-card-body li { margin-bottom: 4px; }
+
+/* Bloque destacado dentro de una card */
+.nov-highlight {
+    background: #fff8f0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border-left: 3px solid #ff6600;
+    font-size: 13px;
+    color: #555;
+}
+.nov-highlight strong { color: #ff6600; }
+
+/* Grilla de modos */
+.nov-modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 14px 0;
+}
+@media (max-width: 720px) { .nov-modes { grid-template-columns: 1fr; } }
+.nov-mode {
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 2px solid;
+}
+.nov-mode.flexible { border-color: #2e7d32; background: #f1f8f3; }
+.nov-mode.standard { border-color: #0277bd; background: #f0f7fc; }
+.nov-mode.exigente { border-color: #c62828; background: #fdf3f3; }
+.nov-mode h4 { margin: 0 0 4px; font-size: 14px; }
+.nov-mode.flexible h4 { color: #2e7d32; }
+.nov-mode.standard h4 { color: #0277bd; }
+.nov-mode.exigente h4 { color: #c62828; }
+.nov-mode p { margin: 0; font-size: 12px; color: #555; line-height: 1.5; }
+
+/* Footer / aviso */
+.nov-footer {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-top: 24px;
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.nov-footer strong { color: #002776; }
+
+/* Quick nav */
+.nov-quicknav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+.nov-quicknav a {
+    background: #fff;
+    color: #555;
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 12px;
+    text-decoration: none;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s;
+}
+.nov-quicknav a:hover {
+    background: #ff6600;
+    color: #fff;
+    border-color: #ff6600;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="nov-container">
+
+    <div class="nov-hero">
+        <span class="nov-version-badge">Actualización Vex Predictive 2.0</span>
+        <h1>✨ Novedades de la plataforma</h1>
+        <p>Mejoramos la forma en que evaluamos a los asesores. Acá te contamos, en lenguaje simple, qué cambió y cómo aprovecharlo. Esta página se va a ir actualizando con las próximas mejoras.</p>
+    </div>
+
+    <!-- Quick nav -->
+    <div class="nov-quicknav">
+        <a href="#modos">🎯 Modos de evaluación</a>
+        <a href="#art">⏱ Tiempo de respuesta (ART)</a>
+        <a href="#delay">⏳ Espera del cliente simulado</a>
+        <a href="#empatia">💛 Rúbrica de empatía</a>
+        <a href="#ortografia">📝 Ortografía más justa</a>
+        <a href="#ia">🤖 Nuevo motor de IA</a>
+        <a href="#chat">💬 Chat más cómodo</a>
+    </div>
+
+    <!-- 🎯 Modos -->
+    <article class="nov-card featured" id="modos">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🎯</div>
+            <div class="nov-card-title">
+                <h2>Modos de Evaluación: Flexible, Standard y Exigente</h2>
+                <p class="subtitle">Cada escenario ahora se evalúa con la severidad adecuada al contexto.</p>
+            </div>
+            <span class="nov-card-tag">Lo más importante</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Antes había un único nivel de exigencia para todos los escenarios. Ahora cuando creás un escenario podés elegir uno de tres modos según para quién es:</p>
+
+            <div class="nov-modes">
+                <div class="nov-mode flexible">
+                    <h4>🟢 Flexible</h4>
+                    <p>Para nuevos ingresos, capacitación o procesos de selección. El sistema premia el esfuerzo y es más permisivo con errores.</p>
+                </div>
+                <div class="nov-mode standard">
+                    <h4>🔵 Standard</h4>
+                    <p>Para asesores activos en producción. Es el modo recomendado por defecto y refleja la operación real.</p>
+                </div>
+                <div class="nov-mode exigente">
+                    <h4>🔴 Exigente</h4>
+                    <p>Para expertos, calibración o pruebas de excelencia. Solo premia la calidad real, no el esfuerzo.</p>
+                </div>
+            </div>
+
+            <p><strong>¿Cómo funciona?</strong> Cuando un asesor inicia un entrenamiento, el sistema toma una "foto" del modo del escenario y la usa para evaluar esa sesión. Si después cambiás el modo del escenario, las sesiones ya iniciadas no cambian — quedan con su modo original.</p>
+
+            <div class="nov-highlight">
+                <strong>Vista nueva:</strong> en <em>Vex Predictive → Modos de Scoring</em> podés ajustar finamente cada modo (pesos, umbrales, exigencia ortográfica…). Si algo se rompe, hay un botón "Volver a valores de fábrica" en cada modo.
+            </div>
+
+            <p><strong>Lo verás en:</strong></p>
+            <ul>
+                <li>Una etiqueta de color en cada escenario (lista de escenarios y al iniciar un chat).</li>
+                <li>Un selector de tres tarjetas al crear o editar un escenario.</li>
+                <li>El resultado del entrenamiento muestra qué modo se usó.</li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- ⏱ ART -->
+    <article class="nov-card featured" id="art">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">⏱</div>
+            <div class="nov-card-title">
+                <h2>Nueva métrica: Tiempo de Respuesta (ART)</h2>
+                <p class="subtitle">Medimos lo que realmente importa: cuánto tarda el asesor en responder al cliente.</p>
+            </div>
+            <span class="nov-card-tag">Cambio mayor</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Antes, "velocidad" era una mezcla de palabras por minuto y duración total del chat. El problema: si el cliente tardaba en escribir, el asesor parecía "lento" sin culpa propia.</p>
+
+            <p>Ahora usamos <strong>ART (Average Response Time)</strong>: el tiempo promedio que pasa <em>desde que el cliente envía un mensaje hasta que el asesor le contesta</em>. Es lo único que el asesor controla.</p>
+
+            <div class="nov-highlight">
+                <strong>Meta saludable:</strong> entre <strong>120 y 180 segundos</strong> de ART en operativas con varios chats simultáneos. Modos diferentes pueden exigir más o menos.
+            </div>
+
+            <p><strong>Qué NO hace ART:</strong></p>
+            <ul>
+                <li>No castiga al asesor si el cliente tarda en escribir.</li>
+                <li>No mide la duración total del chat (un chat largo y exitoso es bueno).</li>
+                <li>No penaliza pausas extremas: si un cliente desaparece 20 minutos, el sistema corta ese tramo en 10 minutos para no arruinar el promedio del asesor.</li>
+            </ul>
+
+            <p><strong>¿Y los entrenamientos viejos?</strong> Sesiones que se hicieron antes de este cambio no tienen ART medido. Reciben un puntaje neutro y no se ven perjudicadas.</p>
+        </div>
+    </article>
+
+    <!-- ⏳ Tiempo de respuesta del cliente -->
+    <article class="nov-card featured" id="delay">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">⏳</div>
+            <div class="nov-card-title">
+                <h2>El cliente simulado ahora espera antes de responder</h2>
+                <p class="subtitle">Configurable por escenario, entre 10 y 60 segundos. Más realista, sin afectar al asesor.</p>
+            </div>
+            <span class="nov-card-tag">Nuevo</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Antes el cliente simulado contestaba al instante. En la realidad, un cliente <strong>lee, piensa y tipea</strong>. Eso le daba al entrenamiento un ritmo poco realista — y a veces el asesor enviaba un solo mensaje porque no le daba tiempo a desarrollar la respuesta.</p>
+
+            <p>Ahora cada escenario tiene un parámetro nuevo: <strong>"Tiempo de respuesta del cliente"</strong> (10 a 60 segundos, por defecto 30). Después del último mensaje del asesor, el cliente espera ese tiempo antes de responder. Si el asesor envía otro mensaje en el medio, el contador se reinicia y todos los mensajes llegan a la IA <strong>en orden</strong> como un solo turno.</p>
+
+            <div class="nov-highlight">
+                <strong>⚠ Lo más importante:</strong> esta espera <strong>NO afecta el ART ni el WPM del asesor</strong>. ART mide solo cuánto tarda el asesor en responder al cliente — la espera del cliente es del lado opuesto y no se cuenta. Las métricas del asesor están protegidas.
+            </div>
+
+            <p><strong>¿Qué ve el asesor?</strong></p>
+            <ul>
+                <li>Después de enviar un mensaje, aparece un cartelito naranja: "Cliente está leyendo y respondiendo… 28s" con un contador en vivo.</li>
+                <li>Si envía otro mensaje, el contador se reinicia.</li>
+                <li>Al llegar a 0, aparecen los tres puntitos (cliente tipeando) y luego la respuesta.</li>
+            </ul>
+
+            <p><strong>¿Cómo se configura?</strong></p>
+            <ul>
+                <li>Al crear o editar un escenario, hay un slider de 10s a 60s con la etiqueta "Tiempo de respuesta del cliente".</li>
+                <li>Al iniciar un entrenamiento, el batch toma una "foto" del valor del escenario. Si lo cambiás después, los entrenamientos en curso siguen con el valor original.</li>
+            </ul>
+
+            <p><strong>Recomendaciones:</strong></p>
+            <ul>
+                <li><strong>10–20s:</strong> chat ágil — clientes que ya tienen claro lo que quieren.</li>
+                <li><strong>30s:</strong> realista para la mayoría de los casos (default).</li>
+                <li><strong>45–60s:</strong> clientes que tardan, casos complejos, o si querés que el asesor maneje varios chats simultáneos sin saturarse.</li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- 💛 Empatía -->
+    <article class="nov-card" id="empatia">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">💛</div>
+            <div class="nov-card-title">
+                <h2>Empatía: ahora se mide en 4 pasos claros</h2>
+                <p class="subtitle">La IA evalúa la empatía con una rúbrica auditable, no solo "feeling".</p>
+            </div>
+            <span class="nov-card-tag">Nuevo</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Antes la empatía era un número mágico que salía del NPS. Ahora la IA llena una <strong>checklist de 4 pilares</strong> ordenados por importancia operativa:</p>
+
+            <ul>
+                <li><strong>1. Nombre (15%)</strong> — ¿Mencionó el nombre del cliente al menos una vez?</li>
+                <li><strong>2. Contexto (25%)</strong> — ¿Demostró comprender el problema? (parafrasear, reconocer la situación)</li>
+                <li><strong>3. Calidez (25%)</strong> — ¿Tono amable y humano, o emojis adecuados?</li>
+                <li><strong>4. Resolución (35%)</strong> — ¿Se enfocó en ayudar, no en recitar un speech?</li>
+            </ul>
+
+            <p>El que más pesa es el último: la <strong>resolución</strong>. Decirle "Sr. González" 5 veces sin ayudarlo no convierte a nadie en empático.</p>
+
+            <div class="nov-highlight">
+                La nota final de empatía es <strong>70% rúbrica + 30% NPS del cliente</strong>. Esto la hace auditable y entrenable: si un asesor saca bajo en "Calidez", sabés exactamente qué practicar.
+            </div>
+        </div>
+    </article>
+
+    <!-- 📝 Ortografía -->
+    <article class="nov-card" id="ortografia">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">📝</div>
+            <div class="nov-card-title">
+                <h2>Ortografía: reglas más justas para chat</h2>
+                <p class="subtitle">No castigamos cosas que en chat informal son normales.</p>
+            </div>
+            <span class="nov-card-tag">Mejora</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Cualquier asesor que tipea rápido en un chat omite alguna tilde o usa "xq" alguna vez. Eso no es un error grave — antes el sistema lo contaba igual. Ahora <strong>solo se penaliza lo que cambia el significado o impide entender</strong> el mensaje.</p>
+
+            <p><strong>NO se cuenta como error:</strong></p>
+            <ul>
+                <li>Tildes omitidas</li>
+                <li>Mayúsculas iniciales en chat informal</li>
+                <li>Abreviaciones comunes (xq, q, tmb, pq, graxs)</li>
+                <li>Emojis o falta de signos de apertura ¿ ¡</li>
+                <li>Errores tipográficos menores (te falta una letra y el cliente igual entiende)</li>
+            </ul>
+
+            <p><strong>SÍ se cuenta:</strong> palabras mal escritas que cambian el sentido, frases ilegibles, conjugaciones que confunden al cliente.</p>
+
+            <div class="nov-highlight">
+                Resultado: en la mayoría de los chats bien escritos el conteo va a ser <strong>0 errores</strong>. Si aparecen, es porque hay algo que un cliente real notaría con molestia.
+            </div>
+        </div>
+    </article>
+
+    <!-- 🤖 IA -->
+    <article class="nov-card feature-ai" id="ia">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🤖</div>
+            <div class="nov-card-title">
+                <h2>Nuevo motor de Inteligencia Artificial: GPT-5.4 mini</h2>
+                <p class="subtitle">El asistente iXpert AI y la evaluación de entrenamientos ahora corren con la última versión.</p>
+            </div>
+            <span class="nov-card-tag">Mejora</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Tanto el chat asistente <strong>iXpert AI</strong> como el cliente simulado y la evaluación de los entrenamientos pasan a usar <strong>GPT-5.4 mini</strong>, la versión más reciente disponible.</p>
+
+            <p><strong>Qué mejora:</strong></p>
+            <ul>
+                <li>Respuestas más naturales y mejor adaptadas al contexto.</li>
+                <li>Mejor comprensión de instrucciones complejas (escenarios con múltiples casos).</li>
+                <li>Evaluaciones más consistentes con la rúbrica de empatía.</li>
+            </ul>
+        </div>
+    </article>
+
+    <!-- 💬 Chat -->
+    <article class="nov-card feature-ux" id="chat">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">💬</div>
+            <div class="nov-card-title">
+                <h2>Chat más cómodo para escribir respuestas largas</h2>
+                <p class="subtitle">El cuadro de mensaje ahora crece con el texto.</p>
+            </div>
+            <span class="nov-card-tag">Mejora UX</span>
+        </div>
+        <div class="nov-card-body">
+            <p>Cuando un asesor escribía una respuesta larga en el chat de entrenamiento o en el asistente iXpert AI, el texto se desplazaba hacia un costado y costaba ver lo que ya había escrito. Ahora el cuadro <strong>se agranda hacia arriba</strong> a medida que escribís, hasta un máximo razonable, y aparece scroll vertical solo si hace falta.</p>
+
+            <p><strong>Atajos:</strong></p>
+            <ul>
+                <li><strong>Enter</strong> — envía el mensaje.</li>
+                <li><strong>Shift + Enter</strong> — agrega un salto de línea sin enviar.</li>
+            </ul>
+
+            <p>Mismo comportamiento en los textareas de creación de escenarios: la "persona del cliente" y la "respuesta esperada" crecen automáticamente con el contenido pegado.</p>
+        </div>
+    </article>
+
+    <!-- Mejoras menores agrupadas -->
+    <article class="nov-card feature-ux">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🛠</div>
+            <div class="nov-card-title">
+                <h2>Otras mejoras del paquete</h2>
+                <p class="subtitle">Detalles internos que también suman.</p>
+            </div>
+            <span class="nov-card-tag">Mejora</span>
+        </div>
+        <div class="nov-card-body">
+            <ul>
+                <li><strong>Pisos mínimos por dimensión:</strong> ninguna dimensión arranca de 0. Una sesión floja ya no hunde el perfil entero.</li>
+                <li><strong>Categorías más alcanzables:</strong> los umbrales para Elite, Alto y Desarrollo se ajustaron para reflejar mejor lo que vemos en producción.</li>
+                <li><strong>Recomendación a 65%</strong> (antes 70%): un asesor que demuestra cumplir el procedimiento con buena empatía ya entra como "Recomendado".</li>
+                <li><strong>Diagnóstico de errores de IA mejorado:</strong> si OpenAI rechaza una llamada, ahora vemos exactamente por qué en los logs (antes solo decía "error 400").</li>
+            </ul>
+        </div>
+    </article>
+
+    <div class="nov-footer">
+        <p><strong>¿Encontraste algo que no funciona como esperabas?</strong></p>
+        <p>Avisanos y lo revisamos. Esta página es tu fuente oficial de novedades.</p>
+    </div>
+
+</div>
+{% endblock %}
