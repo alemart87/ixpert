@@ -189,6 +189,7 @@ class TrainingSession(db.Model):
     total_chars_user = db.Column(db.Integer, default=0)
     spelling_errors = db.Column(db.Integer, default=0)
     words_per_minute = db.Column(db.Float, default=0)
+    avg_response_time = db.Column(db.Float, default=0)  # ART en segundos
     nps_score = db.Column(db.Integer)  # 0-10
     ai_feedback = db.Column(db.Text)
     response_correct = db.Column(db.Boolean)
