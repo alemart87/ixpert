@@ -111,6 +111,77 @@
     .sld-row { grid-template-columns:1fr; gap:6px; }
     .sld-row .sld-translate { grid-column:1; }
 }
+
+/* ============================================================
+ * Editor colapsable por modo (con descripcion visible y brillo)
+ * ============================================================ */
+.mode-editor { margin-top: 16px; }
+.mode-editor[open] { margin-top: 18px; }
+
+.mode-editor-summary {
+    list-style: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00B2BF 0%, #0277bd 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 178, 191, 0.35);
+    transition: transform .15s, box-shadow .25s;
+    user-select: none;
+}
+.mode-editor-summary::-webkit-details-marker { display: none; }
+.mode-editor-summary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 178, 191, 0.5);
+}
+.mee-icon {
+    font-size: 22px;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.mee-text { flex: 1; min-width: 0; }
+.mee-text strong { display: block; font-size: 14px; font-weight: 700; letter-spacing: .3px; }
+.mee-text small { display: block; font-size: 12px; opacity: .85; margin-top: 2px; }
+.mee-arrow {
+    font-size: 16px;
+    transition: transform .25s;
+    flex-shrink: 0;
+}
+.mode-editor[open] .mee-arrow { transform: rotate(180deg); }
+
+/* Brillo recorriendo el toggle */
+.mee-shine {
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.45) 50%, transparent 100%);
+    transform: skewX(-20deg);
+    animation: meeShine 3s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes meeShine {
+    0%   { left: -60%; }
+    60%  { left: 120%; }
+    100% { left: 120%; }
+}
+.mode-editor[open] .mee-shine { animation: none; opacity: 0.3; }
+
+/* Cuerpo desplegable */
+.mode-editor-body { padding: 6px 2px 2px; }
 </style>
 {% endblock %}
 {% block content %}
@@ -179,6 +250,18 @@
         <ul class="summary-list">
             {% for line in m.summary %}<li>{{ line }}</li>{% endfor %}
         </ul>
+
+        <details class="mode-editor">
+            <summary class="mode-editor-summary">
+                <span class="mee-icon">⚙</span>
+                <div class="mee-text">
+                    <strong>Configurar parámetros internos del modo {{ cfg.label }}</strong>
+                    <small>Pesos del Predictive Index, severidad, curva de ART, umbrales y avanzado. {% if readonly %}Vista de solo lectura.{% else %}Click para desplegar.{% endif %}</small>
+                </div>
+                <span class="mee-arrow">▼</span>
+                <span class="mee-shine"></span>
+            </summary>
+            <div class="mode-editor-body">
 
         <form method="POST" action="{{ url_for('training.vex_modos_save') }}" class="mode-form">
             <input type="hidden" name="mode" value="{{ m.key }}">
@@ -415,10 +498,13 @@
         </form>
 
         {% if is_superadmin %}
-        <form method="POST" action="{{ url_for('training.vex_modos_reset', mode=m.key) }}" style="display:inline-block;margin-top:-50px;float:right" onsubmit="return confirm('¿Restaurar &quot;{{ cfg.label }}&quot; a valores de fábrica? Se borrará la personalización guardada.');">
+        <form method="POST" action="{{ url_for('training.vex_modos_reset', mode=m.key) }}" style="margin-top:10px;text-align:right" onsubmit="return confirm('¿Restaurar &quot;{{ cfg.label }}&quot; a valores de fábrica? Se borrará la personalización guardada.');">
             <button type="submit" class="btn-reset">↻ Volver a valores de fábrica</button>
         </form>
         {% endif %}
+
+            </div><!-- /.mode-editor-body -->
+        </details><!-- /.mode-editor -->
     </div>
     {% endfor %}
 
