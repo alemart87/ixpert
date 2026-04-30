@@ -22,6 +22,17 @@
     var emojiBtn = document.getElementById('emojiBtn');
     var emojiPicker = document.getElementById('emojiPicker');
 
+    // Auto-resize textarea (texto se envuelve verticalmente)
+    function autoResize() {
+        if (!chatInput) return;
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+    }
+    if (chatInput) {
+        chatInput.addEventListener('input', autoResize);
+        autoResize();
+    }
+
     // Emoji picker
     var emojis = ['😊','😃','😅','😂','🤔','👍','👋','🙏','💪','⭐','✅','❌','📋','🔍','💳','🏦','📞','📧','🔐','💰','⏳','🎯','❤️','🙂','😢','😡','🤝','👏','🔔','📌'];
     if (emojiPicker) {
@@ -29,6 +40,7 @@
         emojiPicker.addEventListener('click', function(ev) {
             if (ev.target.dataset.emoji) {
                 chatInput.value += ev.target.dataset.emoji;
+                autoResize();
                 chatInput.focus();
             }
         });
@@ -152,8 +164,9 @@
 
     // Send message
     chatSend.addEventListener('click', sendMsg);
+    // Enter envía; Shift+Enter inserta salto manual
     chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); sendMsg(); }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
     });
 
     async function sendMsg() {
@@ -165,6 +178,7 @@
         if (!text) return;
 
         chatInput.value = '';
+        autoResize();
         chatSend.disabled = true;
         i.messages.push({role: 'user', content: text});
         addMsgToDOM('user', text);
