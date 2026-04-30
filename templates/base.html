@@ -50,6 +50,12 @@
                 </div>
 
                 {% if current_user.is_superadmin %}
+                <a href="{{ url_for('admin.novedades') }}" class="nav-novedades">
+                    <span class="nav-novedades-icon">✨</span>
+                    <span>Novedades</span>
+                    <span class="nav-novedades-pulse"></span>
+                </a>
+
                 <!-- Vex Predictive dropdown -->
                 <div class="nav-dropdown">
                     <button class="nav-dropdown-btn">📊 Vex Predictive ▾</button>
