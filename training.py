@@ -1153,7 +1153,7 @@ def calculate_vex_profile(user_id):
     ).all()
 
     if len(sessions) < 2:
-        return None  # Minimum 2 sessions required
+        return None, None  # Minimum 2 sessions required
 
     # Determinar modo a usar para el perfil: el del batch mas reciente.
     sorted_for_mode = sorted(sessions, key=lambda s: s.created_at or datetime.min, reverse=True)
@@ -1353,42 +1353,39 @@ def calculate_vex_profile(user_id):
 
     # --- Hard caps universales (independientes del modo) ---
     # Tres barreras de competencia basica que actuan despues del calculo. Cualquiera
-    # de ellas que se active baja la recomendacion; si la primera (abandono) se
-    # dispara, tambien limita la categoria. cap_reasons queda como atributo
-    # transitorio del profile para que la vista lo muestre.
+    # de las tres baja la categoria (max desarrollo) Y la recomendacion (max
+    # observaciones). No tiene sentido decir "Alto Rendimiento + Con Observaciones":
+    # si el asesor falla mas del 50% o el cliente queda muy insatisfecho, no es
+    # "Alto", se acompaña.
     cap_reasons = []
 
-    # 1. Abandono: > 40% auto-fails
     if abandonment_rate > 0.4:
-        if category in ('elite', 'alto'):
-            category = 'desarrollo'
-        if rec == 'recomendado':
-            rec = 'observaciones'
         cap_reasons.append({
             'key': 'abandonment_high',
             'label': f'Abandono alto ({abandonment_rate*100:.0f}%)',
-            'desc': 'Mas del 40% de las sesiones fueron auto-fails. La categoria queda en "Desarrollo" como maximo y la recomendacion en "Observaciones" como maximo.'
+            'desc': 'Mas del 40% de las sesiones fueron auto-fails. La competencia operativa basica no esta demostrada.'
         })
 
-    # 2. Tasa de aciertos baja: correct_rate < 0.5
     if correct_rate < 0.5:
-        if rec == 'recomendado':
-            rec = 'observaciones'
         cap_reasons.append({
             'key': 'correct_rate_low',
             'label': f'Tasa de aciertos baja ({correct_rate*100:.0f}%)',
-            'desc': 'El asesor resolvio menos de la mitad de los casos correctamente. No puede ser "Recomendado" sin demostrar competencia operativa basica.'
+            'desc': 'El asesor resolvio menos de la mitad de los casos correctamente. No puede ser "Alto" ni "Recomendado" sin demostrar competencia operativa basica.'
         })
 
-    # 3. NPS promedio bajo: avg_nps < 4
     if avg_nps < 4:
-        if rec == 'recomendado':
-            rec = 'observaciones'
         cap_reasons.append({
             'key': 'nps_low',
             'label': f'NPS promedio bajo ({avg_nps:.1f})',
             'desc': 'El cliente quedo sistematicamente insatisfecho. La empatia y la calidad del trato no llegan al minimo esperado.'
         })
+
+    # Aplicar tope si se disparo cualquiera de los tres caps
+    if cap_reasons:
+        if category in ('elite', 'alto'):
+            category = 'desarrollo'
+        if rec == 'recomendado':
+            rec = 'observaciones'
 
     # --- Save/Update ---
     profile = VexProfile.query.filter_by(user_id=user_id).first()
@@ -1410,18 +1407,23 @@ def calculate_vex_profile(user_id):
     profile.last_updated = datetime.utcnow()
     db.session.commit()
 
-    # Datos transitorios para la vista (no se persisten). La ruta /admin/vex/profile
-    # usa el profile devuelto y lee estos atributos para mostrar transparencia.
-    profile._cap_reasons = cap_reasons
-    profile._abandonment_rate = abandonment_rate
-    profile._correct_rate = correct_rate
-    profile._avg_nps = avg_nps
-    profile._avg_art = avg_art
-    profile._mode_used = _eff_mode_name
-    profile._mode_is_legacy = _is_legacy
-    profile._mode_cfg = mode_cfg
+    # Metadata para la vista. Se devuelve en un dict separado porque
+    # SQLAlchemy expira los atributos del objeto al hacer commit y depender
+    # de atributos volatiles del profile es fragil. La firma queda
+    # (profile, meta) — los callers que ignoran el return seguian funcionando
+    # porque Python descarta el tuple.
+    meta = {
+        'cap_reasons': cap_reasons,
+        'abandonment_rate': abandonment_rate,
+        'correct_rate': correct_rate,
+        'avg_nps': avg_nps,
+        'avg_art': avg_art,
+        'mode_used': _eff_mode_name,
+        'mode_is_legacy': _is_legacy,
+        'mode_cfg': mode_cfg,
+    }
 
-    return profile
+    return profile, meta
 
 
 # ===== Vex Routes =====
@@ -1440,19 +1442,13 @@ def vex_dashboard():
 @training_bp.route('/admin/vex/profile/<int:user_id>')
 @superadmin_required
 def vex_profile(user_id):
-    # Recalcular antes de mostrar — devuelve el profile con metadata transitoria.
-    fresh_profile = calculate_vex_profile(user_id)
-    profile = VexProfile.query.filter_by(user_id=user_id).first_or_404()
-    # Heredar metadata transitoria del calculo (si la hubo)
-    if fresh_profile is not None:
-        for attr in ('_cap_reasons', '_abandonment_rate', '_correct_rate',
-                     '_avg_nps', '_avg_art', '_mode_used', '_mode_is_legacy',
-                     '_mode_cfg'):
-            if hasattr(fresh_profile, attr):
-                setattr(profile, attr, getattr(fresh_profile, attr))
+    # Recalcular antes de mostrar — devuelve (profile, meta).
+    fresh_profile, meta = calculate_vex_profile(user_id)
+    profile = fresh_profile if fresh_profile is not None else \
+              VexProfile.query.filter_by(user_id=user_id).first_or_404()
 
     # Distribucion de sesiones por modo (todas las completadas, no solo la pagina)
-    from scoring_modes import get_effective_mode, DEFAULT_MODES
+    from scoring_modes import get_effective_mode
     all_sessions = TrainingSession.query.filter_by(
         user_id=user_id, status='completed'
     ).all()
@@ -1468,13 +1464,14 @@ def vex_profile(user_id):
         else:
             mode_counts[eff_name] = mode_counts.get(eff_name, 0) + 1
 
-    # Baremo del modo activo (el del batch mas reciente)
+    # Baremo del modo activo: viene del meta del calculo. Si no hubo recalculo
+    # (sesiones < 2 → meta is None), construimos un fallback minimo.
     active_mode_info = None
-    if hasattr(profile, '_mode_cfg') and profile._mode_cfg:
-        cfg = profile._mode_cfg
+    if meta and meta.get('mode_cfg'):
+        cfg = meta['mode_cfg']
         active_mode_info = {
-            'name': profile._mode_used,
-            'is_legacy': profile._mode_is_legacy,
+            'name': meta['mode_used'],
+            'is_legacy': meta['mode_is_legacy'],
             'icon': cfg.get('icon', ''),
             'label': cfg.get('label', 'Standard'),
             'color': cfg.get('color', '#0277bd'),
@@ -1484,6 +1481,8 @@ def vex_profile(user_id):
             'art_curve': cfg.get('art_curve', {}),
             'pi_weights': cfg.get('pi_weights', {})
         }
+
+    cap_reasons = (meta or {}).get('cap_reasons', [])
 
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1496,7 +1495,7 @@ def vex_profile(user_id):
                            pagination=pagination,
                            mode_counts=mode_counts,
                            active_mode=active_mode_info,
-                           cap_reasons=getattr(profile, '_cap_reasons', []))
+                           cap_reasons=cap_reasons)
 
 
 @training_bp.route('/admin/vex/methodology')
