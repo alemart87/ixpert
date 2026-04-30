@@ -150,10 +150,21 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Send message
+    // Auto-resize del textarea: crece con el contenido hasta el max-height del CSS.
+    function autoResize() {
+        if (!chatInput) return;
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+    }
+    chatInput.addEventListener('input', autoResize);
+
+    // Send message — Enter envia; Shift+Enter inserta salto de linea.
     chatSend.addEventListener('click', sendMsg);
     chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); sendMsg(); }
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMsg();
+        }
     });
 
     async function sendMsg() {
@@ -165,6 +176,7 @@
         if (!text) return;
 
         chatInput.value = '';
+        autoResize();
         chatSend.disabled = true;
         i.messages.push({role: 'user', content: text});
         addMsgToDOM('user', text);
