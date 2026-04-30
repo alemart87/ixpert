@@ -106,6 +106,7 @@ def scenario_json_filter(scenario):
         'description': scenario.description or '',
         'difficulty': scenario.difficulty,
         'category': scenario.category or '',
+        'scoring_mode': getattr(scenario, 'scoring_mode', None) or 'standard',
         'cases': cases
     }, ensure_ascii=False)
 
