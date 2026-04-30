@@ -184,13 +184,18 @@ def start_batch(scenario_id):
     # Snapshot del modo de scoring del escenario al crear el batch.
     # Asi cambios futuros en el escenario no afectan evaluaciones ya iniciadas.
     # null = legacy (se evalua con Standard pero se etiqueta diferente en UI).
+    # Snapshot del delay del cliente (10-60s, default 30 si el escenario es viejo).
+    delay_snap = getattr(scenario, 'client_response_delay_seconds', None) or 30
+    delay_snap = max(10, min(60, int(delay_snap)))
+
     batch = TrainingBatch(
         user_id=current_user.id,
         scenario_id=scenario.id,
         max_concurrent=max_c,
         status='active',
         started_at=datetime.utcnow(),
-        scoring_mode=getattr(scenario, 'scoring_mode', None)
+        scoring_mode=getattr(scenario, 'scoring_mode', None),
+        client_response_delay_seconds=delay_snap
     )
     db.session.add(batch)
     db.session.flush()
@@ -275,6 +280,132 @@ def batch_view(batch_id):
 @login_required
 def start_session(scenario_id):
     return start_batch(scenario_id)
+
+
+@training_bp.route('/api/training/queue', methods=['POST'])
+@login_required
+def queue_message():
+    """Persiste un mensaje del asesor SIN disparar la IA.
+
+    El JS llama a este endpoint cada vez que el asesor envia un mensaje, y
+    despues de N segundos sin actividad nueva (debounce per session) llama a
+    /flush para que el cliente simulado responda.
+
+    Importante: NO afecta ART/WPM porque solo registra timestamps reales del
+    asesor — la espera ocurre entre el ultimo agent_msg y el proximo client_msg
+    (que NO entra en el calculo de ART, que solo mide client->agent).
+    """
+    data = request.get_json(silent=True) or {}
+    session_id = data.get('session_id')
+    message = data.get('message', '').strip()
+
+    if not message or not session_id:
+        return jsonify({'error': 'Datos incompletos'}), 400
+
+    session = TrainingSession.query.filter_by(
+        id=session_id, user_id=current_user.id, status='active'
+    ).first()
+    if not session:
+        return jsonify({'error': 'Sesion no encontrada o finalizada'}), 404
+
+    word_count = len(message.split())
+    user_msg = TrainingMessage(
+        session_id=session.id,
+        role='user',
+        content=message,
+        word_count=word_count
+    )
+    db.session.add(user_msg)
+    session.total_messages = (session.total_messages or 0) + 1
+    session.total_words_user = (session.total_words_user or 0) + word_count
+    session.total_chars_user = (session.total_chars_user or 0) + len(message)
+    db.session.commit()
+
+    # Devolvemos el delay del batch para que el JS pueda usarlo si lo necesita
+    delay = 30
+    if session.batch_id:
+        batch_obj = TrainingBatch.query.get(session.batch_id)
+        if batch_obj and batch_obj.client_response_delay_seconds:
+            delay = max(10, min(60, batch_obj.client_response_delay_seconds))
+
+    return jsonify({
+        'ok': True,
+        'queued': True,
+        'client_response_delay_seconds': delay,
+        'metrics': {
+            'messages': session.total_messages,
+            'words': session.total_words_user,
+            'elapsed_seconds': int(safe_elapsed(session.started_at))
+        }
+    })
+
+
+@training_bp.route('/api/training/flush', methods=['POST'])
+@login_required
+def flush_session():
+    """Genera la respuesta del cliente simulado tomando todos los mensajes
+    pendientes del asesor (los que estan despues del ultimo client_msg).
+
+    Idempotente: si no hay mensajes del asesor pendientes desde el ultimo
+    mensaje del cliente, devuelve {no_pending: True} sin gastar tokens.
+    """
+    data = request.get_json(silent=True) or {}
+    session_id = data.get('session_id')
+
+    if not session_id:
+        return jsonify({'error': 'Datos incompletos'}), 400
+
+    session = TrainingSession.query.filter_by(
+        id=session_id, user_id=current_user.id, status='active'
+    ).first()
+    if not session:
+        return jsonify({'error': 'Sesion no encontrada o finalizada'}), 404
+
+    # Si no hay mensajes o el ultimo es del cliente, no hay nada que responder.
+    msgs = list(session.messages)
+    if not msgs or msgs[-1].role != 'user':
+        return jsonify({'ok': True, 'no_pending': True})
+
+    scenario = session.scenario
+    system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
+
+{scenario.client_persona}
+
+REGLAS:
+- Actúa como un cliente REAL en un chat de atención
+- NO reveles que sos IA
+- Reaccioná naturalmente al asesor
+- El asesor puede haberte enviado VARIOS mensajes seguidos: leelos todos y respondé UNA sola vez con coherencia
+- Respuestas cortas (1-3 oraciones) como un cliente real en chat
+- Si el asesor te ayuda bien, mostrá satisfacción
+- Si no, mostrá frustración realista"""
+
+    ai_messages = [{'role': 'system', 'content': system_prompt}]
+    for msg in msgs:
+        role = 'assistant' if msg.role == 'client' else 'user'
+        ai_messages.append({'role': role, 'content': msg.content})
+
+    response_text, tokens = call_openai(ai_messages)
+
+    client_msg = TrainingMessage(
+        session_id=session.id,
+        role='client',
+        content=response_text,
+        word_count=len(response_text.split())
+    )
+    db.session.add(client_msg)
+    session.tokens_used = (session.tokens_used or 0) + tokens
+    db.session.commit()
+
+    return jsonify({
+        'ok': True,
+        'response': response_text,
+        'metrics': {
+            'messages': session.total_messages,
+            'words': session.total_words_user,
+            'elapsed_seconds': int(safe_elapsed(session.started_at))
+        }
+    })
 
 
 @training_bp.route('/api/training/message', methods=['POST'])
@@ -682,6 +813,13 @@ def admin_scenario_save():
     if scoring_mode not in ('flexible', 'standard', 'exigente'):
         scoring_mode = 'standard'
 
+    # Delay del cliente simulado: 10-60 segundos.
+    try:
+        client_delay = int(request.form.get('client_response_delay_seconds', 30))
+    except (ValueError, TypeError):
+        client_delay = 30
+    client_delay = max(10, min(60, client_delay))
+
     if not title or not client_persona or not expected_response:
         flash('Título, persona del cliente y respuesta esperada son obligatorios.', 'error')
         return redirect(url_for('training.admin_scenarios'))
@@ -695,12 +833,14 @@ def admin_scenario_save():
         s.difficulty = difficulty
         s.category = category
         s.scoring_mode = scoring_mode
+        s.client_response_delay_seconds = client_delay
     else:
         s = TrainingScenario(
             title=title, description=description,
             client_persona=client_persona, expected_response=expected_response,
             difficulty=difficulty, category=category,
             scoring_mode=scoring_mode,
+            client_response_delay_seconds=client_delay,
             created_by=current_user.id
         )
         db.session.add(s)

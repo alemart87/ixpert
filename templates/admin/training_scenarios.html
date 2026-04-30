@@ -76,6 +76,29 @@
                 </details>
             </div>
 
+            <!-- Comportamiento del cliente simulado -->
+            <div class="mode-selector-section">
+                <h3>⏱ Tiempo de respuesta del cliente</h3>
+                <p class="mode-help">
+                    Cuántos segundos espera el cliente simulado <strong>después del último mensaje del asesor</strong> antes de responder.
+                    Simula que un cliente real lee, piensa y tipea. Si el asesor envía varios mensajes seguidos, el contador se reinicia y todos llegan a la IA en orden.
+                    <br><strong style="color:#2e7d32">No afecta las métricas del asesor</strong> — ART solo mide el tiempo del asesor en responder, no la espera del cliente.
+                </p>
+                <div class="delay-slider-row">
+                    <input type="range" min="10" max="60" step="5" value="30"
+                           name="client_response_delay_seconds" id="delaySlider"
+                           oninput="document.getElementById('delayValue').textContent = this.value">
+                    <div class="delay-value-display">
+                        <span id="delayValue">30</span><span class="delay-unit">s</span>
+                    </div>
+                </div>
+                <div class="delay-marks">
+                    <span>10s — chat ágil</span>
+                    <span>30s — realista</span>
+                    <span>60s — cliente que tarda</span>
+                </div>
+            </div>
+
             <!-- Cases Section -->
             <div style="background:#f8f9fa;border-radius:12px;padding:20px;margin:16px 0;border:2px dashed #ddd">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -193,6 +216,20 @@
                         <p class="mode-card-desc">{{ m.when_to_use }}</p>
                     </label>
                     {% endfor %}
+                </div>
+            </div>
+
+            <!-- Tiempo de respuesta del cliente (edicion) -->
+            <div class="mode-selector-section">
+                <h3>⏱ Tiempo de respuesta del cliente</h3>
+                <p class="mode-help">10–60 s. <strong style="color:#2e7d32">No afecta el ART del asesor.</strong></p>
+                <div class="delay-slider-row">
+                    <input type="range" min="10" max="60" step="5" value="30"
+                           name="client_response_delay_seconds" id="editDelaySlider"
+                           oninput="document.getElementById('editDelayValue').textContent = this.value">
+                    <div class="delay-value-display">
+                        <span id="editDelayValue">30</span><span class="delay-unit">s</span>
+                    </div>
                 </div>
             </div>
 
@@ -359,6 +396,60 @@
 .mode-badge.standard { background: #e3f2fd; color: #0277bd; }
 .mode-badge.exigente { background: #ffebee; color: #c62828; }
 .mode-badge.legacy   { background: #f0f0f0; color: #666; }
+
+/* ===== Slider de delay del cliente ===== */
+.delay-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0 4px;
+}
+.delay-slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2e7d32 0%, #ffa726 50%, #c62828 100%);
+    outline: none;
+    cursor: pointer;
+}
+.delay-slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #ff6600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.delay-slider-row input[type=range]::-moz-range-thumb {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #ff6600;
+    cursor: pointer;
+}
+.delay-value-display {
+    background: #fff4e5;
+    border: 2px solid #ff6600;
+    border-radius: 10px;
+    padding: 8px 16px;
+    min-width: 70px;
+    text-align: center;
+    font-weight: 700;
+    color: #ff6600;
+    font-size: 18px;
+}
+.delay-unit { font-size: 13px; opacity: 0.8; margin-left: 2px; }
+.delay-marks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #888;
+    padding: 0 4px;
+}
 .btn-remove-case {
     background: #dc3545; color: #fff; border: none; border-radius: 6px;
     padding: 4px 10px; cursor: pointer; font-size: 12px;
@@ -496,6 +587,17 @@ function editScenario(id, data) {
             var radio = c.querySelector('input[type="radio"]');
             if (radio) radio.checked = isSel;
         });
+    }
+
+    // Precargar delay del cliente
+    var editDelay = document.getElementById('editDelaySlider');
+    var editDelayVal = document.getElementById('editDelayValue');
+    if (editDelay && editDelayVal) {
+        var dv = parseInt(data.client_response_delay_seconds || 30, 10);
+        if (isNaN(dv)) dv = 30;
+        dv = Math.max(10, Math.min(60, dv));
+        editDelay.value = dv;
+        editDelayVal.textContent = dv;
     }
 
     // Load cases

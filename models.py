@@ -146,6 +146,9 @@ class TrainingScenario(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     scoring_mode = db.Column(db.String(20), nullable=True)  # flexible/standard/exigente, null=legacy
+    # Tiempo (s) que el cliente simulado espera antes de responder al asesor
+    # tras recibir su(s) mensaje(s). Range 10-60.
+    client_response_delay_seconds = db.Column(db.Integer, default=30)
 
     sessions = db.relationship('TrainingSession', backref='scenario', lazy=True)
     creator = db.relationship('User', foreign_keys=[created_by])
@@ -169,6 +172,8 @@ class TrainingBatch(db.Model):
     # Snapshot del modo de scoring del escenario al crear el batch.
     # null = legacy (se evalua con Standard pero se etiqueta diferente).
     scoring_mode = db.Column(db.String(20), nullable=True)
+    # Snapshot del delay del escenario al crear el batch (segundos 10-60).
+    client_response_delay_seconds = db.Column(db.Integer, default=30)
 
     sessions = db.relationship('TrainingSession', backref='batch', lazy=True)
     user = db.relationship('User', backref='training_batches')
