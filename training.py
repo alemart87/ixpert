@@ -367,9 +367,14 @@ def flush_session():
         return jsonify({'ok': True, 'no_pending': True})
 
     scenario = session.scenario
+    # Bug fix: usar SOLO el caso asignado a esta sesion (session.case_index),
+    # no el JSON completo de scenario.client_persona, sino la IA "ve" todas las
+    # personas y puede saltar a otra entre turnos (ej: empezar como cliente con
+    # pedido equivocado y al turno siguiente "ser" un cliente con PIN olvidado).
+    case = get_case(scenario, session.case_index or 0)
     system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
-{scenario.client_persona}
+{case['persona']}
 
 REGLAS:
 - Actúa como un cliente REAL en un chat de atención
@@ -377,6 +382,7 @@ REGLAS:
 - Reaccioná naturalmente al asesor
 - El asesor puede haberte enviado VARIOS mensajes seguidos: leelos todos y respondé UNA sola vez con coherencia
 - Respuestas cortas (1-3 oraciones) como un cliente real en chat
+- MANTENÉ tu personalidad y tu situación inicial: NO cambies de problema ni de identidad entre turnos
 - Si el asesor te ayuda bien, mostrá satisfacción
 - Si no, mostrá frustración realista"""
 
@@ -444,15 +450,18 @@ def send_message():
     # WPM is recalculated accurately at session end using message timestamps
 
     # Build conversation for OpenAI
+    # Bug fix: usar el caso asignado a esta sesion, no el JSON completo
+    case = get_case(scenario, session.case_index or 0)
     system_prompt = f"""Eres un cliente simulado. Tu personalidad y situación:
 
-{scenario.client_persona}
+{case['persona']}
 
 REGLAS:
 - Actúa como un cliente REAL en un chat de atención
 - NO reveles que sos IA
 - Reaccioná naturalmente al asesor
 - Respuestas cortas (1-3 oraciones) como un cliente real en chat
+- MANTENÉ tu personalidad y tu situación inicial: NO cambies de problema ni de identidad entre turnos
 - Si el asesor te ayuda bien, mostrá satisfacción
 - Si no, mostrá frustración realista"""
 
