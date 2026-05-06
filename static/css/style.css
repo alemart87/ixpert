@@ -240,6 +240,21 @@ nav .nav-logout { color: #ffcccc; }
 .content-body h2 { color: var(--azul-itau); border-bottom: 2px solid var(--naranja-itau); padding-bottom: 4px; }
 .content-body h3 { color: var(--azul-medio); }
 
+/* Documentos HTML completos (juegos, calculadoras) en iframe sandbox */
+.content-body-iframe { padding: 0; overflow: hidden; }
+.content-iframe {
+    width: 100%;
+    min-height: 80vh;
+    height: 80vh;
+    border: 0;
+    display: block;
+    background: #fff;
+    border-radius: var(--radius-md);
+}
+@media (max-width: 768px) {
+    .content-iframe { min-height: 75vh; height: 75vh; }
+}
+
 /* ===== Category Page ===== */
 .category-page h1 { color: var(--azul-itau); border-bottom: 2px solid var(--naranja-itau); padding-bottom: 8px; }
 .category-desc { color: var(--gris-meta); margin-bottom: 20px; }

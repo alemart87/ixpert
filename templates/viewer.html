@@ -10,9 +10,23 @@
         <a href="{{ url_for('view_category', slug=content.category.slug) }}" class="badge">{{ content.category.name }}</a>
         {% endif %}
     </div>
+    {% if content.html_content | is_full_html_doc %}
+    {# Documento HTML completo (juego, calculadora, etc.) → iframe sandbox para
+       que sus estilos y scripts no pisen el portal. #}
+    <div class="content-body content-body-iframe">
+        <iframe
+            class="content-iframe"
+            srcdoc="{{ content.html_content }}"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            referrerpolicy="no-referrer"
+            loading="lazy"
+            title="{{ content.title }}"></iframe>
+    </div>
+    {% else %}
     <div class="content-body">
         {{ content.html_content|safe }}
     </div>
+    {% endif %}
 </article>
 
 <a href="{{ url_for('index') }}" class="fixed-back-btn">Volver al Inicio</a>
