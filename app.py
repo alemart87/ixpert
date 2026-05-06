@@ -16,7 +16,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+# Subimos el limite a 50MB. Los HTMLs ricos del CMS (Quill embebe imagenes como
+# base64 al pegar capturas) facilmente pasan los 16MB anteriores.
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['UPLOAD_DIR'] = UPLOAD_DIR
 
@@ -82,6 +84,17 @@ app.register_blueprint(training_bp)
 # ===== Auth routes directly in app (no blueprint) =====
 from flask_login import login_user, logout_user
 import json as json_module
+
+
+@app.template_filter('is_full_html_doc')
+def is_full_html_doc(html):
+    """True si el html_content es un documento completo (DOCTYPE/<html>/<body>).
+    Estos contenidos se renderizan en iframe srcdoc para que sus estilos y
+    scripts no pisen el portal."""
+    if not html:
+        return False
+    head = html.lstrip()[:2000].lower()
+    return ('<!doctype html' in head) or ('<html' in head) or ('<body' in head)
 
 
 @app.template_filter('count_cases')
@@ -159,6 +172,20 @@ def debug_check():
 def serve_image(filename):
     """Serve images from persistent disk or static fallback."""
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
+
+
+@app.errorhandler(413)
+def request_entity_too_large(e):
+    """Reemplaza el cartel feo de werkzeug por un flash con redirect.
+    Dispara cuando el cuerpo del request supera MAX_CONTENT_LENGTH (50MB).
+    El caso tipico es el editor Quill con muchas imagenes embebidas en base64.
+    """
+    flash('El contenido es demasiado grande (máximo 50 MB). '
+          'Si pegaste imágenes en el editor, intentá usar el botón de subir '
+          'imagen — así no quedan en base64 dentro del HTML.', 'error')
+    # Volver al referer si viene del admin; sino al listado de contenidos.
+    ref = request.referrer or url_for('admin.content_list')
+    return redirect(ref), 303
 
 
 @app.context_processor

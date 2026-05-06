@@ -86,19 +86,36 @@ def extract_title(html):
     return 'Sin título'
 
 
+def is_full_document(html):
+    """True si el HTML trae un <head> con <style> o <script> propios.
+    Esos archivos (juegos, calculadoras) deben guardarse COMPLETOS para que
+    el viewer los renderice en iframe sandbox sin pisar el portal.
+    """
+    head_match = re.search(r'<head[^>]*>(.*?)</head>', html, re.IGNORECASE | re.DOTALL)
+    if not head_match:
+        return False
+    head = head_match.group(1)
+    return ('<style' in head.lower()) or ('<script' in head.lower())
+
+
 def extract_body(html):
-    """Extract body content from HTML, preserving internal structure."""
-    # Try to get content between body tags
-    m = re.search(r'<body[^>]*>(.*)</body>', html, re.IGNORECASE | re.DOTALL)
-    if m:
-        body = m.group(1)
-    else:
+    """Devuelve el HTML que va al campo content.html_content.
+
+    - Si el archivo es un documento completo con <style>/<script> propios en
+      <head>, se devuelve tal cual (sera renderizado en iframe sandbox por
+      viewer.html — ver filtro is_full_html_doc en app.py).
+    - Si es solo contenido (lo tipico del CMS), se extrae el <body>.
+    En ambos casos se reescriben rutas relativas a imagenes/.
+    """
+    if is_full_document(html):
         body = html
+    else:
+        m = re.search(r'<body[^>]*>(.*)</body>', html, re.IGNORECASE | re.DOTALL)
+        body = m.group(1) if m else html
 
     # Fix image paths to use static folder
     body = re.sub(r'src=["\'](?:\.\.\/)*imagenes/', 'src="/imagenes/', body)
     body = re.sub(r'src=["\']imagenes/', 'src="/imagenes/', body)
-
     return body
 
 
