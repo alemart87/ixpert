@@ -1,6 +1,80 @@
 {% extends "base.html" %}
 {% block title %}Vex People Skill Predictive{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/training.css') }}">{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/training.css') }}">
+<style>
+.vex-dash-filters {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 18px;
+}
+.vex-dash-filters form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.vex-dash-filters .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.vex-dash-filters label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.vex-dash-filters input[type=text],
+.vex-dash-filters select {
+    padding: 7px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.vex-dash-filters input[type=text]:focus,
+.vex-dash-filters select:focus { border-color: #ff6600; }
+.vex-dash-filters input[type=text] { min-width: 200px; }
+.vex-dash-filters .btn-clear {
+    background: none;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 7px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+}
+.vex-dash-filters .btn-clear:hover { border-color: #ff6600; color: #ff6600; }
+
+.row-no-profile { opacity: 0.7; background: #fafafa !important; }
+.no-profile-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    background: #f0f0f0;
+}
+.no-profile-meta {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+}
+.results-count {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+}
+.results-count strong { color: #004080; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="admin-container">
@@ -8,19 +82,69 @@
     <p style="color:#888;margin-top:-8px;margin-bottom:20px">Evaluación predictiva de habilidades para decisiones de capacitación e incorporación</p>
 
     <div class="admin-nav">
+        {% if current_user.is_superadmin %}
         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        {% endif %}
         <a href="{{ url_for('training.admin_dashboard') }}" class="btn btn-secondary">CX Entrenamiento</a>
         <a href="{{ url_for('training.vex_dashboard') }}" class="btn btn-primary">Vex Predictive</a>
         <a href="{{ url_for('training.vex_methodology') }}" class="btn btn-secondary" style="border:2px solid #ff6600">📖 Metodología y Documentación</a>
     </div>
 
-    {% if not profiles %}
-    <div style="text-align:center;padding:60px 20px;color:#888">
-        <p style="font-size:48px;margin-bottom:16px">📊</p>
-        <h3>Sin perfiles generados</h3>
-        <p>Los perfiles se generan automáticamente cuando un usuario completa al menos 2 sesiones de entrenamiento.</p>
+    <!-- Filtros -->
+    <div class="vex-dash-filters">
+        <form method="GET" action="{{ url_for('training.vex_dashboard') }}">
+            <div class="filter-group">
+                <label for="q">Buscar</label>
+                <input type="text" id="q" name="q" value="{{ q_text }}" placeholder="Nombre o email…">
+            </div>
+            <div class="filter-group">
+                <label for="role">Rol</label>
+                <select id="role" name="role">
+                    <option value="all" {% if role_f == 'all' %}selected{% endif %}>Todos</option>
+                    <option value="asesor" {% if role_f == 'asesor' %}selected{% endif %}>Asesor</option>
+                    <option value="supervisor" {% if role_f == 'supervisor' %}selected{% endif %}>Supervisor</option>
+                    <option value="analista" {% if role_f == 'analista' %}selected{% endif %}>Analista</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="show">Mostrar</label>
+                <select id="show" name="show">
+                    <option value="all" {% if show_f == 'all' %}selected{% endif %}>Todos</option>
+                    <option value="with_profile" {% if show_f == 'with_profile' %}selected{% endif %}>Con perfil</option>
+                    <option value="without_profile" {% if show_f == 'without_profile' %}selected{% endif %}>Sin perfil</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="per_page">Por página</label>
+                <select id="per_page" name="per_page">
+                    {% for n in [10, 25, 50, 100] %}
+                    <option value="{{ n }}" {% if per_page == n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Aplicar</button>
+            {% if q_text or role_f != 'all' or show_f != 'all' or per_page != 25 %}
+            <a href="{{ url_for('training.vex_dashboard') }}" class="btn-clear">✕ Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <p class="results-count">
+        <strong>{{ pagination.total }}</strong> usuario{{ 's' if pagination.total != 1 else '' }} —
+        página <strong>{{ pagination.page }}</strong> de <strong>{{ pagination.pages or 1 }}</strong>
+    </p>
+
+    {% if not rows %}
+    <div style="text-align:center;padding:60px 20px;color:#888;background:#fff;border-radius:12px">
+        <p style="font-size:48px;margin-bottom:16px">🔍</p>
+        <h3>No hay resultados</h3>
+        <p>Probá ajustar los filtros o limpiarlos para ver todos los usuarios.</p>
     </div>
     {% else %}
+    {% set cat_colors = {'elite': '#2e7d32', 'alto': '#004080', 'desarrollo': '#e65100', 'refuerzo': '#c62828'} %}
+    {% set cat_labels = {'elite': 'Elite', 'alto': 'Alto Rendimiento', 'desarrollo': 'En Desarrollo', 'refuerzo': 'Requiere Refuerzo'} %}
+    {% set rec_colors = {'recomendado': '#2e7d32', 'observaciones': '#e65100', 'no_recomendado': '#c62828'} %}
+    {% set rec_labels = {'recomendado': 'Recomendado', 'observaciones': 'Con Observaciones', 'no_recomendado': 'No Recomendado'} %}
     <div class="table-responsive">
         <table class="admin-table">
             <thead>
@@ -36,20 +160,59 @@
                 </tr>
             </thead>
             <tbody>
-                {% for p in profiles %}
-                {% set cat_colors = {'elite': '#2e7d32', 'alto': '#004080', 'desarrollo': '#e65100', 'refuerzo': '#c62828'} %}
-                {% set cat_labels = {'elite': 'Elite', 'alto': 'Alto Rendimiento', 'desarrollo': 'En Desarrollo', 'refuerzo': 'Requiere Refuerzo'} %}
-                {% set rec_colors = {'recomendado': '#2e7d32', 'observaciones': '#e65100', 'no_recomendado': '#c62828'} %}
-                {% set rec_labels = {'recomendado': 'Recomendado', 'observaciones': 'Con Observaciones', 'no_recomendado': 'No Recomendado'} %}
-                <tr>
-                    <td><strong>{{ p.user.name }}</strong></td>
-                    <td>{{ p.user.role }}</td>
-                    <td><span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:{{ cat_colors.get(p.profile_category, '#888') }}">{{ cat_labels.get(p.profile_category, p.profile_category) }}</span></td>
-                    <td><strong style="font-size:18px;color:{{ cat_colors.get(p.profile_category, '#333') }}">{{ p.overall_score }}/10</strong></td>
+                {% for r in rows %}
+                {% set u = r.user %}
+                {% set p = r.profile %}
+                {% set sc = r.sessions_count %}
+                <tr {% if not p %}class="row-no-profile"{% endif %}>
+                    <td>
+                        <strong>{{ u.name }}</strong>
+                        <br><small style="color:#888">{{ u.email }}</small>
+                    </td>
+                    <td>{{ u.role }}</td>
+                    {% if p %}
+                    <td>
+                        <span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:{{ cat_colors.get(p.profile_category, '#888') }}">
+                            {{ cat_labels.get(p.profile_category, p.profile_category or '—') }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="font-size:18px;color:{{ cat_colors.get(p.profile_category, '#333') }}">
+                            {{ p.overall_score }}/10
+                        </strong>
+                    </td>
                     <td><strong>{{ p.predictive_index }}%</strong></td>
-                    <td><span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:{{ rec_colors.get(p.recommendation, '#888') }}">{{ rec_labels.get(p.recommendation, p.recommendation) }}</span></td>
+                    <td>
+                        <span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:{{ rec_colors.get(p.recommendation, '#888') }}">
+                            {{ rec_labels.get(p.recommendation, p.recommendation or '—') }}
+                        </span>
+                    </td>
                     <td>{{ p.sessions_analyzed }}</td>
-                    <td><a href="{{ url_for('training.vex_profile', user_id=p.user_id) }}" class="btn btn-sm btn-primary">Ver Perfil</a></td>
+                    <td><a href="{{ url_for('training.vex_profile', user_id=u.id) }}" class="btn btn-sm btn-primary">Ver Perfil</a></td>
+                    {% else %}
+                    <td colspan="4">
+                        <span class="no-profile-badge">Sin datos suficientes</span>
+                        <span class="no-profile-meta" style="margin-left:8px">
+                            {% if sc == 0 %}
+                                Aún no entrenó.
+                            {% elif sc == 1 %}
+                                1 sesión completa — necesita 2 para generar el perfil.
+                            {% else %}
+                                {{ sc }} sesiones — el perfil se generará al recalcular.
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="no-profile-meta">{{ sc }} sesion{{ 'es' if sc != 1 else '' }}</span>
+                    </td>
+                    <td>
+                        {% if sc >= 2 %}
+                        <a href="{{ url_for('training.vex_profile', user_id=u.id) }}" class="btn btn-sm btn-primary">Generar perfil</a>
+                        {% else %}
+                        <span style="color:#bbb;font-size:12px">—</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -58,26 +221,23 @@
 
     {% if pagination.pages > 1 %}
     <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:24px;flex-wrap:wrap">
+        {% set qs = '&q=' ~ q_text|urlencode ~ '&role=' ~ role_f ~ '&show=' ~ show_f ~ '&per_page=' ~ per_page %}
         {% if pagination.has_prev %}
-        <a href="{{ url_for('training.vex_dashboard', page=pagination.prev_num) }}" class="btn btn-sm btn-secondary">&larr; Anterior</a>
+        <a href="?page={{ pagination.prev_num }}{{ qs }}" class="btn btn-sm btn-secondary">&larr; Anterior</a>
         {% endif %}
-
         {% for p_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
             {% if p_num %}
-                <a href="{{ url_for('training.vex_dashboard', page=p_num) }}" class="btn btn-sm {{ 'btn-primary' if p_num == pagination.page else 'btn-secondary' }}" style="min-width:36px;text-align:center">{{ p_num }}</a>
+                <a href="?page={{ p_num }}{{ qs }}" class="btn btn-sm {{ 'btn-primary' if p_num == pagination.page else 'btn-secondary' }}" style="min-width:36px;text-align:center">{{ p_num }}</a>
             {% else %}
                 <span style="color:#888">...</span>
             {% endif %}
         {% endfor %}
-
         {% if pagination.has_next %}
-        <a href="{{ url_for('training.vex_dashboard', page=pagination.next_num) }}" class="btn btn-sm btn-secondary">Siguiente &rarr;</a>
+        <a href="?page={{ pagination.next_num }}{{ qs }}" class="btn btn-sm btn-secondary">Siguiente &rarr;</a>
         {% endif %}
-
-        <span style="color:#888;font-size:13px;margin-left:12px">{{ pagination.total }} perfiles</span>
+        <span style="color:#888;font-size:13px;margin-left:12px">Total: {{ pagination.total }}</span>
     </div>
     {% endif %}
-
     {% endif %}
 </div>
 {% endblock %}
