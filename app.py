@@ -228,11 +228,32 @@ def index():
     return render_template('index.html', categories=categories, featured=featured)
 
 
+def render_trivia_html(content):
+    """Renderiza el HTML completo del juego trivia con las preguntas inyectadas
+    desde content.content_data (JSON). Devuelve el string que va al iframe srcdoc.
+    """
+    import json as _json
+    try:
+        data = _json.loads(content.content_data) if content.content_data else {}
+    except (ValueError, TypeError):
+        data = {}
+    questions = data.get('questions', []) if isinstance(data, dict) else []
+    return render_template(
+        'games/trivia.html',
+        trivia=data if isinstance(data, dict) else {},
+        questions_json=_json.dumps(questions, ensure_ascii=False),
+        slug=content.slug,
+    )
+
+
 @app.route('/content/<slug>')
 @login_required
 def view_content(slug):
     content = Content.query.filter_by(slug=slug, is_active=True).first_or_404()
-    return render_template('viewer.html', content=content)
+    trivia_html = None
+    if (content.content_type or 'visual') == 'trivia':
+        trivia_html = render_trivia_html(content)
+    return render_template('viewer.html', content=content, trivia_html=trivia_html)
 
 
 @app.route('/category/<slug>')

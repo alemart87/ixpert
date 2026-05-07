@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ trivia.title or 'Trivia' }}</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0; padding: 0;
+      height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      background: linear-gradient(270deg, #004080, #ff6600, #333);
+      background-size: 600% 600%;
+      animation: bgAnimation 18s ease infinite;
+      overflow: hidden;
+      color: #333;
+    }
+    @keyframes bgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .game-container {
+      width: 95%; max-width: 800px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      padding: 25px; text-align: center;
+      position: relative; animation: zoomIn 0.8s ease;
+      z-index: 2;
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    h1 { margin-bottom: 15px; font-size: 26px; color: #004080; }
+    .question-card {
+      margin: 20px 0; font-size: 20px; font-weight: bold;
+      min-height: 80px; animation: fadeIn 0.6s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .option {
+      background: #ff6600; color: #fff;
+      padding: 14px; border-radius: 14px; border: none;
+      font-size: 16px; cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .option:hover { transform: scale(1.07); background: #cc5200; }
+    .correct { background: #28a745 !important; }
+    .incorrect { background: #dc3545 !important; }
+    .score { margin-top: 15px; font-size: 16px; }
+    .progress-bar {
+      height: 8px; background: #e9ecef; border-radius: 4px;
+      overflow: hidden; margin: 15px 0;
+    }
+    .progress { height: 100%; width: 0; background: #004080; transition: width 0.5s ease; }
+    .timer {
+      margin: 10px auto; width: 60px; height: 60px;
+      border-radius: 50%; border: 6px solid #004080;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 18px; color: #004080;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .start-screen, .end-screen { text-align: center; animation: fadeIn 1s ease; }
+    .btn {
+      background: #004080; color: #fff;
+      padding: 12px 20px; border: none; border-radius: 12px;
+      font-size: 18px; cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn:hover { background: #002d59; transform: scale(1.05); }
+    canvas#confetti {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+    }
+    .home-button {
+      position: fixed; top: 20px; left: 20px;
+      width: 46px; height: 46px;
+      background: #004080; color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.2s, background 0.3s;
+      z-index: 3;
+    }
+    .home-button:hover { background: #002d59; transform: scale(1.15); }
+    .home-button svg { width: 24px; height: 24px; fill: #fff; }
+    .empty-state {
+      text-align: center; padding: 40px;
+      color: #666; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <a href="/" target="_top" class="home-button" title="Volver al inicio">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-10.5z"/>
+    </svg>
+  </a>
+
+  <div class="game-container">
+    <div id="start" class="start-screen">
+      <h1>{{ trivia.welcome_title or '🎉 Bienvenido a la Trivia 🎉' }}</h1>
+      <p>{{ trivia.welcome_subtitle or 'Responde correctamente y suma puntos.' }}</p>
+      <button class="btn" onclick="startGame()">Comenzar</button>
+    </div>
+
+    <div id="game" style="display:none;">
+      <h1>{{ trivia.title or 'Trivia' }}</h1>
+      <div class="progress-bar"><div id="progress" class="progress"></div></div>
+      <p id="progressText"></p>
+      <div id="timer" class="timer"></div>
+      <div id="question" class="question-card"></div>
+      <div id="options" class="options"></div>
+      <div id="score" class="score"></div>
+    </div>
+
+    <div id="end" class="end-screen" style="display:none;">
+      <h1>🎊 ¡Juego terminado! 🎊</h1>
+      <p id="finalScore"></p>
+      <p id="finalMessage"></p>
+      <p id="bestScore"></p>
+      <button class="btn" onclick="startGame()">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <script>
+    // Las preguntas se inyectan desde el servidor (content.content_data).
+    const preguntas = {{ questions_json | safe }};
+    const QUESTIONS_PER_ROUND = {{ trivia.questions_per_round or 10 }};
+    const TIME_PER_QUESTION = {{ trivia.time_per_question or 30 }};
+
+    let shuffledQuestions = [];
+    let score = 0;
+    let questionIndex = 0;
+    let timerInterval;
+    let streak = 0;
+
+    function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+    function startGame() {
+      if (!preguntas || preguntas.length === 0) {
+        document.getElementById("start").innerHTML =
+          '<div class="empty-state">⚠ Esta trivia todavía no tiene preguntas cargadas.<br><br>El SuperAdmin puede agregarlas desde el panel de edición de contenido.</div>';
+        return;
+      }
+      score = 0; questionIndex = 0; streak = 0;
+      shuffledQuestions = shuffle([...preguntas]).slice(0, QUESTIONS_PER_ROUND);
+      document.getElementById("start").style.display = "none";
+      document.getElementById("end").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (questionIndex >= shuffledQuestions.length) { endGame(); return; }
+      const q = shuffledQuestions[questionIndex];
+      document.getElementById("question").innerText = q.pregunta;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      const shuffledOptions = shuffle([...q.opciones]);
+      shuffledOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt === q.correcta);
+        optionsDiv.appendChild(btn);
+      });
+      document.getElementById("score").innerText = `Puntos: ${score}`;
+      document.getElementById("progress").style.width = `${(questionIndex / shuffledQuestions.length) * 100}%`;
+      document.getElementById("progressText").innerText = `Pregunta ${questionIndex + 1} de ${shuffledQuestions.length}`;
+      startTimer(TIME_PER_QUESTION);
+    }
+
+    function checkAnswer(btn, correct) {
+      clearInterval(timerInterval);
+      if (correct) {
+        btn.classList.add("correct");
+        score += 10;
+        streak++;
+        if (streak % 3 === 0) score += 5;
+        launchConfetti(150);
+      } else {
+        btn.classList.add("incorrect");
+        streak = 0;
+      }
+      setTimeout(() => { questionIndex++; showQuestion(); }, 1000);
+    }
+
+    function startTimer(seconds) {
+      let time = seconds;
+      document.getElementById("timer").innerText = time;
+      timerInterval = setInterval(() => {
+        time--;
+        document.getElementById("timer").innerText = time;
+        if (time <= 0) { clearInterval(timerInterval); questionIndex++; showQuestion(); }
+      }, 1000);
+    }
+
+    function endGame() {
+      document.getElementById("game").style.display = "none";
+      document.getElementById("end").style.display = "block";
+      const totalPosible = shuffledQuestions.length * 10;
+      document.getElementById("finalScore").innerText = `Tu puntuación final es: ${score} puntos de ${totalPosible}.`;
+      let mensaje = "";
+      const porcentaje = (score / totalPosible) * 100;
+      if (porcentaje >= 80) mensaje = "¡Crack total 👏!";
+      else if (porcentaje >= 50) mensaje = "Bien hecho 💪";
+      else mensaje = "Podés mejorar 😉";
+      document.getElementById("finalMessage").innerText = mensaje;
+      const best = localStorage.getItem("bestScore_{{ slug }}") || 0;
+      if (score > best) localStorage.setItem("bestScore_{{ slug }}", score);
+      document.getElementById("bestScore").innerText = `Tu récord actual es: ${localStorage.getItem("bestScore_{{ slug }}")} puntos`;
+      document.getElementById("progress").style.width = "100%";
+      launchConfetti(600);
+    }
+
+    const confettiCanvas = document.getElementById("confetti");
+    const ctx = confettiCanvas.getContext("2d");
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    let confettiPieces = [];
+
+    function launchConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        confettiPieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          size: Math.random() * 8 + 4,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function updateConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiPieces.forEach((p, i) => {
+        p.y += p.speed;
+        p.x += Math.sin(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        if (p.y > confettiCanvas.height) confettiPieces.splice(i, 1);
+      });
+      requestAnimationFrame(updateConfetti);
+    }
+    updateConfetti();
+
+    window.onresize = () => {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    };
+  </script>
+</body>
+</html>

@@ -56,10 +56,13 @@ class Content(db.Model):
     keywords = db.Column(db.Text)
     description = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
-    # Tipo de edicion: 'visual' (Quill, render inline) o 'raw_html' (textarea
-    # con HTML/JS, render en iframe sandbox). Default 'visual' para
-    # retrocompatibilidad con CMS clasico.
+    # Tipo de edicion: 'visual' (Quill, render inline), 'raw_html' (textarea
+    # con HTML/JS, render en iframe sandbox), o 'trivia' (editor estructurado
+    # de preguntas/respuestas, render con plantilla stock).
     content_type = db.Column(db.String(20), default='visual')
+    # Datos estructurados segun content_type (JSON). Para 'trivia' es:
+    # {"questions": [...], "title": "...", "questions_per_round": 10, ...}.
+    content_data = db.Column(db.Text)
     # Hash sha256 del archivo de origen en iXpert/ (si fue importado por
     # migracion). Permite detectar si el admin lo modifico antes de re-importar.
     source_hash = db.Column(db.String(64))
