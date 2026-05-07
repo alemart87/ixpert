@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trivia Bancaria WOW</title>
+  <title>Trivia iXpert</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -83,104 +83,61 @@
     .correct { background: #28a745 !important; }
     .incorrect { background: #dc3545 !important; }
 
-    .score {
-      margin-top: 15px;
-      font-size: 16px;
-    }
+    .score { margin-top: 15px; font-size: 16px; }
 
     .progress-bar {
-      height: 8px;
-      background: #e9ecef;
-      border-radius: 4px;
-      overflow: hidden;
-      margin: 15px 0;
+      height: 8px; background: #e9ecef; border-radius: 4px;
+      overflow: hidden; margin: 15px 0;
     }
     .progress {
-      height: 100%;
-      width: 0;
-      background: #004080;
+      height: 100%; width: 0; background: #004080;
       transition: width 0.5s ease;
     }
 
     .timer {
-      margin: 10px auto;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 6px solid #004080;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: #004080;
+      margin: 10px auto; width: 60px; height: 60px;
+      border-radius: 50%; border: 6px solid #004080;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 18px; color: #004080;
       animation: pulse 1s infinite;
     }
-
     @keyframes pulse {
-      0% {transform: scale(1);}
-      50% {transform: scale(1.1);}
-      100% {transform: scale(1);}
+      0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);}
     }
 
-    .start-screen, .end-screen {
-      text-align: center;
-      animation: fadeIn 1s ease;
-    }
+    .start-screen, .end-screen { text-align: center; animation: fadeIn 1s ease; }
 
     .btn {
-      background: #004080;
-      color: #fff;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      cursor: pointer;
+      background: #004080; color: #fff;
+      padding: 12px 20px; border: none; border-radius: 12px;
+      font-size: 18px; cursor: pointer;
       transition: background 0.3s, transform 0.2s;
     }
     .btn:hover { background: #002d59; transform: scale(1.05); }
 
     canvas#confetti {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
     }
 
     .home-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 46px;
-      height: 46px;
-      background: #004080;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: fixed; top: 20px; left: 20px;
+      width: 46px; height: 46px;
+      background: #004080; color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       transition: transform 0.2s, background 0.3s;
       z-index: 3;
     }
-    .home-button:hover {
-      background: #002d59;
-      transform: scale(1.15);
-    }
-    .home-button svg {
-      width: 24px;
-      height: 24px;
-      fill: #fff;
-    }
+    .home-button:hover { background: #002d59; transform: scale(1.15); }
+    .home-button svg { width: 24px; height: 24px; fill: #fff; }
   </style>
 </head>
 <body>
   <canvas id="confetti"></canvas>
 
-  <a href="../iXpert.html" class="home-button" title="Volver al inicio">
+  <a href="/" class="home-button" title="Volver al inicio">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-10.5z"/>
     </svg>
@@ -213,284 +170,50 @@
   </div>
 
   <script>
-    // Tus 20 preguntas exactas
     const preguntas = [
-    //1
-        {pregunta: "¡Quiero pagar mi préstamo y no puedo! Me sale un error que dice 'Algo salió mal'. ¿Qué puedo hacer?",
-        correcta: "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
-        opciones: [
-        "Su PIN de transacción está vencido. Debe generar uno nuevo desde la app de Bancard >> 'Seguridad' >> 'Solicitar PIN de transacción' y activarlo con su tarjeta de débito (por SMS o en un cajero automático).",
-        "Reinstale la app para reiniciar el sistema de pagos. Al ingresar digite su PIN de nuevo y va a funcionar",
-        "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
-        "Contacte con atención al cliente para procesar el pago desde la Banca."
-        ]},
-    //2
-        //{pregunta: "Quiero generar pin de transferencia",
-    //correcta: "Verifico que en su consulta anterior ya había solicitado la activación de su pin de transacción y el mismo se derivó correctamente, le sugiero aguardar el plazo indicado de 24hs y realizar un intento luego del tiempo mencionado para verificar que esté activo y en caso de inconvenientes estoy para ayudarle.",
-    //opciones: [
-      //"Debe cerrar sesión y volver a ingresar a la app.",
-      //"Solicite nuevamente el PIN desde la app.",
-      //"Verifico que en su consulta anterior ya había solicitado la activación de su pin de transacción y el mismo se derivó correctamente, le sugiero aguardar el plazo indicado de 24hs y realizar un intento luego del tiempo mencionado para verificar que esté activo y en caso de inconvenientes estoy para ayudarle.",
-      //"Llame al banco para que lo activen manualmente."]},
-    //3
-        {pregunta: "Para saber el historial de transferencia",
-        correcta: "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días.",
-        opciones: [
-        "Solicite el historial desde la APP y sera remitido por correo electronico en un plazo no mayor a 72hs.",
-        "Por favor facilitar error desde la app por el canal de chat para que se pueda remitir la info desde SAC@.",
-        "Desde la sección 'Cuentas' en la APP > 'Movimientos'> Verificar Movimientos > Transferencias. Filtrar por 30 días",
-        "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días."
-        ]},
-    //4  
-        {pregunta: "Cómo activo mi token",
-        correcta: "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción.",
-        opciones: [
-        "Cerrar sesión en la web, entrar en 'iToken', aceptar términos y 'Instalar'. Luego ir a un cajero y hacer una consulta o extracción desde su TC de otra entidad para finalizar la activación.",
-        "El proceso de activación tiene una demora de 24hs por el canal de chat, por favor acerquese a un cajero para activar.",
-        "Debe ingresar desde la APP en la sección Seguridad > Accesos > iToken > Activar e instalar, luego reiniciar el celular para que funcione",
-        "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción."
-        ]}, 
-    //5
-        {pregunta: "Se me bloqueó el sistema para realizar transferencias",
-        correcta: "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
-        opciones: [
-        "El PIN de acceso está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).",
-        "Su PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en su celular: 'Seguridad' >> 'Solicitar PIN de seguridad' y activarlo con su tarjeta (SMS o cajero automático).",
-        "Debe ir a una sucursal para desbloquearlo.",
-        "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero)."
-        ]}, 
-    //6
-        {pregunta: "Necesito solicitar un préstamo",
-        correcta: "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted.",
-        opciones: [
-        "Debe enviar un correo electrónico al área correspondiente; no contamos con atención telefónica disponible.",
-        "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.",
-        "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 hs / sáb 8:30 a 12:00 hs).",
-        "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted."
-        ]}, 
-    //7
-        {pregunta: "Quiero saber por qué se me descontó 99mil anoche",
-        correcta: "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
-        opciones: [
-        "La cuenta de salario pasó a personal tras 60 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
-        "La cuenta de salario pasó a personal tras 90 días sin acreditación. La comisión (Gs. 199.000 en caja de ahorro, Gs. 200.000 en cuenta corriente) debe mantener el promedio exigido.",
-        "La cuenta de salario pasó a otra persona tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.",
-        "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido."
-        ]}, 
-    //8
-        {pregunta: "Hice una transferencia de un monto muy alto y todavía no le llegó a mi cliente",
-        correcta: "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
-        opciones: [
-        "Las transferencias SIPAP de Gs. 5.000.000 o mas son inmediatas. Montos menores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
-        "Las transferencias SIPAP de hasta Gs. 5.000.000 dependen del BCP. Contacte con entre 17:31 y 07:59,lo acreditan en el siguiente horario de corte.",
-        "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.",
-        "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Pero solo se acreditan los días hábiles por la mañana."
-        ]},
-    //9
-        {pregunta: "¿Cómo hago para crear mis alias?",
-        correcta: "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
-        opciones: [
-        "En la sucursal, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
-        "En la app, Transferencias > Alias. Teléfono y mail se registran y usan de inmediato sin plazo mínimo.",
-        "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).",
-        "En la app, opción 'Transferencias' >> 'Alias'. Alli debe ingresar el numero de registro de conducir (teléfono y mail deben estar registrados hace más de 2 meses)."
-        ]}, 
-    //10
-        {pregunta: "¿Cómo cambiar número de celular?",
-        correcta: "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).",
-        opciones: [
-        "Puede hacerlo desde la app en la sección 'Perfil'. Completar formulario con los datos actualizados y listo",
-        "Debe hacerlo por el chat llenando un formulario. El horario general de cambio es 08:30 a 13:30 (atención 24 horas).",
-        "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).",
-        "No es posible cambiar el número una vez registrado. Unicamente lo puede hacer en caso de que sea un caso Iphone"
-        ]}, 
-    //11
-        {pregunta: "¿Se puede adquirir tarjetas de crédito en Itaú?",
-        correcta: "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.",
-        opciones: [
-        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000. Puede solicitarla en https://www.itau.com.py/canaldigital, opción 'Full'.",
-        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.",
-        "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.",
-        "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/ventas, opción 'Full'.",
-        ]},
-    //12
-        {pregunta: "Error de destinatario en una transferencia, ¿con quién puedo ver la reversión?",
-        correcta: "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
-        opciones: [
-        "Desde la app: 'Transferir' >> 'Solicitudes de desembolso' >> 'Solicitar una desembolso'. Seleccione la transacción, ingrese importe y motivo, y envíe. El beneficiario se contactara.",
-        "Desde la app: 'Seguiridad' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
-        "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.",
-        "No se puede revertir una transferencia una vez enviada. Lo unico que se puede realizar es contactar al que le llego y solicitar que le transfiera de nuevo"
-        ]}, 
-    //13
-        {pregunta: "Consulta: se me perdió mi tarjeta, ¿lo pueden bloquear?",
-        correcta: "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
-        opciones: [
-        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.",
-        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 5 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
-        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
-        "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 45.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."
-        ]}, 
-    //14
-        {pregunta: "¿Cómo puedo extraer mi extracto de cuenta?",
-        correcta: "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
-        opciones: [
-        "Desde www.itau.com.br en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
-        "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Transferencias'. Allí puede descargar meses anteriores.",
-        "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
-        "Desde www.bancard.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.",
-        ]},
-    //15
-        {pregunta: "¿Desde mi app puedo ver mi código de seguridad de la tarjeta?",
-        correcta: "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.",
-        opciones: [
-        "Sí, en la app Itaú PY >> Productos >> Solictar Tarjeta Virtual.",
-        "No, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.",
-        "Sí, desde el cajero >> Cuentas >> Ver tarjeta virtual.",
-        "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual."
-        ]},
-    //16
-        {pregunta: "¿Por qué yo no tengo intervale?",
-        correcta: "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).",
-        opciones: [
-        "El intervale depende del gerente interno de crédito y riesgo (analiza pagos, referencias, comportamiento financiero, entre otros).",
-        "Solo se otorga a clientes con tarjeta de crédito. Y riesgo crediticio bajo (pagos, referencias, comportamiento financiero, entre otros).",
-        "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).",
-        "El intervale depende de devoluciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros)."
-        ]}, 
-    //17
-        {pregunta: "¿Cómo puedo bloquear mi tarjeta de crédito?",
-        correcta: "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
-        opciones: [
-        "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.",
-        "Solo puede bloquearla desde un cajero automático. Y solicitar reimpresión, es sin costo.",
-        "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.",
-        "Se puede bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."
-        ]}, 
-    //18
-        {pregunta: "Quiero saber el pago total a la fecha de mis tarjetas de crédito",
-        correcta: "Brindar importe e informar pasos para revisar en la APP",
-        opciones: [
-        "Brindar el importe sin rodeos.",
-        "No se puede saber el total desde el canal de chat.",
-        "Brindar importe e informar pasos para revisar en la APP",
-        "Brindar importe e informar pasos para abonar por chat"
-        ]}, 
-    //19
-        {pregunta: "Quisiera consultar sobre una acreditación de ahorro programado a mi cuenta, según la app el día de ayer se tuvo que haber acreditado",
-        correcta: "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
-        opciones: [
-        "Debe esperar 72 horas para que se procese. Ya que solo se realiza un día habil a partir de las 17:00 horas.",
-        "Las acreditaciones se realizan en días Lunes a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
-        "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.",
-        "Las acreditaciones no se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día no hábil."
-        ]}, 
-    //20
-        {pregunta: "¿Cómo activo mi token?",
-        correcta: "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.",
-        opciones: [
-        "Debe esperar 24 horas para que se active automáticamente. Luego ir a un cajero Itaú/Infonet con una consulta o extracción.",
-        "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Dinelco con una consulta o extracción.",
-        "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.",
-        "Cierre sesión en la app, entre en la APP, vaya a la sección de chat a solicitar. Luego active en un cajero Itaú/Infonet con una consulta o extracción."
-        ]},
-    //extras
-        {pregunta: "¿Cómo abro una cuenta digital en Itaú sin ir al banco?",
-        correcta: "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
-        opciones: [
-        "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu resgistro de conducir, comprobante de compras y domicilio. En minutos ya tenés tu cuenta activa..",
-        "Podés abrir la cuenta 100% digital desde tu celular, contacta con el chat, envia comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
-        "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.",
-        "Podés abrir la cuenta 100% digital desde tu celular, llamando al 5050, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa."
-        ]},
-        {pregunta: "¿Qué diferencia hay entre la cuenta Básica y la Full en Itaú?",
-        correcta: "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.",
-        opciones: [
-        "La Básica es mas barato y con menos requisitos, pero no tiene límites. La Full pide ingresos demostrables y ofrece más beneficios.",
-        "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y es para empresas.",
-        "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.",
-        "La Básica se abre más rápido y pero debo ser personal bank, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios."
-        ]},
-        {pregunta: "¿Cuáles son los requisitos para pedir una tarjeta de crédito Itaú Full?",
-        correcta: "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.",
-        opciones: [
-        "Solo tener una cuenta en Itaú. Ser mayor de edad y tener ingresos.",
-        "Ser mayor de edad, tener un préstamo activo demostrable que se abona con salario.",
-        "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.",
-        "Ser cliente del banco hace más de 5 años. Facilita el acceso a la tarjeta full"
-        ]},
-        {pregunta: "¿Qué es Itaú Ticket y cómo funciona?",
-        correcta: "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.",
-        opciones: [
-        "Es un servicio para prestar dinero del banco a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto de giro en 24 horas.",
-        "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas. Aplica solo para Personal Bank",
-        "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.",
-        "Es un servicio para enviar courier a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario recibe en un punto Itaú Express en 24 horas."
-        ]},
-        {pregunta: "¿Para qué sirve el iToken en Itaú?",
-        correcta: "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.",
-        opciones: [
-        "Sirve para usar tiktok de forma segura desde la app o web, generando una clave única.",
-        "Sirve como codigo para desbloquear el celular de forma segura desde la app o web, generando una clave única.",
-        "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.",
-        "Sirve para pedir transferencias o prestamos de forma segura desde la app o web, generando una clave única.."
-        ]},
-        {pregunta: "¿Qué requisitos necesito para solicitar un préstamo 'Mi Casa' en Itaú?",
-        correcta: "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
-        opciones: [
-        "Cédula vigente, vida y residencia, antigüedad en el domicilio (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
-        "Cédula vigente, comprobante de ingresos, antigüedad laboral (10 años asalariados / 20 años independientes) y que la propiedad esté asegurada y tasada.",
-        "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.",
-        "Cédula verde, comprobante de chapa, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada."
-        ]},
-        {pregunta: "¿Cómo cancelo mi cuenta Itaú si ya no la quiero usar?",
-        correcta: "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.",
-        opciones: [
-        "No podés cancelarla desde la app Itaú PY o llamando al SAC. Podés ir a sucursal si preferís.",
-        "Solo podés cancelarla en cajero automático. O escribiendo al Chat",
-        "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.",
-        "Podés cancelarla si lo dejas de usar o contactando al SAC. También podés ir a sucursal si preferís."
-        ]},
-        {pregunta: "Después de abrir mi cuenta Full, ¿dónde veo mis productos?",
-        correcta: "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
-        opciones: [
-        "Se recibe por email, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
-        "Solo contactando al Chat se puede validar todos los productos vigentes asi como saldos y movimientos.",
-        "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.",
-        "En la galeria de fotos de Itau Py, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos."
-        ]},
-        {pregunta: "¿Puedo pedir reversión de un pago con Itaú Ticket?",
-        correcta: "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.",
-        opciones: [
-        "Si, una vez generado y cobrado el ticket si se puede revertir. Solo se pedir cancelar una vez que fue cobrado.",
-        "No, una vez generado y cobrado el ticket no se puede revertir. Pero contactando al chat se puede revertir.",
-        "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.",
-        "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar por el chat."
-        ]},
-        {pregunta: "¿Cómo solicito mi extracto mensual en Itaú?",
-        correcta: "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.",
-        opciones: [
-        "Podés solicitarlo desde la web al oficial o contactar al chat en la sección Extractos.",
-        "No es posible descargarlo desde la web oficial o la app Itaú PY",
-        "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.",
-        "Se envía automáticamente por correo, revise sus correos anteriores."
-        ]},
-        {pregunta: "Cliente responde correctamente preguntas de seguridad para el PIN, menos la marca/modelo del celular. ¿Qué hago?",
-        correcta: "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia",
-        opciones: [
-        "Se indica que por el medio demora 24hs para la activación y procedo a derivar la solicitud.",
-        "Solicitar al cliente una foto selfie con su cédula en mano para validar titularidad",
-        "Actualmente es posible activarlo por este canal. En un plazo de 24hs recibirá un SMS confirmando la activación",
-        "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia"
-        ]},
-        {pregunta: "Cliente responde correctamente preguntas de seguridad para el PIN, menos la marca/modelo del celular. ¿Qué hago?",
-        correcta: "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia",
-        opciones: [
-        "Se indica que por el medio demora 24hs para la activación y procedo a derivar la solicitud.",
-        "Solicitar al cliente una foto selfie con su cédula en mano para validar titularidad",
-        "Actualmente es posible activarlo por este canal. En un plazo de 24hs recibirá un SMS confirmando la activación",
-        "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia"
-        ]},   
+      {pregunta: "¡Quiero pagar mi préstamo y no puedo! Me sale un error que dice 'Algo salió mal'. ¿Qué puedo hacer?", correcta: "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).", opciones: ["Su PIN de transacción está vencido. Debe generar uno nuevo desde la app de Bancard >> 'Seguridad' >> 'Solicitar PIN de transacción' y activarlo con su tarjeta de débito (por SMS o en un cajero automático).", "Reinstale la app para reiniciar el sistema de pagos. Al ingresar digite su PIN de nuevo y va a funcionar", "PIN de transacción vencida. Debe generar uno nuevo en la app:Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).", "Contacte con atención al cliente para procesar el pago desde la Banca."]},
+      {pregunta: "Para saber el historial de transferencia", correcta: "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días.", opciones: ["Solicite el historial desde la APP y sera remitido por correo electronico en un plazo no mayor a 72hs.", "Por favor facilitar error desde la app por el canal de chat para que se pueda remitir la info desde SAC@.", "Desde la sección 'Cuentas' en la APP > 'Movimientos'> Verificar Movimientos > Transferencias. Filtrar por 30 días", "En la app, ingrese a 'Transferir' >> 'Historial'. Puede ver operaciones enviadas o recibidas de hasta 120 días, filtrando en rangos de 30 días."]},
+      {pregunta: "Cómo activo mi token", correcta: "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción.", opciones: ["Cerrar sesión en la web, entrar en 'iToken', aceptar términos y 'Instalar'. Luego ir a un cajero y hacer una consulta o extracción desde su TC de otra entidad para finalizar la activación.", "El proceso de activación tiene una demora de 24hs por el canal de chat, por favor acerquese a un cajero para activar.", "Debe ingresar desde la APP en la sección Seguridad > Accesos > iToken > Activar e instalar, luego reiniciar el celular para que funcione", "Debe cerrar sesión, ingresar a iToken, aceptar términos e instalar. Luego, finalizar la activación en un cajero Itaú o Infonet con una consulta o extracción."]},
+      {pregunta: "Se me bloqueó el sistema para realizar transferencias", correcta: "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).", opciones: ["El PIN de acceso está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero).", "Su PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en su celular: 'Seguridad' >> 'Solicitar PIN de seguridad' y activarlo con su tarjeta (SMS o cajero automático).", "Debe ir a una sucursal para desbloquearlo.", "El PIN de transacción está bloqueado por intentos inválidos. Debe generar uno nuevo en la app: Seguridad > Solicitar PIN, y activarlo con su tarjeta (SMS o cajero)."]},
+      {pregunta: "Necesito solicitar un préstamo", correcta: "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted.", opciones: ["Debe enviar un correo electrónico al área correspondiente; no contamos con atención telefónica disponible.", "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.", "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 hs / sáb 8:30 a 12:00 hs).", "Puede llamar al (021) 617 5050 (lun-vie 8:30 a 17:30 / sáb 8:30 a 12:00) o le derivo la solicitud para que se contacten con usted."]},
+      {pregunta: "Quiero saber por qué se me descontó 99mil anoche", correcta: "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.", opciones: ["La cuenta de salario pasó a personal tras 60 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.", "La cuenta de salario pasó a personal tras 90 días sin acreditación. La comisión (Gs. 199.000 en caja de ahorro, Gs. 200.000 en cuenta corriente) debe mantener el promedio exigido.", "La cuenta de salario pasó a otra persona tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido.", "La cuenta de salario pasó a personal tras 90 días sin acreditación. Para evitar la comisión (Gs. 99.000 en caja de ahorro, Gs. 220.000 en cuenta corriente) debe mantener el promedio exigido."]},
+      {pregunta: "Hice una transferencia de un monto muy alto y todavía no le llegó a mi cliente", correcta: "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.", opciones: ["Las transferencias SIPAP de Gs. 5.000.000 o mas son inmediatas. Montos menores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.", "Las transferencias SIPAP de hasta Gs. 5.000.000 dependen del BCP. Contacte con entre 17:31 y 07:59,lo acreditan en el siguiente horario de corte.", "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Montos mayores, en dólares o a cooperativas hechas entre 17:31 y 07:59 se acreditan en el siguiente horario de corte.", "Las transferencias SIPAP de hasta Gs. 5.000.000 son inmediatas. Pero solo se acreditan los días hábiles por la mañana."]},
+      {pregunta: "¿Cómo hago para crear mis alias?", correcta: "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).", opciones: ["En la sucursal, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).", "En la app, Transferencias > Alias. Teléfono y mail se registran y usan de inmediato sin plazo mínimo.", "En la app, opción 'Transferencias' >> 'Alias'. Puede usar cédula, RUC, teléfono o mail (teléfono y mail deben estar registrados hace más de 2 meses).", "En la app, opción 'Transferencias' >> 'Alias'. Alli debe ingresar el numero de registro de conducir (teléfono y mail deben estar registrados hace más de 2 meses)."]},
+      {pregunta: "¿Cómo cambiar número de celular?", correcta: "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).", opciones: ["Puede hacerlo desde la app en la sección 'Perfil'. Completar formulario con los datos actualizados y listo", "Debe hacerlo por el chat llenando un formulario. El horario general de cambio es 08:30 a 13:30 (atención 24 horas).", "Debe hacerlo en una agencia llenando un formulario. El horario general es 08:30 a 13:30 (varía según sucursal).", "No es posible cambiar el número una vez registrado. Unicamente lo puede hacer en caso de que sea un caso Iphone"]},
+      {pregunta: "¿Se puede adquirir tarjetas de crédito en Itaú?", correcta: "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.", opciones: ["Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000. Puede solicitarla en https://www.itau.com.py/canaldigital, opción 'Full'.", "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/cuentadigital, opción 'Full'.", "Puede llamar al (021) 617 5050 las 24 horas o acercarse a cualquier sucursal sin necesidad de agendar.", "Sí, si es mayor de edad, con ingreso mínimo de Gs. 2.000.000 y con comprobante de ingresos. Puede solicitarla en https://www.itau.com.py/ventas, opción 'Full'."]},
+      {pregunta: "Error de destinatario en una transferencia, ¿con quién puedo ver la reversión?", correcta: "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.", opciones: ["Desde la app: 'Transferir' >> 'Solicitudes de desembolso' >> 'Solicitar una desembolso'. Seleccione la transacción, ingrese importe y motivo, y envíe. El beneficiario se contactara.", "Desde la app: 'Seguiridad' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.", "Desde la app: 'Transferir' >> 'Solicitudes de devolución' >> 'Solicitar una devolución'. Seleccione la transferencia, ingrese importe y motivo, y envíe. Depende de la aceptación del beneficiario.", "No se puede revertir una transferencia una vez enviada. Lo unico que se puede realizar es contactar al que le llego y solicitar que le transfiera de nuevo"]},
+      {pregunta: "Consulta: se me perdió mi tarjeta, ¿lo pueden bloquear?", correcta: "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.", opciones: ["Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.", "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 5 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.", "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.", "Puedo bloquear su tarjeta y solicitar la reimpresión (Gs. 45.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."]},
+      {pregunta: "¿Cómo puedo extraer mi extracto de cuenta?", correcta: "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.", opciones: ["Desde www.itau.com.br en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.", "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Transferencias'. Allí puede descargar meses anteriores.", "Desde www.itau.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores.", "Desde www.bancard.com.py en 'Productos y servicios' >> 'Caja de ahorro/corriente' >> 'Extracto'. Allí puede descargar meses anteriores."]},
+      {pregunta: "¿Desde mi app puedo ver mi código de seguridad de la tarjeta?", correcta: "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.", opciones: ["Sí, en la app Itaú PY >> Productos >> Solictar Tarjeta Virtual.", "No, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual.", "Sí, desde el cajero >> Cuentas >> Ver tarjeta virtual.", "Sí, en la app Itaú PY >> Cuentas >> Ver tarjeta virtual."]},
+      {pregunta: "¿Por qué yo no tengo intervale?", correcta: "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).", opciones: ["El intervale depende del gerente interno de crédito y riesgo (analiza pagos, referencias, comportamiento financiero, entre otros).", "Solo se otorga a clientes con tarjeta de crédito. Y riesgo crediticio bajo (pagos, referencias, comportamiento financiero, entre otros).", "El intervale depende de evaluaciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros).", "El intervale depende de devoluciones internas de crédito y riesgo (pagos, referencias, comportamiento financiero, entre otros)."]},
+      {pregunta: "¿Cómo puedo bloquear mi tarjeta de crédito?", correcta: "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.", opciones: ["Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 meses si es envío a domicilio.", "Solo puede bloquearla desde un cajero automático. Y solicitar reimpresión, es sin costo.", "Se puede bloquear su tarjeta y solicitar la reimpresión sin costo. Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio.", "Se puede bloquear su tarjeta y solicitar la reimpresión (Gs. 55.000). Retiro en 3 días hábiles en puesto express o 5 a 7 días si es envío a domicilio."]},
+      {pregunta: "Quiero saber el pago total a la fecha de mis tarjetas de crédito", correcta: "Brindar importe e informar pasos para revisar en la APP", opciones: ["Brindar el importe sin rodeos.", "No se puede saber el total desde el canal de chat.", "Brindar importe e informar pasos para revisar en la APP", "Brindar importe e informar pasos para abonar por chat"]},
+      {pregunta: "Quisiera consultar sobre una acreditación de ahorro programado a mi cuenta, según la app el día de ayer se tuvo que haber acreditado", correcta: "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.", opciones: ["Debe esperar 72 horas para que se procese. Ya que solo se realiza un día habil a partir de las 17:00 horas.", "Las acreditaciones se realizan en días Lunes a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.", "Las acreditaciones se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día hábil.", "Las acreditaciones no se realizan en días hábiles a partir de las 17:00 horas. Si fue día no hábil, se acredita el siguiente día no hábil."]},
+      {pregunta: "¿Cómo activo mi token?", correcta: "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.", opciones: ["Debe esperar 24 horas para que se active automáticamente. Luego ir a un cajero Itaú/Infonet con una consulta o extracción.", "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Dinelco con una consulta o extracción.", "Cierre sesión en la app, entre en 'iToken', acepte términos e 'Instalar'. Luego active en un cajero Itaú/Infonet con una consulta o extracción.", "Cierre sesión en la app, entre en la APP, vaya a la sección de chat a solicitar. Luego active en un cajero Itaú/Infonet con una consulta o extracción."]},
+      {pregunta: "¿Cómo abro una cuenta digital en Itaú sin ir al banco?", correcta: "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.", opciones: ["Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu resgistro de conducir, comprobante de compras y domicilio. En minutos ya tenés tu cuenta activa..", "Podés abrir la cuenta 100% digital desde tu celular, contacta con el chat, envia comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.", "Podés abrir la cuenta 100% digital desde tu celular, subiendo foto de tu cédula, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa.", "Podés abrir la cuenta 100% digital desde tu celular, llamando al 5050, comprobante de ingresos y domicilio. En minutos ya tenés tu cuenta activa."]},
+      {pregunta: "¿Qué diferencia hay entre la cuenta Básica y la Full en Itaú?", correcta: "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.", opciones: ["La Básica es mas barato y con menos requisitos, pero no tiene límites. La Full pide ingresos demostrables y ofrece más beneficios.", "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y es para empresas.", "La Básica se abre más rápido y con menos requisitos, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios.", "La Básica se abre más rápido y pero debo ser personal bank, pero tiene límites menores. La Full pide ingresos demostrables y ofrece más beneficios."]},
+      {pregunta: "¿Cuáles son los requisitos para pedir una tarjeta de crédito Itaú Full?", correcta: "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.", opciones: ["Solo tener una cuenta en Itaú. Ser mayor de edad y tener ingresos.", "Ser mayor de edad, tener un préstamo activo demostrable que se abona con salario.", "Ser mayor de edad, tener ingreso mínimo demostrable y ser asalariado, profesional o comerciante.", "Ser cliente del banco hace más de 5 años. Facilita el acceso a la tarjeta full"]},
+      {pregunta: "¿Qué es Itaú Ticket y cómo funciona?", correcta: "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.", opciones: ["Es un servicio para prestar dinero del banco a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto de giro en 24 horas.", "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas. Aplica solo para Personal Bank", "Es un servicio para enviar dinero a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario cobra en un punto Itaú Express en 24 horas.", "Es un servicio para enviar courier a personas sin cuenta bancaria. Generás un ticket en la app y el destinatario recibe en un punto Itaú Express en 24 horas."]},
+      {pregunta: "¿Para qué sirve el iToken en Itaú?", correcta: "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.", opciones: ["Sirve para usar tiktok de forma segura desde la app o web, generando una clave única.", "Sirve como codigo para desbloquear el celular de forma segura desde la app o web, generando una clave única.", "Sirve para validar transferencias y operaciones de forma segura desde la app o web, generando una clave única.", "Sirve para pedir transferencias o prestamos de forma segura desde la app o web, generando una clave única.."]},
+      {pregunta: "¿Qué requisitos necesito para solicitar un préstamo 'Mi Casa' en Itaú?", correcta: "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.", opciones: ["Cédula vigente, vida y residencia, antigüedad en el domicilio (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.", "Cédula vigente, comprobante de ingresos, antigüedad laboral (10 años asalariados / 20 años independientes) y que la propiedad esté asegurada y tasada.", "Cédula vigente, comprobante de ingresos, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada.", "Cédula verde, comprobante de chapa, antigüedad laboral (1 año asalariados / 2 años independientes) y que la propiedad esté asegurada y tasada."]},
+      {pregunta: "¿Cómo cancelo mi cuenta Itaú si ya no la quiero usar?", correcta: "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.", opciones: ["No podés cancelarla desde la app Itaú PY o llamando al SAC. Podés ir a sucursal si preferís.", "Solo podés cancelarla en cajero automático. O escribiendo al Chat", "Podés cancelarla desde la app Itaú PY o llamando al SAC. También podés ir a sucursal si preferís.", "Podés cancelarla si lo dejas de usar o contactando al SAC. También podés ir a sucursal si preferís."]},
+      {pregunta: "Después de abrir mi cuenta Full, ¿dónde veo mis productos?", correcta: "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.", opciones: ["Se recibe por email, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.", "Solo contactando al Chat se puede validar todos los productos vigentes asi como saldos y movimientos.", "En la app Itaú PY, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos.", "En la galeria de fotos de Itau Py, en la sección de Cuentas y Tarjetas. Ahí ves tus datos, saldos y movimientos."]},
+      {pregunta: "¿Puedo pedir reversión de un pago con Itaú Ticket?", correcta: "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.", opciones: ["Si, una vez generado y cobrado el ticket si se puede revertir. Solo se pedir cancelar una vez que fue cobrado.", "No, una vez generado y cobrado el ticket no se puede revertir. Pero contactando al chat se puede revertir.", "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar antes de que sea cobrado.", "No, una vez generado y cobrado el ticket no se puede revertir. Solo se puede cancelar por el chat."]},
+      {pregunta: "¿Cómo solicito mi extracto mensual en Itaú?", correcta: "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.", opciones: ["Podés solicitarlo desde la web al oficial o contactar al chat en la sección Extractos.", "No es posible descargarlo desde la web oficial o la app Itaú PY", "Podés descargarlo desde la web oficial o la app Itaú PY en la sección Extractos.", "Se envía automáticamente por correo, revise sus correos anteriores."]},
+      {pregunta: "Cliente responde correctamente preguntas de seguridad para el PIN, menos la marca/modelo del celular. ¿Qué hago?", correcta: "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia", opciones: ["Se indica que por el medio demora 24hs para la activación y procedo a derivar la solicitud.", "Solicitar al cliente una foto selfie con su cédula en mano para validar titularidad", "Actualmente es posible activarlo por este canal. En un plazo de 24hs recibirá un SMS confirmando la activación", "Actualmente no es posible activarlo por este canal. Se sugiere activar por cajero, SMS o en una agencia"]},
+      {pregunta: "Cliente nuevo con kit recibido no puede transaccionar por iToken. No tiene el iToken generado en Admin24 y no tiene tarjeta física activa. ¿Qué debe hacer el operador?", correcta: "Indicar que lo genere desde la App y mencionar que los canales de activación son solo SMS o Agencia.", opciones: ["Indicar que lo genere desde la App y que debe ir exclusivamente al cajero automático.", "Derivar el caso a soporte técnico para la activación remota en 24hs.", "Indicar que lo genere desde la App y mencionar que los canales de activación son solo SMS o Agencia.", "Informar que al ser cliente nuevo el iToken se activará automáticamente con su primera compra."]},
+      {pregunta: "Cliente solicita activar PIN de transacción bloqueado. Cumple con antigüedad de catastro y tiene iToken activo en Admin24. ¿Cuál es el procedimiento?", correcta: "Informar que se deriva la solicitud y que se contactarán con él vía llamada en 24 horas.", opciones: ["Solicitar que se acerque a una sucursal para la firma de documentos.", "Informar que se deriva la solicitud y que se contactarán con él vía llamada en 24 horas.", "Indicar que debe realizar el cambio de PIN directamente desde un cajero automático.", "Realizar el desbloqueo inmediato en Admin24 y solicitar una selfie para validar."]},
+      {pregunta: "Cliente solicita activar PIN de transacción por bloqueo, pero el operador verifica que NO tiene el iToken activo. ¿Qué se le indica?", correcta: "Indicar cómo generar y activar el iToken; una vez hecho esto, debe volver a contactar para derivar la activación del PIN.", opciones: ["Derivar la solicitud de igual manera aclarando que el iToken está inactivo.", "Indicar cómo generar y activar el iToken; una vez hecho esto, debe volver a contactar para derivar la activación del PIN.", "Mencionar que el PIN se desbloqueará solo tras 48 horas de inactividad.", "Pedir al cliente que envíe un correo a soporte con la foto de su cédula."]},
+      {pregunta: "Cliente interesado en préstamo 'Itaú sin vueltas' que figura en la App. No tiene oficial de cuenta ni está en recuperaciones. ¿Cómo procede el operador?", correcta: "Solicitar teléfono y correo, y derivar la solicitud vía Extranet.", opciones: ["Indicar al cliente que debe acercarse a la sucursal más cercana para firmar el pagaré.", "Solicitar teléfono y correo, y derivar la solicitud vía Extranet.", "Informar que solo se puede gestionar de forma presencial por seguridad.", "Transferir la llamada directamente al departamento de créditos."]},
+      {pregunta: "Cliente interesado en un préstamo, pero al verificar se constata que cuenta con un Oficial de Cuentas asignado. ¿Qué debe hacer el operador?", correcta: "Solicitar datos de contacto y derivar el contacto directamente al oficial de cuentas.", opciones: ["Aplicar el procedimiento de 'Itaú sin vueltas' y derivar por Extranet.", "Indicar al cliente que llame personalmente a su oficial en horario administrativo.", "Solicitar datos de contacto y derivar el contacto directamente al oficial de cuentas.", "Informar que no es posible otorgar el préstamo por tener oficial asignado."]},
+      {pregunta: "Cliente solicita cancelar su Tarjeta de Crédito (TC) por falta de uso. Al verificar, el cliente tiene deuda pendiente. ¿Qué se debe hacer?", correcta: "Mencionar que debe cancelar la deuda y realizar el decaimiento de cuotas si las tuviera.", opciones: ["Proceder con la cancelación en BPM y bloquear en Bancard ignorando la deuda.", "Mencionar que debe cancelar la deuda y realizar el decaimiento de cuotas si las tuviera.", "Indicar que la tarjeta se cancelará automáticamente al llegar a saldo cero.", "Derivar el caso a recuperaciones para que ellos gestionen la cancelación."]},
+      {pregunta: "Cliente extravió su Tarjeta de Débito (TD). ¿Cuál es el proceso de solución?", correcta: "Bloquear y regrabar con costo, solicitar puesto de retención y cargar en BPM/Bancard.", opciones: ["Bloquear y regrabar sin costo indicando que llegará a su domicilio en 48hs.", "Indicar que debe realizar la denuncia policial antes de solicitar la reimpresión.", "Bloquear y regrabar con costo, solicitar puesto de retención y cargar en BPM/Bancard.", "Solo bloquear en Bancard y pedir al cliente que pase por una agencia."]},
+      {pregunta: "Cliente extravió su Tarjeta de Crédito (TC). ¿Qué diferencia este proceso del de la tarjeta de débito?", correcta: "La regrabación no tiene costo y se realiza vía sac.com.", opciones: ["La regrabación tiene un costo mayor por ser de crédito.", "No se puede bloquear por teléfono, debe ser presencial.", "La regrabación no tiene costo y se realiza vía sac.com.", "Se requiere obligatoriamente una selfie para procesar el pedido."]},
+      {pregunta: "Cliente desconoce movimientos en su Tarjeta de Débito (TD) y desea realizar un contracargo. ¿Por qué medio se carga la solicitud?", correcta: "Se realiza el pre filtro y se carga la solicitud vía BPM.", opciones: ["Se carga directamente a través de sac.com como si fuera TC.", "Se debe derivar al oficial de cuentas para que cargue el reclamo.", "Se realiza el pre filtro y se carga la solicitud vía BPM.", "Se indica al cliente que debe reclamar directamente en el comercio."]},
+      {pregunta: "Cliente reclama un reintegro de promoción que aún está dentro del plazo de 72 horas hábiles. ¿Qué debe responder el operador?", correcta: "Verificar bases y condiciones e indicar que debe aguardar a que se cumpla el plazo.", opciones: ["Derivar de inmediato a BackOffice para análisis de urgencia.", "Indicar que el reintegro fue rechazado por el sistema.", "Verificar bases y condiciones e indicar que debe aguardar a que se cumpla el plazo.", "Pedir al cliente que envíe el ticket de compra por correo."]},
+      {pregunta: "Cliente no encuentra cómo ver sus movimientos del mes pasado en la App. ¿Qué acción toma el operador?", correcta: "Aplicar speech detallando el paso a paso para descargar extractos por App o Web.", opciones: ["Ofrecer el envío de los extractos por correo electrónico con costo adicional.", "Derivar al área de tecnología para revisar el error de la App del cliente.", "Aplicar speech detallando el paso a paso para descargar extractos por App o Web.", "Indicar que solo puede ver los movimientos del mes en curso por seguridad."]},
+      {pregunta: "Cliente llama molesto solicitando la cancelación de un seguro que no solicitó. ¿Cómo debe proceder el operador?", correcta: "Aplicar directamente el speech de cancelación de seguro detallando el horario correspondiente.", opciones: ["Transferir la llamada al área de retención de seguros para intentar convencerlo.", "Aplicar directamente el speech de cancelación de seguro detallando el horario correspondiente.", "Indicar que debe presentar una nota firmada en la casa matriz.", "Informar que los seguros no se pueden cancelar por teléfono."]},
+      {pregunta: "Cliente indica que desea unificar sus deudas (Refinanciación). ¿Cuál es la respuesta correcta?", correcta: "Aplicar speech de cobranzas detallando el horario de atención de dicha área.", opciones: ["Informar que el banco no realiza unificación de deudas actualmente.", "Solicitar todos los comprobantes de deuda de otros bancos para iniciar el trámite.", "Aplicar speech de cobranzas detallando el horario de atención de dicha área.", "Derivar el caso como una solicitud de préstamo personal nuevo."]}
     ];
 
     let shuffledQuestions = [];
@@ -499,15 +222,11 @@
     let timerInterval;
     let streak = 0;
 
-    function shuffle(array) {
-      return array.sort(() => Math.random() - 0.5);
-    }
+    function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
     function startGame() {
-      score = 0;
-      questionIndex = 0;
-      streak = 0;
-      shuffledQuestions = shuffle([...preguntas]).slice(0, 10); // solo 10 preguntas
+      score = 0; questionIndex = 0; streak = 0;
+      shuffledQuestions = shuffle([...preguntas]).slice(0, 10);
       document.getElementById("start").style.display = "none";
       document.getElementById("end").style.display = "none";
       document.getElementById("game").style.display = "block";
@@ -515,17 +234,12 @@
     }
 
     function showQuestion() {
-      if (questionIndex >= shuffledQuestions.length) {
-        endGame();
-        return;
-      }
-
+      if (questionIndex >= shuffledQuestions.length) { endGame(); return; }
       const q = shuffledQuestions[questionIndex];
       document.getElementById("question").innerText = q.pregunta;
       const optionsDiv = document.getElementById("options");
       optionsDiv.innerHTML = "";
       const shuffledOptions = shuffle([...q.opciones]);
-
       shuffledOptions.forEach(opt => {
         const btn = document.createElement("button");
         btn.className = "option";
@@ -533,12 +247,10 @@
         btn.onclick = () => checkAnswer(btn, opt === q.correcta);
         optionsDiv.appendChild(btn);
       });
-
       document.getElementById("score").innerText = `Puntos: ${score}`;
       document.getElementById("progress").style.width = `${(questionIndex / shuffledQuestions.length) * 100}%`;
       document.getElementById("progressText").innerText = `Pregunta ${questionIndex + 1} de ${shuffledQuestions.length}`;
-
-      startTimer(20);
+      startTimer(30);
     }
 
     function checkAnswer(btn, correct) {
@@ -547,17 +259,13 @@
         btn.classList.add("correct");
         score += 10;
         streak++;
-        if (streak % 3 === 0) score += 5; // bonus
+        if (streak % 3 === 0) score += 5;
         launchConfetti(150);
       } else {
         btn.classList.add("incorrect");
         streak = 0;
       }
-
-      setTimeout(() => {
-        questionIndex++;
-        showQuestion();
-      }, 1000);
+      setTimeout(() => { questionIndex++; showQuestion(); }, 1000);
     }
 
     function startTimer(seconds) {
@@ -566,33 +274,24 @@
       timerInterval = setInterval(() => {
         time--;
         document.getElementById("timer").innerText = time;
-        if (time <= 0) {
-          clearInterval(timerInterval);
-          questionIndex++;
-          showQuestion();
-        }
+        if (time <= 0) { clearInterval(timerInterval); questionIndex++; showQuestion(); }
       }, 1000);
     }
 
     function endGame() {
       document.getElementById("game").style.display = "none";
       document.getElementById("end").style.display = "block";
-
       const totalPosible = shuffledQuestions.length * 10;
       document.getElementById("finalScore").innerText = `Tu puntuación final es: ${score} puntos de ${totalPosible}.`;
-
       let mensaje = "";
       const porcentaje = (score / totalPosible) * 100;
       if (porcentaje >= 80) mensaje = "¡Crack total 👏!";
       else if (porcentaje >= 50) mensaje = "Bien hecho 💪";
       else mensaje = "Podés mejorar 😉";
       document.getElementById("finalMessage").innerText = mensaje;
-
-      // Guardar récord
       const best = localStorage.getItem("bestScore") || 0;
       if(score > best) localStorage.setItem("bestScore", score);
       document.getElementById("bestScore").innerText = `Tu récord actual es: ${localStorage.getItem("bestScore")} puntos`;
-
       document.getElementById("progress").style.width = "100%";
       launchConfetti(600);
     }
