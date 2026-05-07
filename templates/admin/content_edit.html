@@ -65,13 +65,21 @@
                     </div>
                     <p class="ctype-desc">Editor enriquecido tipo Word. Recomendado para artículos, tutoriales, FAQs.</p>
                 </label>
+                <label class="ctype-card{% if ctype == 'trivia' %} selected{% endif %}" data-ctype="trivia">
+                    <input type="radio" name="content_type" value="trivia" {% if ctype == 'trivia' %}checked{% endif %}>
+                    <div class="ctype-head">
+                        <span class="ctype-icon">🎮</span>
+                        <span class="ctype-title">Trivia (juego)</span>
+                    </div>
+                    <p class="ctype-desc">Cargá preguntas con sus opciones desde un formulario. La plantilla del juego corre sola.</p>
+                </label>
                 <label class="ctype-card{% if ctype == 'raw_html' %} selected{% endif %}" data-ctype="raw_html">
                     <input type="radio" name="content_type" value="raw_html" {% if ctype == 'raw_html' %}checked{% endif %}>
                     <div class="ctype-head">
                         <span class="ctype-icon">⚙️</span>
                         <span class="ctype-title">HTML/JS personalizado</span>
                     </div>
-                    <p class="ctype-desc">Pegá un HTML completo con &lt;style&gt; y &lt;script&gt;. Ideal para juegos, calculadoras, simuladores.</p>
+                    <p class="ctype-desc">Pegá un HTML completo con &lt;style&gt; y &lt;script&gt;. Ideal para calculadoras, simuladores, otros juegos.</p>
                 </label>
             </div>
         </div>
@@ -80,6 +88,43 @@
         <div class="form-group editor-pane" data-pane="visual">
             <label>Contenido</label>
             <div id="editor" style="min-height: 400px;">{{ content.html_content|safe if content and ctype == 'visual' else '' }}</div>
+        </div>
+
+        {# Editor de Trivia — visible si ctype == 'trivia' #}
+        <div class="form-group editor-pane" data-pane="trivia">
+            <label>Configuración de la trivia</label>
+            <p style="font-size:11px;color:#888;margin:-2px 0 8px">
+                Definí el título, la pantalla de bienvenida y las preguntas. La plantilla del juego (animaciones, scoring, confetti) se aplica automáticamente.
+            </p>
+
+            <div class="trivia-meta">
+                <div class="form-group">
+                    <label for="triviaTitle">Título del juego</label>
+                    <input type="text" id="triviaTitle" placeholder="iXpert Trivia">
+                </div>
+                <div class="form-group">
+                    <label for="triviaWelcome">Pantalla de bienvenida</label>
+                    <input type="text" id="triviaWelcome" placeholder="🎉 Bienvenido a la Trivia 🎉">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="triviaPerRound">Preguntas por partida</label>
+                        <input type="number" id="triviaPerRound" min="1" max="100" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="triviaTime">Tiempo por pregunta (segundos)</label>
+                        <input type="number" id="triviaTime" min="5" max="300" value="30">
+                    </div>
+                </div>
+            </div>
+
+            <div class="trivia-questions-head">
+                <h3 style="margin:14px 0 4px;color:#004080">Preguntas</h3>
+                <button type="button" class="btn btn-secondary" id="btnAddQuestion">+ Agregar pregunta</button>
+            </div>
+            <p style="font-size:11px;color:#888;margin:0 0 8px">Marcá una opción como correcta. Las opciones se mezclan al azar al jugar.</p>
+            <div id="triviaQuestions"></div>
+            <p id="triviaCount" style="font-size:12px;color:#666;margin-top:6px"></p>
         </div>
 
         {# Editor HTML/JS — visible si ctype == 'raw_html' #}
@@ -103,6 +148,7 @@
         </div>
 
         <input type="hidden" name="html_content" id="html_content">
+        <input type="hidden" name="content_data" id="content_data" value='{{ content.content_data if content and content.content_data else "" }}'>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Guardar</button>
@@ -138,6 +184,43 @@
 .ctype-desc { margin: 0; color: #555; font-size: 12px; line-height: 1.4; }
 .editor-pane { display: none; }
 .editor-pane.active { display: block; }
+
+/* ===== Trivia editor ===== */
+.trivia-meta { background: #f8f9fa; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+.trivia-questions-head { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.q-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px; position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.q-card:hover { border-color: #ff6600; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.q-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.q-num { font-weight: 700; color: #004080; }
+.q-card .q-text {
+    width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px;
+    font-size: 14px; resize: vertical; min-height: 50px; font-family: inherit;
+    box-sizing: border-box;
+}
+.q-options { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.q-option {
+    display: flex; align-items: center; gap: 8px;
+    background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px;
+    padding: 6px 10px;
+}
+.q-option input[type=text] {
+    flex: 1; border: none; background: transparent;
+    font-size: 13px; outline: none; padding: 4px 6px;
+}
+.q-option input[type=radio] { flex-shrink: 0; cursor: pointer; }
+.q-option label { font-size: 11px; color: #666; cursor: pointer; }
+.q-option.is-correct { background: #e8f5e9; border-color: #2e7d32; }
+.q-option.is-correct input[type=text] { color: #1b5e20; font-weight: 600; }
+.q-remove {
+    background: none; border: none; cursor: pointer; color: #c62828;
+    font-size: 18px; padding: 2px 8px; border-radius: 4px;
+}
+.q-remove:hover { background: #ffebee; }
+@media (max-width: 600px) { .q-options { grid-template-columns: 1fr; } }
 </style>
 
 {% block extra_scripts %}
@@ -220,14 +303,129 @@ btnClose.addEventListener('click', () => {
     previewFrame.srcdoc = '';
 });
 
+// ===== Editor de Trivia =====
+const triviaQuestionsEl = document.getElementById('triviaQuestions');
+const triviaCountEl = document.getElementById('triviaCount');
+
+function escAttr(s) {
+    return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function renderQuestionCard(q, idx) {
+    const opts = q.opciones || ['', '', '', ''];
+    while (opts.length < 4) opts.push('');
+    const correctIdx = opts.indexOf(q.correcta);
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.dataset.idx = idx;
+    card.innerHTML =
+        '<div class="q-head">' +
+            '<span class="q-num">Pregunta ' + (idx + 1) + '</span>' +
+            '<button type="button" class="q-remove" title="Eliminar">🗑</button>' +
+        '</div>' +
+        '<textarea class="q-text" placeholder="Texto de la pregunta..."></textarea>' +
+        '<div class="q-options">' +
+            opts.slice(0, 4).map(function(opt, i) {
+                const isC = (i === correctIdx);
+                return '<div class="q-option' + (isC ? ' is-correct' : '') + '">' +
+                    '<input type="radio" name="correct-' + idx + '" id="c-' + idx + '-' + i + '"' +
+                    (isC ? ' checked' : '') + '>' +
+                    '<label for="c-' + idx + '-' + i + '">' + String.fromCharCode(65 + i) + '</label>' +
+                    '<input type="text" class="opt-text" placeholder="Opción ' + String.fromCharCode(65 + i) + '">' +
+                '</div>';
+            }).join('') +
+        '</div>';
+    // Setear valores DESPUES de insertar al DOM (asi <textarea> respeta saltos)
+    card.querySelector('.q-text').value = q.pregunta || '';
+    card.querySelectorAll('.opt-text').forEach((inp, i) => { inp.value = opts[i] || ''; });
+    triviaQuestionsEl.appendChild(card);
+
+    card.querySelector('.q-remove').addEventListener('click', function() {
+        if (!confirm('¿Eliminar esta pregunta?')) return;
+        card.remove();
+        renumberQuestions();
+    });
+    card.querySelectorAll('input[type=radio]').forEach((rad, i) => {
+        rad.addEventListener('change', function() {
+            card.querySelectorAll('.q-option').forEach((opt, j) => {
+                opt.classList.toggle('is-correct', j === i);
+            });
+        });
+    });
+}
+
+function renumberQuestions() {
+    triviaQuestionsEl.querySelectorAll('.q-card').forEach((c, i) => {
+        c.dataset.idx = i;
+        c.querySelector('.q-num').textContent = 'Pregunta ' + (i + 1);
+    });
+    if (triviaCountEl) {
+        const n = triviaQuestionsEl.querySelectorAll('.q-card').length;
+        triviaCountEl.textContent = n + ' pregunta' + (n !== 1 ? 's' : '') + ' cargada' + (n !== 1 ? 's' : '') + '.';
+    }
+}
+
+document.getElementById('btnAddQuestion').addEventListener('click', function() {
+    const idx = triviaQuestionsEl.querySelectorAll('.q-card').length;
+    renderQuestionCard({pregunta:'', correcta:'', opciones:['','','','']}, idx);
+    renumberQuestions();
+});
+
+// Cargar datos existentes al abrir
+function loadTriviaData() {
+    const raw = document.getElementById('content_data').value;
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch(e) { data = {}; }
+    document.getElementById('triviaTitle').value = data.title || '';
+    document.getElementById('triviaWelcome').value = data.welcome_title || '';
+    document.getElementById('triviaPerRound').value = data.questions_per_round || 10;
+    document.getElementById('triviaTime').value = data.time_per_question || 30;
+    triviaQuestionsEl.innerHTML = '';
+    (data.questions || []).forEach((q, i) => renderQuestionCard(q, i));
+    renumberQuestions();
+}
+loadTriviaData();
+
+function buildTriviaJSON() {
+    const questions = [];
+    triviaQuestionsEl.querySelectorAll('.q-card').forEach((card) => {
+        const text = card.querySelector('.q-text').value.trim();
+        const opts = Array.from(card.querySelectorAll('.opt-text')).map(i => i.value.trim());
+        const radios = card.querySelectorAll('input[type=radio]');
+        let correctIdx = -1;
+        radios.forEach((r, i) => { if (r.checked) correctIdx = i; });
+        if (!text || correctIdx < 0) return;  // saltar incompleta
+        const filledOpts = opts.filter(o => o.length > 0);
+        if (filledOpts.length < 2) return;
+        questions.push({
+            pregunta: text,
+            correcta: opts[correctIdx],
+            opciones: opts.slice(0, 4),
+        });
+    });
+    return JSON.stringify({
+        title: document.getElementById('triviaTitle').value.trim() || 'Trivia',
+        welcome_title: document.getElementById('triviaWelcome').value.trim() || '',
+        questions_per_round: parseInt(document.getElementById('triviaPerRound').value, 10) || 10,
+        time_per_question: parseInt(document.getElementById('triviaTime').value, 10) || 30,
+        questions: questions,
+    });
+}
+
 // ===== Submit: usa el contenido del editor activo =====
-document.getElementById('contentForm').addEventListener('submit', function() {
+document.getElementById('contentForm').addEventListener('submit', function(e) {
     const t = document.querySelector('input[name=content_type]:checked').value;
     const hidden = document.getElementById('html_content');
+    const dataHidden = document.getElementById('content_data');
     if (t === 'raw_html') {
         hidden.value = document.getElementById('rawHtml').value;
+        dataHidden.value = '';
+    } else if (t === 'trivia') {
+        hidden.value = '';  // no se usa para trivia
+        dataHidden.value = buildTriviaJSON();
     } else {
         hidden.value = quill.root.innerHTML;
+        dataHidden.value = '';
     }
 });
 </script>
