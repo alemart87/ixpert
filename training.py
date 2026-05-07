@@ -1171,9 +1171,15 @@ def calculate_vex_profile(user_id):
     """
     from scoring_modes import get_effective_mode
 
-    sessions = TrainingSession.query.filter_by(
-        user_id=user_id, status='completed'
-    ).all()
+    # Si el perfil tiene reset_at seteado, ignorar sesiones anteriores al reset
+    # (siguen en BD para historial/auditoria pero no entran al promedio).
+    existing_profile = VexProfile.query.filter_by(user_id=user_id).first()
+    reset_at = existing_profile.reset_at if existing_profile else None
+
+    q = TrainingSession.query.filter_by(user_id=user_id, status='completed')
+    if reset_at:
+        q = q.filter(TrainingSession.created_at > reset_at)
+    sessions = q.all()
 
     if len(sessions) < 2:
         return None, None  # Minimum 2 sessions required
@@ -1512,13 +1518,84 @@ def vex_profile(user_id):
     pagination = TrainingSession.query.filter_by(
         user_id=user_id, status='completed'
     ).order_by(TrainingSession.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    # Historial de resets — los snapshots ordenados del mas reciente al mas viejo
+    from models import VexProfileSnapshot
+    snapshots = VexProfileSnapshot.query.filter_by(user_id=user_id).order_by(
+        VexProfileSnapshot.taken_at.desc()
+    ).limit(10).all()
+
     return render_template('admin/vex_profile.html',
                            profile=profile,
                            sessions=pagination.items,
                            pagination=pagination,
                            mode_counts=mode_counts,
                            active_mode=active_mode_info,
-                           cap_reasons=cap_reasons)
+                           cap_reasons=cap_reasons,
+                           snapshots=snapshots)
+
+
+@training_bp.route('/admin/vex/profile/<int:user_id>/reset', methods=['POST'])
+@analista_or_above
+def vex_profile_reset(user_id):
+    """Reinicia las metricas del perfil VEX de un usuario.
+
+    Antes de resetear:
+      1) Toma un snapshot del perfil actual con who/when/why → log auditable.
+      2) Marca profile.reset_at = now() para que calculate_vex_profile filtre
+         sesiones anteriores y empiece a medir desde cero.
+      3) Limpia los scores actuales del perfil.
+
+    Las sesiones de entrenamiento NO se borran: quedan en BD para historial.
+    El usuario verá su nuevo perfil basarse solo en sesiones nuevas.
+    """
+    from models import VexProfileSnapshot
+    target = User.query.get_or_404(user_id)
+    profile = VexProfile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        flash(f'{target.name} aún no tiene perfil VEX para reiniciar.', 'error')
+        return redirect(url_for('training.vex_dashboard'))
+
+    reason = (request.form.get('reason') or '').strip() or None
+
+    # 1. Snapshot del estado actual
+    snap = VexProfileSnapshot(
+        user_id=user_id,
+        taken_by=current_user.id,
+        reason=reason,
+        communication_score=profile.communication_score,
+        empathy_score=profile.empathy_score,
+        resolution_score=profile.resolution_score,
+        speed_score=profile.speed_score,
+        adaptability_score=profile.adaptability_score,
+        compliance_score=profile.compliance_score,
+        overall_score=profile.overall_score,
+        predictive_index=profile.predictive_index,
+        profile_category=profile.profile_category,
+        recommendation=profile.recommendation,
+        sessions_analyzed=profile.sessions_analyzed,
+    )
+    db.session.add(snap)
+
+    # 2. Marcar fecha de reset y limpiar scores
+    profile.reset_at = datetime.utcnow()
+    profile.communication_score = 0
+    profile.empathy_score = 0
+    profile.resolution_score = 0
+    profile.speed_score = 0
+    profile.adaptability_score = 0
+    profile.compliance_score = 0
+    profile.overall_score = 0
+    profile.predictive_index = 0
+    profile.profile_category = None
+    profile.recommendation = None
+    profile.sessions_analyzed = 0
+    profile.last_updated = datetime.utcnow()
+
+    db.session.commit()
+    print(f'[VEX RESET] user_id={user_id} by={current_user.id} reason={reason!r}', flush=True)
+    flash(f'Métricas de {target.name} reiniciadas. El último resultado quedó guardado en el historial.', 'success')
+    return redirect(url_for('training.vex_profile', user_id=user_id))
 
 
 @training_bp.route('/admin/vex/methodology')

@@ -64,6 +64,10 @@ def migrate_pre():
             _ensure_column('training_batches', 'scoring_mode', 'VARCHAR(20)')
             _ensure_column('training_batches', 'client_response_delay_seconds', 'INTEGER DEFAULT 30')
 
+        # vex_profiles — campo agregado en v11 (reset de metricas)
+        if _table_exists('vex_profiles'):
+            _ensure_column('vex_profiles', 'reset_at', 'TIMESTAMP')
+
         print('[MIGRATE PRE] Schema OK.')
 
 

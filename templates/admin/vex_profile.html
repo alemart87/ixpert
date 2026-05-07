@@ -55,6 +55,79 @@
     border-left:3px solid #ff9500; font-size:12px; color:#555;
 }
 .cap-item strong { display:block; color:#e65100; font-size:13px; margin-bottom:2px; }
+
+/* ===== Reiniciar metricas ===== */
+.btn-reset-metrics {
+    background: #fff;
+    color: #c62828;
+    border: 2px solid #c62828;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-reset-metrics:hover { background: #c62828; color: #fff; }
+
+/* Historial de snapshots */
+.snapshots-card { border-left: 4px solid #ff9500; }
+.snapshots-list { display: flex; flex-direction: column; gap: 12px; }
+.snapshot-item {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: box-shadow 0.2s;
+}
+.snapshot-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.snap-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+.snap-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.snap-score {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+}
+.snap-score .lbl { display: block; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
+.snap-score .val { display: block; font-size: 16px; font-weight: 700; color: #004080; font-family: monospace; }
+.snap-score-pi { background: linear-gradient(135deg, #fff4e5, #fff); border-color: #ffcc99; }
+.snap-score-pi .val { color: #ff6600; }
+.snap-reason {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #f0f7ff;
+    border-left: 3px solid #0277bd;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #555;
+    font-style: italic;
+}
+
+/* Modal reuse — soporte basico si no esta definido en otro lado */
+.modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 5000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
 </style>
 {% endblock %}
 
@@ -76,6 +149,11 @@
         <a href="{{ url_for('training.vex_dashboard') }}" class="btn btn-secondary">&larr; Volver</a>
         <a href="{{ url_for('training.vex_methodology') }}" class="btn btn-secondary">📖 Metodología</a>
         <button class="btn btn-primary" onclick="window.print()">Exportar PDF</button>
+        {% if current_user.can_admin_training and profile.sessions_analyzed and profile.sessions_analyzed > 0 %}
+        <button type="button" class="btn btn-reset-metrics" onclick="document.getElementById('resetModal').style.display='flex'">
+            ↻ Reiniciar métricas
+        </button>
+        {% endif %}
     </div>
 
     <!-- Profile Header -->
@@ -240,6 +318,64 @@
         {% endif %}
     </div>
 
+    <!-- Historial de reinicios (snapshots) -->
+    {% if snapshots %}
+    <div class="vex-card snapshots-card" style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.08);margin-bottom:20px">
+        <h2 style="color:#004080;margin:0 0 6px">📸 Historial de reinicios</h2>
+        <p style="color:#666;font-size:13px;margin:0 0 16px">
+            Cada vez que se reiniciaron las métricas, guardamos el resultado anterior. Esto permite empezar de cero sin perder el historial de rendimiento.
+        </p>
+        {% if profile.reset_at %}
+        <div style="background:#fff8e1;border-left:4px solid #ff9500;padding:10px 16px;border-radius:6px;margin-bottom:14px;font-size:13px;color:#555">
+            ⏱ <strong>Período actual:</strong> mide desde el último reinicio del
+            <strong>{{ profile.reset_at.strftime('%d/%m/%Y %H:%M') }}</strong>.
+            Las sesiones anteriores siguen en el historial pero no cuentan en el promedio.
+        </div>
+        {% endif %}
+        <div class="snapshots-list">
+            {% for snap in snapshots %}
+            {% set rec_color = rec_colors.get(snap.recommendation, '#888') %}
+            {% set cat_color = cat_colors.get(snap.profile_category, '#888') %}
+            <div class="snapshot-item">
+                <div class="snap-head">
+                    <div>
+                        <strong>📅 {{ snap.taken_at.strftime('%d/%m/%Y %H:%M') if snap.taken_at else '-' }}</strong>
+                        {% if snap.actor %}
+                        <span style="color:#888;font-size:12px">— por {{ snap.actor.name }}</span>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        {% if snap.profile_category %}
+                        <span style="background:{{ cat_color }}20;color:{{ cat_color }};padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">
+                            {{ cat_labels.get(snap.profile_category, snap.profile_category) }}
+                        </span>
+                        {% endif %}
+                        {% if snap.recommendation %}
+                        <span style="background:{{ rec_color }};color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">
+                            {{ rec_labels.get(snap.recommendation, snap.recommendation) }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="snap-scores">
+                    <div class="snap-score"><span class="lbl">Comunicación</span><span class="val">{{ '%.1f'|format(snap.communication_score or 0) }}</span></div>
+                    <div class="snap-score"><span class="lbl">Empatía</span><span class="val">{{ '%.1f'|format(snap.empathy_score or 0) }}</span></div>
+                    <div class="snap-score"><span class="lbl">Resolución</span><span class="val">{{ '%.1f'|format(snap.resolution_score or 0) }}</span></div>
+                    <div class="snap-score"><span class="lbl">Velocidad</span><span class="val">{{ '%.1f'|format(snap.speed_score or 0) }}</span></div>
+                    <div class="snap-score"><span class="lbl">Adaptab.</span><span class="val">{{ '%.1f'|format(snap.adaptability_score or 0) }}</span></div>
+                    <div class="snap-score"><span class="lbl">Compliance</span><span class="val">{{ '%.1f'|format(snap.compliance_score or 0) }}</span></div>
+                    <div class="snap-score snap-score-pi"><span class="lbl">PI</span><span class="val">{{ '%.0f'|format(snap.predictive_index or 0) }}%</span></div>
+                    <div class="snap-score"><span class="lbl">Sesiones</span><span class="val">{{ snap.sessions_analyzed or 0 }}</span></div>
+                </div>
+                {% if snap.reason %}
+                <div class="snap-reason">💬 {{ snap.reason }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Scientific Documentation -->
     <div class="vex-card" style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.08);margin-bottom:20px">
         <h2 style="color:#004080;margin:0 0 16px">Metodología de Evaluación</h2>
@@ -339,6 +475,46 @@
             <button class="btn btn-secondary" onclick="document.getElementById('sessionModal').style.display='none'">Cerrar</button>
         </div>
     </div>
+
+    <!-- Modal: Reiniciar metricas -->
+    {% if current_user.can_admin_training and profile.sessions_analyzed and profile.sessions_analyzed > 0 %}
+    <div id="resetModal" class="modal no-print" style="display:none">
+        <div class="modal-content" style="max-width:520px">
+            <h2 style="color:#c62828;margin:0 0 12px">↻ Reiniciar métricas de {{ profile.user.name }}</h2>
+            <p style="color:#555;font-size:14px;line-height:1.6">
+                Esto va a:
+            </p>
+            <ul style="color:#555;font-size:13px;line-height:1.8;margin:6px 0 14px">
+                <li>📸 <strong>Guardar el resultado actual</strong> en el historial de reinicios (no se pierde nada).</li>
+                <li>🔄 <strong>Empezar a medir desde cero</strong>: las sesiones futuras forman el nuevo perfil.</li>
+                <li>📚 Las sesiones de entrenamiento previas siguen en BD para auditoría, pero no cuentan en el nuevo promedio.</li>
+            </ul>
+            <div style="background:#fff8e1;border-left:4px solid #ff9500;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:12px;color:#555">
+                ⚠ Acción reversible solo manualmente desde la BD. Asegurate de tener una buena razón documentada.
+            </div>
+            <form method="POST" action="{{ url_for('training.vex_profile_reset', user_id=profile.user_id) }}">
+                <div class="form-group">
+                    <label for="resetReason" style="font-size:13px;font-weight:600;color:#444">
+                        Motivo del reinicio (opcional pero recomendado)
+                    </label>
+                    <textarea id="resetReason" name="reason" rows="3"
+                              placeholder="Ej: cambio de operativa, cierre de capacitación, evaluación trimestral..."
+                              style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:13px;resize:vertical"></textarea>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+                    <button type="button" class="btn btn-secondary"
+                            onclick="document.getElementById('resetModal').style.display='none'">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn"
+                            style="background:#c62828;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:700">
+                        Sí, reiniciar métricas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% block extra_scripts %}

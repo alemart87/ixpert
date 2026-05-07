@@ -270,8 +270,49 @@ class VexProfile(db.Model):
     recommendation = db.Column(db.String(30))  # recomendado, observaciones, no_recomendado
     sessions_analyzed = db.Column(db.Integer, default=0)
     last_updated = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    # Reinicio de metricas: si esta seteado, calculate_vex_profile solo agrega
+    # sesiones cuyo created_at > reset_at. Permite "empezar de nuevo" sin
+    # perder historial (los snapshots quedan en VexProfileSnapshot).
+    reset_at = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref=db.backref('vex_profile', uselist=False))
+
+
+class VexProfileSnapshot(db.Model):
+    """Snapshot del perfil VEX al momento de un reinicio de metricas.
+
+    Cada vez que un SuperAdmin o Analista reinicia las metricas de un usuario,
+    se persiste aqui el estado del perfil "antes del reinicio" + metadata
+    (quien lo hizo, cuando, motivo). Esto cumple dos objetivos:
+      1) Mantener un log auditable de los reinicios.
+      2) Mostrar al admin el ultimo resultado registrado al lado del nuevo,
+         para no perder de vista el historial de rendimiento.
+    """
+    __tablename__ = 'vex_profile_snapshots'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    taken_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    taken_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    reason = db.Column(db.Text)  # nota opcional del admin sobre el motivo
+
+    # Snapshot completo de los scores al momento del reset
+    communication_score = db.Column(db.Float)
+    empathy_score = db.Column(db.Float)
+    resolution_score = db.Column(db.Float)
+    speed_score = db.Column(db.Float)
+    adaptability_score = db.Column(db.Float)
+    compliance_score = db.Column(db.Float)
+    overall_score = db.Column(db.Float)
+    predictive_index = db.Column(db.Float)
+    profile_category = db.Column(db.String(30))
+    recommendation = db.Column(db.String(30))
+    sessions_analyzed = db.Column(db.Integer)
+
+    user = db.relationship('User', foreign_keys=[user_id],
+                           backref=db.backref('vex_snapshots', lazy='dynamic',
+                                              order_by='VexProfileSnapshot.taken_at.desc()'))
+    actor = db.relationship('User', foreign_keys=[taken_by])
 
 
 class ScoringModeOverride(db.Model):
