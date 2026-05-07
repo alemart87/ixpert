@@ -83,17 +83,7 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 1;
     }
-    .home-button {
-      position: fixed; top: 20px; left: 20px;
-      width: 46px; height: 46px;
-      background: #004080; color: #fff; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.2s, background 0.3s;
-      z-index: 3;
-    }
-    .home-button:hover { background: #002d59; transform: scale(1.15); }
-    .home-button svg { width: 24px; height: 24px; fill: #fff; }
+    .home-button { display: none; }
     .empty-state {
       text-align: center; padding: 40px;
       color: #666; font-size: 16px;
@@ -102,12 +92,6 @@
 </head>
 <body>
   <canvas id="confetti"></canvas>
-
-  <a href="/" target="_top" class="home-button" title="Volver al inicio">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-10.5z"/>
-    </svg>
-  </a>
 
   <div class="game-container">
     <div id="start" class="start-screen">

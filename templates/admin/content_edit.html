@@ -51,10 +51,12 @@
         {# Modo de edicion: visual (Quill) o raw HTML/JS (textarea con iframe sandbox al guardar) #}
         {% set ctype = (content.content_type if content else 'visual') or 'visual' %}
         <div class="form-group">
-            <label style="font-weight:700;color:#004080">Modo de edición</label>
-            <p style="font-size:12px;color:#666;margin:0 0 10px">
-                <strong>Visual</strong>: editor enriquecido (texto, imágenes, links). El más usado.
-                <br><strong>HTML/JS personalizado</strong>: pegá un documento HTML completo con sus estilos y scripts (juegos, calculadoras, dashboards). Se renderiza en una caja aislada (sandbox).
+            <label style="font-weight:700;color:#004080;font-size:15px">¿Cómo querés crear este contenido?</label>
+            <p style="font-size:13px;color:#555;margin:6px 0 12px;line-height:1.6">
+                Elegí UNO de los tres modos. Lo que veas debajo cambia según tu elección:
+                <br>• <strong>Visual</strong> — para artículos, tutoriales, FAQs (editor tipo Word).
+                <br>• <strong>Trivia</strong> — para un juego de preguntas y respuestas (formulario, sin código).
+                <br>• <strong>HTML/JS personalizado</strong> — para subir tu propio archivo (calculadoras, simuladores, otros juegos).
             </p>
             <div class="ctype-cards">
                 <label class="ctype-card{% if ctype == 'visual' %} selected{% endif %}" data-ctype="visual">
