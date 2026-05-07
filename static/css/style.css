@@ -277,6 +277,36 @@ nav .nav-logout { color: #ffcccc; }
 }
 .fixed-back-btn:hover { background: var(--naranja-itau); transform: scale(1.05); }
 
+/* Boton flotante de edicion (solo SuperAdmin sobre /content/<slug>) */
+.fixed-edit-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 200px;          /* a la izquierda de "Volver al Inicio" */
+    background: linear-gradient(135deg, #ff6600, #ff9500);
+    color: #fff !important;
+    padding: 12px 18px;
+    border-radius: 24px;
+    box-shadow: 0 4px 14px rgba(255, 102, 0, 0.4);
+    z-index: 1000;
+    font-weight: 700;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    border-bottom: none !important;
+    transition: transform 0.2s, box-shadow 0.3s;
+}
+.fixed-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 102, 0, 0.6);
+}
+.fixed-edit-btn svg { flex-shrink: 0; }
+@media (max-width: 768px) {
+    .fixed-edit-btn { right: 20px; bottom: 80px; padding: 10px 14px; font-size: 13px; }
+    .fixed-edit-btn span { display: none; }
+}
+
 /* ===== Buttons ===== */
 .btn {
     display: inline-block;
