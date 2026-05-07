@@ -1460,12 +1460,82 @@ def calculate_vex_profile(user_id):
 @training_bp.route('/admin/vex')
 @analista_or_above
 def vex_dashboard():
+    """Dashboard Vex Predictive: muestra TODOS los usuarios (no solo los que
+    tienen VexProfile generado). Los que aún no completaron las 2 sesiones
+    minimas aparecen con badge 'Sin datos suficientes' + contador de sesiones.
+
+    Filtros via querystring:
+      - role: 'all' (default), 'asesor', 'supervisor', 'analista'
+      - show: 'all' (default), 'with_profile', 'without_profile'
+      - q:    busqueda por nombre o email
+      - per_page: 10 / 25 / 50 / 100 (default 25)
+    """
+    from sqlalchemy import func, or_, case
+
+    role_f = (request.args.get('role') or 'all').lower()
+    show_f = (request.args.get('show') or 'all').lower()
+    q_text = (request.args.get('q') or '').strip()
+    try:
+        per_page = int(request.args.get('per_page') or 25)
+    except (ValueError, TypeError):
+        per_page = 25
+    if per_page not in (10, 25, 50, 100):
+        per_page = 25
     page = request.args.get('page', 1, type=int)
-    per_page = 10
-    pagination = VexProfile.query.join(User).order_by(
-        VexProfile.overall_score.desc()
-    ).paginate(page=page, per_page=per_page, error_out=False)
-    return render_template('admin/vex_dashboard.html', profiles=pagination.items, pagination=pagination)
+
+    # Subquery: cantidad de sesiones completadas por user (para los sin perfil)
+    sess_count_sq = db.session.query(
+        TrainingSession.user_id.label('uid'),
+        func.count(TrainingSession.id).label('cnt')
+    ).filter(TrainingSession.status == 'completed').group_by(TrainingSession.user_id).subquery()
+
+    # Query base: TODOS los usuarios activos no-superadmin, outer join a perfil.
+    # Ordenar: primero los que tienen perfil (por overall_score desc), despues
+    # los sin perfil al final (por nombre).
+    q = db.session.query(User, VexProfile, sess_count_sq.c.cnt).\
+        outerjoin(VexProfile, VexProfile.user_id == User.id).\
+        outerjoin(sess_count_sq, sess_count_sq.c.uid == User.id).\
+        filter(User.is_active_user == True).\
+        filter(User.role != 'superadmin')
+
+    if role_f in ('asesor', 'supervisor', 'analista'):
+        q = q.filter(User.role == role_f)
+
+    if show_f == 'with_profile':
+        q = q.filter(VexProfile.id.isnot(None))
+    elif show_f == 'without_profile':
+        q = q.filter(VexProfile.id.is_(None))
+
+    if q_text:
+        like = f'%{q_text}%'
+        q = q.filter(or_(User.name.ilike(like), User.email.ilike(like)))
+
+    # Orden: primero perfiles con score (desc), luego sin perfil (nombre)
+    q = q.order_by(
+        case((VexProfile.id.is_(None), 1), else_=0),
+        VexProfile.overall_score.desc().nullslast(),
+        User.name.asc()
+    )
+
+    pagination = q.paginate(page=page, per_page=per_page, error_out=False)
+
+    # Adaptar a una lista de dicts para que el template no se complique con
+    # tuplas SQLAlchemy.
+    rows = []
+    for user, profile, sess_count in pagination.items:
+        rows.append({
+            'user': user,
+            'profile': profile,
+            'sessions_count': sess_count or 0,
+        })
+
+    return render_template('admin/vex_dashboard.html',
+                           rows=rows,
+                           pagination=pagination,
+                           role_f=role_f,
+                           show_f=show_f,
+                           q_text=q_text,
+                           per_page=per_page)
 
 
 @training_bp.route('/admin/vex/profile/<int:user_id>')
