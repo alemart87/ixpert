@@ -3,14 +3,17 @@
 {% block title %}{{ content.title }} - Itaú Xpert{% endblock %}
 
 {% block content %}
-<article class="content-viewer">
+{% set ctype = content.content_type or 'visual' %}
+{% set is_iframe = (ctype == 'trivia') or (ctype == 'raw_html') or (ctype == 'visual' and content.html_content | is_full_html_doc) %}
+<article class="content-viewer{% if is_iframe %} content-viewer-fullscreen{% endif %}">
+    {% if not is_iframe %}
     <div class="content-header">
         <h1>{{ content.title }}</h1>
         {% if content.category %}
         <a href="{{ url_for('view_category', slug=content.category.slug) }}" class="badge">{{ content.category.name }}</a>
         {% endif %}
     </div>
-    {% set ctype = content.content_type or 'visual' %}
+    {% endif %}
     {# Decision de render:
        - 'trivia'    → iframe con la plantilla stock + preguntas inyectadas
        - 'raw_html'  → iframe con el HTML/JS custom del admin

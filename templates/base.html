@@ -42,7 +42,7 @@
                     <button class="nav-dropdown-btn">🎯 Entrenamiento ▾</button>
                     <div class="nav-dropdown-menu">
                         <a href="{{ url_for('training.index') }}">Mis Entrenamientos</a>
-                        {% if current_user.is_superadmin %}
+                        {% if current_user.can_admin_training %}
                         <a href="{{ url_for('training.admin_scenarios') }}">Crear Escenarios</a>
                         <a href="{{ url_for('training.admin_dashboard') }}">CX Dashboard</a>
                         {% endif %}
@@ -55,16 +55,23 @@
                     <span>Novedades</span>
                     <span class="nav-novedades-pulse"></span>
                 </a>
+                {% endif %}
 
-                <!-- Vex Predictive dropdown -->
+                {% if current_user.can_admin_training %}
+                <!-- Vex Predictive dropdown (SuperAdmin + Analista) -->
                 <div class="nav-dropdown">
                     <button class="nav-dropdown-btn">📊 Vex Predictive ▾</button>
                     <div class="nav-dropdown-menu">
                         <a href="{{ url_for('training.vex_dashboard') }}">Resultados</a>
                         <a href="{{ url_for('training.vex_methodology') }}">Metodología</a>
+                        {% if current_user.is_superadmin %}
                         <a href="{{ url_for('training.vex_modos') }}">Modos de Scoring</a>
+                        {% endif %}
                     </div>
                 </div>
+                {% endif %}
+
+                {% if current_user.is_superadmin %}
 
                 <!-- Admin dropdown -->
                 <div class="nav-dropdown">

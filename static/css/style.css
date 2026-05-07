@@ -233,6 +233,7 @@ nav .nav-logout { color: #ffcccc; }
 
 /* ===== Content Viewer ===== */
 .content-viewer { max-width: 900px; margin: 0 auto; }
+.content-viewer-fullscreen { max-width: 100%; padding: 0; }
 .content-header { margin-bottom: 20px; }
 .content-header h1 { color: var(--azul-itau); font-size: 1.8em; margin-bottom: 8px; }
 .content-body { background: var(--blanco); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--sombra-sm); }
@@ -241,18 +242,24 @@ nav .nav-logout { color: #ffcccc; }
 .content-body h3 { color: var(--azul-medio); }
 
 /* Documentos HTML completos (juegos, calculadoras) en iframe sandbox */
-.content-body-iframe { padding: 0; overflow: hidden; }
+.content-body-iframe {
+    padding: 0;
+    overflow: hidden;
+    margin-left: calc(50% - 50vw);   /* romper la columna y ocupar todo el ancho */
+    margin-right: calc(50% - 50vw);
+    border-radius: 0;
+    box-shadow: none;
+}
 .content-iframe {
     width: 100%;
-    min-height: 80vh;
-    height: 80vh;
+    min-height: calc(100vh - 130px);   /* casi viewport completo - portal header */
+    height: calc(100vh - 130px);
     border: 0;
     display: block;
     background: #fff;
-    border-radius: var(--radius-md);
 }
 @media (max-width: 768px) {
-    .content-iframe { min-height: 75vh; height: 75vh; }
+    .content-iframe { min-height: calc(100vh - 100px); height: calc(100vh - 100px); }
 }
 
 /* ===== Category Page ===== */
