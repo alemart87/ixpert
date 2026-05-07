@@ -53,6 +53,9 @@ def content_new():
         html_content = request.form.get('html_content', '')
         keywords = request.form.get('keywords', '')
         description = request.form.get('description', '')
+        content_type = request.form.get('content_type', 'visual')
+        if content_type not in ('visual', 'raw_html'):
+            content_type = 'visual'
 
         if not title or not slug:
             flash('Título y slug son obligatorios.', 'error')
@@ -66,6 +69,7 @@ def content_new():
                 html_content=html_content,
                 keywords=keywords,
                 description=description,
+                content_type=content_type,
                 created_by=current_user.id,
                 updated_by=current_user.id
             )
@@ -90,6 +94,11 @@ def content_edit(content_id):
         content.html_content = request.form.get('html_content', '')
         content.keywords = request.form.get('keywords', '')
         content.description = request.form.get('description', '')
+        ctype = request.form.get('content_type', 'visual')
+        content.content_type = ctype if ctype in ('visual', 'raw_html') else 'visual'
+        # Si el admin edita el contenido, lo marcamos como modificado por usuario
+        # invalidando el source_hash para que migraciones futuras no lo pisen.
+        content.source_hash = None
         content.updated_by = current_user.id
         content.updated_at = datetime.now(timezone.utc)
         db.session.commit()

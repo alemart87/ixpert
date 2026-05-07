@@ -10,9 +10,12 @@
         <a href="{{ url_for('view_category', slug=content.category.slug) }}" class="badge">{{ content.category.name }}</a>
         {% endif %}
     </div>
-    {% if content.html_content | is_full_html_doc %}
-    {# Documento HTML completo (juego, calculadora, etc.) → iframe sandbox para
-       que sus estilos y scripts no pisen el portal. #}
+    {% set ctype = content.content_type or 'visual' %}
+    {# Decision de render:
+       - 'raw_html' explicito → iframe sandbox (HTML/JS personalizado)
+       - 'visual' con auto-deteccion de doc completo → iframe (legacy)
+       - cualquier otro caso → render inline #}
+    {% if ctype == 'raw_html' or (ctype == 'visual' and content.html_content | is_full_html_doc) %}
     <div class="content-body content-body-iframe">
         <iframe
             class="content-iframe"

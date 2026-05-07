@@ -56,6 +56,13 @@ class Content(db.Model):
     keywords = db.Column(db.Text)
     description = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
+    # Tipo de edicion: 'visual' (Quill, render inline) o 'raw_html' (textarea
+    # con HTML/JS, render en iframe sandbox). Default 'visual' para
+    # retrocompatibilidad con CMS clasico.
+    content_type = db.Column(db.String(20), default='visual')
+    # Hash sha256 del archivo de origen en iXpert/ (si fue importado por
+    # migracion). Permite detectar si el admin lo modifico antes de re-importar.
+    source_hash = db.Column(db.String(64))
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     updated_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

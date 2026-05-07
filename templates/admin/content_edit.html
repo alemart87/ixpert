@@ -48,11 +48,61 @@
             <input type="text" id="description" name="description" value="{{ content.description if content else '' }}">
         </div>
 
+        {# Modo de edicion: visual (Quill) o raw HTML/JS (textarea con iframe sandbox al guardar) #}
+        {% set ctype = (content.content_type if content else 'visual') or 'visual' %}
         <div class="form-group">
-            <label>Contenido HTML</label>
-            <div id="editor" style="min-height: 400px;">{{ content.html_content|safe if content else '' }}</div>
-            <input type="hidden" name="html_content" id="html_content">
+            <label style="font-weight:700;color:#004080">Modo de edición</label>
+            <p style="font-size:12px;color:#666;margin:0 0 10px">
+                <strong>Visual</strong>: editor enriquecido (texto, imágenes, links). El más usado.
+                <br><strong>HTML/JS personalizado</strong>: pegá un documento HTML completo con sus estilos y scripts (juegos, calculadoras, dashboards). Se renderiza en una caja aislada (sandbox).
+            </p>
+            <div class="ctype-cards">
+                <label class="ctype-card{% if ctype == 'visual' %} selected{% endif %}" data-ctype="visual">
+                    <input type="radio" name="content_type" value="visual" {% if ctype == 'visual' %}checked{% endif %}>
+                    <div class="ctype-head">
+                        <span class="ctype-icon">✏️</span>
+                        <span class="ctype-title">Visual</span>
+                    </div>
+                    <p class="ctype-desc">Editor enriquecido tipo Word. Recomendado para artículos, tutoriales, FAQs.</p>
+                </label>
+                <label class="ctype-card{% if ctype == 'raw_html' %} selected{% endif %}" data-ctype="raw_html">
+                    <input type="radio" name="content_type" value="raw_html" {% if ctype == 'raw_html' %}checked{% endif %}>
+                    <div class="ctype-head">
+                        <span class="ctype-icon">⚙️</span>
+                        <span class="ctype-title">HTML/JS personalizado</span>
+                    </div>
+                    <p class="ctype-desc">Pegá un HTML completo con &lt;style&gt; y &lt;script&gt;. Ideal para juegos, calculadoras, simuladores.</p>
+                </label>
+            </div>
         </div>
+
+        {# Editor Visual (Quill) — visible si ctype == 'visual' #}
+        <div class="form-group editor-pane" data-pane="visual">
+            <label>Contenido</label>
+            <div id="editor" style="min-height: 400px;">{{ content.html_content|safe if content and ctype == 'visual' else '' }}</div>
+        </div>
+
+        {# Editor HTML/JS — visible si ctype == 'raw_html' #}
+        <div class="form-group editor-pane" data-pane="raw_html">
+            <label for="rawHtml">HTML / JavaScript completo</label>
+            <p style="font-size:11px;color:#888;margin:-2px 0 6px">
+                Pegá tu archivo .html (con &lt;!DOCTYPE&gt;, &lt;style&gt;, &lt;script&gt;). Se ejecutará dentro de un iframe sandbox aislado del portal.
+            </p>
+            <textarea id="rawHtml" rows="22"
+                      style="width:100%;font-family:'Courier New',monospace;font-size:13px;padding:12px;border:2px solid #ddd;border-radius:8px;line-height:1.5"
+                      placeholder="<!DOCTYPE html>&#10;<html>&#10;<head>...</head>&#10;<body>...</body>&#10;</html>">{{ content.html_content if content and ctype == 'raw_html' else '' }}</textarea>
+            <button type="button" class="btn btn-secondary" id="btnPreview" style="margin-top:8px">👁 Previsualizar</button>
+            <div id="previewBox" style="display:none;margin-top:12px;border:2px dashed #00B2BF;border-radius:10px;overflow:hidden;background:#fff">
+                <div style="background:#e0f7fa;padding:6px 12px;font-size:12px;color:#00695c;display:flex;justify-content:space-between;align-items:center">
+                    <span>Previsualización (se ejecuta en sandbox como en /content/...)</span>
+                    <button type="button" id="btnClosePreview" style="background:none;border:none;cursor:pointer;font-size:18px;color:#00695c">&times;</button>
+                </div>
+                <iframe id="previewFrame" style="width:100%;height:540px;border:0;display:block;background:#fff"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            </div>
+        </div>
+
+        <input type="hidden" name="html_content" id="html_content">
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Guardar</button>
@@ -60,6 +110,35 @@
         </div>
     </form>
 </div>
+
+<style>
+.ctype-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.ctype-card {
+    display: block; cursor: pointer; user-select: none;
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 12px 16px; background: #fafbfc;
+    transition: all 0.2s; position: relative;
+}
+.ctype-card:hover { border-color: #b0b8c4; background: #fff; transform: translateY(-1px); }
+.ctype-card input[type=radio] { position: absolute; opacity: 0; pointer-events: none; }
+.ctype-card.selected {
+    border-color: #ff6600; background: #fff;
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.15);
+}
+.ctype-card.selected::after {
+    content: "✓"; position: absolute; top: 10px; right: 12px;
+    width: 22px; height: 22px; background: #ff6600; color: #fff;
+    border-radius: 50%; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+}
+.ctype-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.ctype-icon { font-size: 18px; }
+.ctype-title { font-weight: 700; color: #2c3e50; font-size: 14px; }
+.ctype-card.selected .ctype-title { color: #ff6600; }
+.ctype-desc { margin: 0; color: #555; font-size: 12px; line-height: 1.4; }
+.editor-pane { display: none; }
+.editor-pane.active { display: block; }
+</style>
 
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
@@ -79,7 +158,6 @@ const quill = new Quill('#editor', {
     }
 });
 
-// Image upload handler
 quill.getModule('toolbar').addHandler('image', function() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -99,8 +177,58 @@ quill.getModule('toolbar').addHandler('image', function() {
     input.click();
 });
 
+// ===== Selector de modo Visual / Raw HTML =====
+const ctypeCards = document.querySelectorAll('.ctype-card');
+const panes = {
+    visual: document.querySelector('.editor-pane[data-pane="visual"]'),
+    raw_html: document.querySelector('.editor-pane[data-pane="raw_html"]')
+};
+function setActiveType(t) {
+    ctypeCards.forEach(c => {
+        const sel = c.dataset.ctype === t;
+        c.classList.toggle('selected', sel);
+        const r = c.querySelector('input[type=radio]');
+        if (r) r.checked = sel;
+    });
+    Object.entries(panes).forEach(([k, el]) => {
+        if (el) el.classList.toggle('active', k === t);
+    });
+}
+ctypeCards.forEach(c => {
+    c.addEventListener('click', e => {
+        if (e.target.tagName === 'INPUT') return;
+        setActiveType(c.dataset.ctype);
+    });
+});
+// Activar el modo inicial segun el radio marcado
+const initial = document.querySelector('input[name=content_type]:checked');
+setActiveType(initial ? initial.value : 'visual');
+
+// ===== Previsualizar HTML personalizado =====
+const btnPrev = document.getElementById('btnPreview');
+const btnClose = document.getElementById('btnClosePreview');
+const previewBox = document.getElementById('previewBox');
+const previewFrame = document.getElementById('previewFrame');
+btnPrev.addEventListener('click', () => {
+    const html = document.getElementById('rawHtml').value;
+    previewFrame.srcdoc = html;
+    previewBox.style.display = 'block';
+    previewBox.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+});
+btnClose.addEventListener('click', () => {
+    previewBox.style.display = 'none';
+    previewFrame.srcdoc = '';
+});
+
+// ===== Submit: usa el contenido del editor activo =====
 document.getElementById('contentForm').addEventListener('submit', function() {
-    document.getElementById('html_content').value = quill.root.innerHTML;
+    const t = document.querySelector('input[name=content_type]:checked').value;
+    const hidden = document.getElementById('html_content');
+    if (t === 'raw_html') {
+        hidden.value = document.getElementById('rawHtml').value;
+    } else {
+        hidden.value = quill.root.innerHTML;
+    }
 });
 </script>
 {% endblock %}
