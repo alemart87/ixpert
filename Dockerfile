@@ -20,6 +20,7 @@ CMD ["sh", "-c", "\
     touch /persistent/.initialized && \
     echo 'Images copied to persistent disk'; \
   fi && \
+  python migrate_pre.py && \
   python migrate.py && \
   python migrate_v2.py && \
   python migrate_v5.py && \
