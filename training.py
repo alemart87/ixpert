@@ -65,12 +65,26 @@ def superadmin_required(f):
     return decorated
 
 
-def can_view_training(f):
-    """SuperAdmin or supervisor with permission."""
+def analista_or_above(f):
+    """SuperAdmin o Analista — pueden crear escenarios, ver CX dashboard,
+    ver perfiles VEX, gestionar entrenamientos. NO pueden editar modos de
+    scoring ni gestionar usuarios (eso queda para SuperAdmin)."""
     @wraps(f)
     @login_required
     def decorated(*args, **kwargs):
-        if current_user.is_superadmin:
+        if current_user.can_admin_training:
+            return f(*args, **kwargs)
+        flash('No tienes permisos para esta sección.', 'error')
+        return redirect(url_for('index'))
+    return decorated
+
+
+def can_view_training(f):
+    """SuperAdmin, Analista, o supervisor con permiso explicito."""
+    @wraps(f)
+    @login_required
+    def decorated(*args, **kwargs):
+        if current_user.can_admin_training:
             return f(*args, **kwargs)
         perm = TrainingViewPermission.query.filter_by(supervisor_id=current_user.id).first()
         if perm:
@@ -799,7 +813,7 @@ def admin_dashboard():
 
 
 @training_bp.route('/admin/training/scenarios')
-@superadmin_required
+@analista_or_above
 def admin_scenarios():
     from scoring_modes import list_modes
     scenarios = TrainingScenario.query.order_by(TrainingScenario.is_active.desc(), TrainingScenario.created_at.desc()).all()
@@ -809,7 +823,7 @@ def admin_scenarios():
 
 
 @training_bp.route('/admin/training/scenarios/save', methods=['POST'])
-@superadmin_required
+@analista_or_above
 def admin_scenario_save():
     s_id = request.form.get('id')
     title = request.form.get('title', '').strip()
@@ -860,7 +874,7 @@ def admin_scenario_save():
 
 
 @training_bp.route('/admin/training/scenarios/<int:s_id>/delete', methods=['POST'])
-@superadmin_required
+@analista_or_above
 def admin_scenario_delete(s_id):
     s = TrainingScenario.query.get_or_404(s_id)
     s.is_active = False
@@ -870,7 +884,7 @@ def admin_scenario_delete(s_id):
 
 
 @training_bp.route('/admin/training/scenarios/<int:s_id>/toggle', methods=['POST'])
-@superadmin_required
+@analista_or_above
 def admin_scenario_toggle(s_id):
     s = TrainingScenario.query.get_or_404(s_id)
     action = request.form.get('action', 'hide')
@@ -881,7 +895,7 @@ def admin_scenario_toggle(s_id):
 
 
 @training_bp.route('/admin/api/training/enhance', methods=['POST'])
-@superadmin_required
+@analista_or_above
 def enhance_text():
     """Use AI to improve a scenario instruction text."""
     data = request.get_json(silent=True) or {}
@@ -1438,7 +1452,7 @@ def calculate_vex_profile(user_id):
 # ===== Vex Routes =====
 
 @training_bp.route('/admin/vex')
-@superadmin_required
+@analista_or_above
 def vex_dashboard():
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1449,7 +1463,7 @@ def vex_dashboard():
 
 
 @training_bp.route('/admin/vex/profile/<int:user_id>')
-@superadmin_required
+@analista_or_above
 def vex_profile(user_id):
     # Recalcular antes de mostrar — devuelve (profile, meta).
     fresh_profile, meta = calculate_vex_profile(user_id)
@@ -1508,7 +1522,7 @@ def vex_profile(user_id):
 
 
 @training_bp.route('/admin/vex/methodology')
-@superadmin_required
+@analista_or_above
 def vex_methodology():
     return render_template('admin/vex_methodology.html')
 

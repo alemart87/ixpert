@@ -190,7 +190,7 @@ def user_save():
     is_active = request.form.get('is_active') == 'on'
     max_concurrent = int(request.form.get('max_concurrent', 1) or 1)
 
-    if role not in ('supervisor', 'asesor'):
+    if role not in ('analista', 'supervisor', 'asesor'):
         flash('Rol no válido.', 'error')
         return redirect(url_for('admin.user_list'))
 

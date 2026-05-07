@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  # superadmin, supervisor, asesor
+    role = db.Column(db.String(20), nullable=False)  # superadmin, analista, supervisor, asesor
     is_active_user = db.Column(db.Boolean, default=True)
     max_concurrent_training = db.Column(db.Integer, default=1)  # 1-10 simultaneous chats
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -28,6 +28,16 @@ class User(UserMixin, db.Model):
     @property
     def is_superadmin(self):
         return self.role == 'superadmin'
+
+    @property
+    def is_analista(self):
+        return self.role == 'analista'
+
+    @property
+    def can_admin_training(self):
+        """SuperAdmin o Analista — pueden crear escenarios, ver CX dashboard,
+        ver perfiles VEX, gestionar entrenamientos."""
+        return self.role in ('superadmin', 'analista')
 
 
 class Category(db.Model):
