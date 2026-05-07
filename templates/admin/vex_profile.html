@@ -110,15 +110,18 @@
     font-style: italic;
 }
 
-/* Modal reuse — soporte basico si no esta definido en otro lado */
-.modal {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 5000;
-    align-items: center; justify-content: center;
+/* Reset modal — definicion robusta para que abra/cierre via display:none/flex */
+#resetModal {
+    position: fixed !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 99999 !important;            /* arriba de todo, incluso navbar */
+    align-items: center;
+    justify-content: center;
     padding: 20px;
+    /* display lo controla el JS via inline style */
 }
-.modal-content {
+#resetModal .modal-content {
     background: #fff;
     border-radius: 12px;
     padding: 24px;
@@ -126,7 +129,12 @@
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    animation: resetModalIn .25s ease-out;
+}
+@keyframes resetModalIn {
+    from { opacity: 0; transform: scale(.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 </style>
 {% endblock %}
@@ -150,7 +158,7 @@
         <a href="{{ url_for('training.vex_methodology') }}" class="btn btn-secondary">📖 Metodología</a>
         <button class="btn btn-primary" onclick="window.print()">Exportar PDF</button>
         {% if current_user.can_admin_training and profile.sessions_analyzed and profile.sessions_analyzed > 0 %}
-        <button type="button" class="btn btn-reset-metrics" onclick="document.getElementById('resetModal').style.display='flex'">
+        <button type="button" class="btn btn-reset-metrics" onclick="openResetModal()">
             ↻ Reiniciar métricas
         </button>
         {% endif %}
@@ -476,49 +484,70 @@
         </div>
     </div>
 
-    <!-- Modal: Reiniciar metricas -->
-    {% if current_user.can_admin_training and profile.sessions_analyzed and profile.sessions_analyzed > 0 %}
-    <div id="resetModal" class="modal no-print" style="display:none">
-        <div class="modal-content" style="max-width:520px">
-            <h2 style="color:#c62828;margin:0 0 12px">↻ Reiniciar métricas de {{ profile.user.name }}</h2>
-            <p style="color:#555;font-size:14px;line-height:1.6">
-                Esto va a:
-            </p>
-            <ul style="color:#555;font-size:13px;line-height:1.8;margin:6px 0 14px">
-                <li>📸 <strong>Guardar el resultado actual</strong> en el historial de reinicios (no se pierde nada).</li>
-                <li>🔄 <strong>Empezar a medir desde cero</strong>: las sesiones futuras forman el nuevo perfil.</li>
-                <li>📚 Las sesiones de entrenamiento previas siguen en BD para auditoría, pero no cuentan en el nuevo promedio.</li>
-            </ul>
-            <div style="background:#fff8e1;border-left:4px solid #ff9500;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:12px;color:#555">
-                ⚠ Acción reversible solo manualmente desde la BD. Asegurate de tener una buena razón documentada.
-            </div>
-            <form method="POST" action="{{ url_for('training.vex_profile_reset', user_id=profile.user_id) }}">
-                <div class="form-group">
-                    <label for="resetReason" style="font-size:13px;font-weight:600;color:#444">
-                        Motivo del reinicio (opcional pero recomendado)
-                    </label>
-                    <textarea id="resetReason" name="reason" rows="3"
-                              placeholder="Ej: cambio de operativa, cierre de capacitación, evaluación trimestral..."
-                              style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:13px;resize:vertical"></textarea>
-                </div>
-                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
-                    <button type="button" class="btn btn-secondary"
-                            onclick="document.getElementById('resetModal').style.display='none'">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn"
-                            style="background:#c62828;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:700">
-                        Sí, reiniciar métricas
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% endif %}
+    <!-- Modal: Reiniciar metricas: ahora fuera de admin-container abajo -->
 </div>
+
+{# Modal afuera del admin-container para que position:fixed funcione bien
+   independiente del contenedor padre. #}
+{% if current_user.can_admin_training and profile.sessions_analyzed and profile.sessions_analyzed > 0 %}
+<div id="resetModal" class="modal no-print" style="display:none" onclick="if(event.target===this)closeResetModal()">
+    <div class="modal-content" style="max-width:520px">
+        <h2 style="color:#c62828;margin:0 0 12px">↻ Reiniciar métricas de {{ profile.user.name }}</h2>
+        <p style="color:#555;font-size:14px;line-height:1.6">
+            Esto va a:
+        </p>
+        <ul style="color:#555;font-size:13px;line-height:1.8;margin:6px 0 14px">
+            <li>📸 <strong>Guardar el resultado actual</strong> en el historial de reinicios (no se pierde nada).</li>
+            <li>🔄 <strong>Empezar a medir desde cero</strong>: las sesiones futuras forman el nuevo perfil.</li>
+            <li>📚 Las sesiones de entrenamiento previas siguen en BD para auditoría, pero no cuentan en el nuevo promedio.</li>
+        </ul>
+        <div style="background:#fff8e1;border-left:4px solid #ff9500;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:12px;color:#555">
+            ⚠ Acción reversible solo manualmente desde la BD. Asegurate de tener una buena razón documentada.
+        </div>
+        <form method="POST" action="{{ url_for('training.vex_profile_reset', user_id=profile.user_id) }}">
+            <div class="form-group">
+                <label for="resetReason" style="font-size:13px;font-weight:600;color:#444">
+                    Motivo del reinicio (opcional pero recomendado)
+                </label>
+                <textarea id="resetReason" name="reason" rows="3"
+                          placeholder="Ej: cambio de operativa, cierre de capacitación, evaluación trimestral..."
+                          style="width:100%;padding:10px;border:2px solid #ddd;border-radius:8px;font-family:inherit;font-size:13px;resize:vertical"></textarea>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+                <button type="button" class="btn btn-secondary" onclick="closeResetModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn"
+                        style="background:#c62828;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:700">
+                    Sí, reiniciar métricas
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
 
 {% block extra_scripts %}
 <script>
+// ===== Reset metrics modal =====
+function openResetModal() {
+    var m = document.getElementById('resetModal');
+    if (!m) { alert('No se encontró el modal de reinicio.'); return; }
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';   // bloquear scroll del fondo
+    var ta = document.getElementById('resetReason');
+    if (ta) setTimeout(function(){ ta.focus(); }, 50);
+}
+function closeResetModal() {
+    var m = document.getElementById('resetModal');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+}
+// Cerrar con Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeResetModal();
+});
+
 async function viewSession(sid) {
     var res = await fetch('/admin/training/session/' + sid + '/detail');
     var d = await res.json();
