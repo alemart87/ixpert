@@ -174,6 +174,7 @@
         <a href="#empatia">💛 Rúbrica de empatía</a>
         <a href="#abandono">🛡 Fix abandonos</a>
         <a href="#caps">🚨 Barreras + transparencia</a>
+        <a href="#content-pro">🎮 Editor PRO (Visual/HTML)</a>
         <a href="#ortografia">📝 Ortografía más justa</a>
         <a href="#ia">🤖 Nuevo motor de IA</a>
         <a href="#chat">💬 Chat más cómodo</a>
@@ -460,6 +461,42 @@
             </ul>
 
             <p><strong>¿Qué pasa con los perfiles ya cargados?</strong> Se recalculan automáticamente la próxima vez que el asesor cierre una sesión. Si querés forzar el recálculo de un asesor en particular, basta con entrar a su perfil VEX desde el dashboard — la página los recalcula al abrirla.</p>
+        </div>
+    </article>
+
+    <!-- 🎮 PRO: Editor de contenido con dos modos -->
+    <article class="nov-card featured" id="content-pro">
+        <div class="nov-card-head">
+            <div class="nov-card-icon">🎮</div>
+            <div class="nov-card-title">
+                <h2>Editor PRO: contenido Visual o HTML/JS personalizado</h2>
+                <p class="subtitle">Ahora podés cargar juegos, calculadoras y simuladores propios sin perder el editor visual.</p>
+            </div>
+            <span class="nov-card-tag">PRO</span>
+        </div>
+        <div class="nov-card-body">
+            <p>El editor de contenido ahora te deja elegir <strong>cómo</strong> querés crear cada artículo. Antes solo había Quill (texto enriquecido). Ahora hay un selector arriba del editor con dos opciones:</p>
+
+            <div class="nov-modes">
+                <div class="nov-mode standard">
+                    <h4>✏️ Visual</h4>
+                    <p>El editor de siempre, tipo Word. Texto enriquecido, imágenes, links, listas. Recomendado para artículos, tutoriales, FAQs y procedimientos.</p>
+                </div>
+                <div class="nov-mode exigente">
+                    <h4>⚙️ HTML/JS personalizado</h4>
+                    <p>Pegás un HTML completo con sus <code>&lt;style&gt;</code> y <code>&lt;script&gt;</code>. Ideal para juegos de trivia, calculadoras (NPS, intereses), simuladores o páginas con efectos especiales.</p>
+                </div>
+            </div>
+
+            <div class="nov-highlight">
+                <strong>🛡 Sandbox automático:</strong> el HTML personalizado se ejecuta dentro de un iframe aislado. Sus estilos NO pisan el portal y sus scripts NO acceden a las cookies/sesión del usuario. Podés pegar código sin miedo a romper el resto de la aplicación.
+            </div>
+
+            <p><strong>Botón Previsualizar:</strong> mientras editás en modo HTML, podés clickear "👁 Previsualizar" para ver tu juego/calculadora corriendo en el sandbox <em>antes</em> de guardar. Cualquier ajuste se ve al toque.</p>
+
+            <p><strong>Sincronización inteligente desde el repositorio:</strong> el sistema ahora guarda un hash del archivo fuente. Cuando se actualiza el repo y se redeploya, los contenidos que <em>no</em> fueron editados manualmente se actualizan automáticamente. Los que el admin tocó <em>se preservan</em> — no se pisan.</p>
+
+            <p><strong>Trivia actualizada:</strong> el juego de trivia que ya estaba subido se renovó con <strong>43 preguntas</strong> incluyendo casos de BPM, Bancard, refinanciación, seguros, oficiales de cuenta y más. Lo vas a ver al entrar a <code>/content/game1</code>.</p>
         </div>
     </article>
 
