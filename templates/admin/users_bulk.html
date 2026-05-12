@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}Carga masiva de usuarios - Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+.bulk-container { max-width: 980px; margin: 0 auto; }
+.bulk-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 22px 26px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
+.bulk-card h2 { color: #004080; margin: 0 0 10px; }
+.bulk-card .lead { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
+
+.format-hint {
+    background: #f0f7ff;
+    border-left: 4px solid #0277bd;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #555;
+}
+.format-hint code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #c62828;
+    border: 1px solid #e0e0e0;
+}
+
+.format-example {
+    background: #1e1e1e;
+    color: #f5f5f5;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 12px 0;
+    overflow-x: auto;
+}
+.format-example .h { color: #ffd54f; font-weight: 700; }
+.format-example .c { color: #aaa; }
+
+.upload-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 14px;
+}
+.upload-form input[type=file] {
+    flex: 1;
+    min-width: 240px;
+    padding: 10px 14px;
+    border: 2px dashed #b0b8c4;
+    border-radius: 8px;
+    background: #fafbfc;
+    cursor: pointer;
+    font-size: 13px;
+}
+.upload-form input[type=file]:hover { border-color: #ff6600; background: #fff8f0; }
+
+.results-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.stat-tile {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    text-align: center;
+    border-left: 4px solid #888;
+}
+.stat-tile.created { border-left-color: #2e7d32; }
+.stat-tile.errors { border-left-color: #c62828; }
+.stat-tile.generated { border-left-color: #ff6600; }
+.stat-tile .num { font-size: 28px; font-weight: 700; color: #004080; line-height: 1; }
+.stat-tile .lbl { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+.results-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.results-table th {
+    background: #004080; color: #fff; padding: 10px 12px;
+    text-align: left; font-weight: 600;
+}
+.results-table td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+.results-table tr.row-created { background: #f1f8f3; }
+.results-table tr.row-error { background: #ffebee; }
+.results-table tr.row-error td { color: #555; }
+.status-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 10px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.status-badge.created { background: #2e7d32; color: #fff; }
+.status-badge.error { background: #c62828; color: #fff; }
+.pwd-cell {
+    font-family: monospace;
+    background: #fff8f0;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px dashed #ffcc99;
+    user-select: all;
+    cursor: pointer;
+    display: inline-block;
+}
+.pwd-cell.generated::after {
+    content: " 🔐";
+    font-size: 10px;
+}
+
+.security-warning {
+    background: #fff3e0;
+    border-left: 4px solid #e65100;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+}
+.security-warning strong { color: #e65100; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bulk-container">
+    <h1 style="color:#004080">Carga masiva de usuarios</h1>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin.user_list') }}" class="btn btn-secondary">← Volver a Usuarios</a>
+        <a href="{{ url_for('admin.user_bulk_template') }}" class="btn btn-primary" download>
+            ⬇ Descargar formato de ejemplo (CSV)
+        </a>
+    </div>
+
+    {% if not results %}
+    <!-- ===== Vista de subida ===== -->
+    <div class="bulk-card">
+        <h2>📋 Cómo funciona</h2>
+        <p class="lead">
+            Subí un archivo <strong>.csv</strong> con los usuarios a crear. El sistema valida cada fila,
+            crea los que están bien y te muestra un reporte con cualquier error. Si una contraseña queda en
+            blanco, se genera una segura automáticamente y se te muestra una sola vez después de la carga.
+        </p>
+
+        <div class="format-hint">
+            <strong>Columnas requeridas</strong> (en cualquier orden, no importan acentos ni mayúsculas):
+            <code>nombre</code>, <code>email</code>, <code>rol</code> y opcionalmente <code>password</code>.
+            <br><br>
+            <strong>Roles válidos:</strong> <code>asesor</code>, <code>supervisor</code>, <code>analista</code>.
+            El SuperAdmin no se puede crear desde acá.
+        </div>
+
+        <div class="format-example">
+<span class="h">nombre,email,rol,password</span>
+Juan Pérez,juan.perez&#64;ejemplo.com,asesor,
+María González,maria.gonzalez&#64;ejemplo.com,supervisor,MiClave2026
+Pedro Rodríguez,pedro.rodriguez&#64;ejemplo.com,analista,
+<span class="c"># Las dos filas sin password reciben una password generada automáticamente</span>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="upload-form">
+            <input type="file" name="csv_file" accept=".csv,text/csv" required>
+            <button type="submit" class="btn btn-primary">📤 Procesar CSV</button>
+        </form>
+
+        <div class="security-warning" style="margin-top:18px">
+            <strong>⚠ Sobre las contraseñas:</strong>
+            <ul style="margin:6px 0 0;padding-left:22px">
+                <li>Si dejás la columna <code>password</code> vacía, el sistema genera una password segura
+                    de 10 caracteres (sin <code>0/O</code>, <code>1/l/I</code> para evitar confusión).</li>
+                <li>Las contraseñas se muestran <strong>una sola vez</strong> en el reporte de resultados.
+                    Copialas o exportalas antes de cerrar la página.</li>
+                <li>Comunicalas a los usuarios por un canal seguro (no email plano) y pediles que la cambien
+                    en su primer login.</li>
+            </ul>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- ===== Vista de resultados ===== -->
+    <div class="bulk-card">
+        <h2>✅ Resultados de la carga</h2>
+
+        <div class="results-stats">
+            <div class="stat-tile"><div class="num">{{ stats.total }}</div><div class="lbl">Filas procesadas</div></div>
+            <div class="stat-tile created"><div class="num">{{ stats.created }}</div><div class="lbl">Usuarios creados</div></div>
+            <div class="stat-tile errors"><div class="num">{{ stats.errors }}</div><div class="lbl">Errores</div></div>
+            <div class="stat-tile generated"><div class="num">{{ stats.generated }}</div><div class="lbl">Passwords generadas</div></div>
+        </div>
+
+        {% if stats.created > 0 %}
+        <div class="security-warning">
+            <strong>🔐 Importante:</strong>
+            Esta es la <strong>única vez</strong> que vas a ver las contraseñas en claro. Copiá/exportá
+            esta tabla y comunicáselas a cada usuario por un canal seguro. Si recargás esta página,
+            no se pueden recuperar.
+            <br><br>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="copyAllCredentials()">📋 Copiar todas (TSV)</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="window.print()" style="margin-left:6px">🖨 Imprimir</button>
+        </div>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th style="width:48px">#</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Password</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr class="row-{{ r.status }}">
+                        <td>{{ r.row_num }}</td>
+                        <td>{{ r.nombre or '—' }}</td>
+                        <td>{{ r.email or '—' }}</td>
+                        <td>{{ r.role or '—' }}</td>
+                        <td>
+                            {% if r.status == 'created' %}
+                            <span class="pwd-cell{% if r.generated %} generated{% endif %}"
+                                  title="{{ 'Generada automáticamente' if r.generated else 'Provista en el CSV' }} — click para seleccionar">{{ r.password_effective }}</span>
+                            {% else %}
+                            <span style="color:#bbb">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge {{ r.status }}">
+                                {% if r.status == 'created' %}Creado{% else %}Error{% endif %}
+                            </span>
+                            {% if r.message %}
+                            <div style="font-size:11px;color:#888;margin-top:3px">{{ r.message }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:10px">
+            <a href="{{ url_for('admin.user_bulk') }}" class="btn btn-secondary">📤 Cargar otro CSV</a>
+            <a href="{{ url_for('admin.user_list') }}" class="btn btn-primary">Volver a Usuarios</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if results %}
+<script>
+function copyAllCredentials() {
+    var rows = document.querySelectorAll('.results-table tbody tr.row-created');
+    if (!rows.length) { alert('No hay usuarios creados para copiar.'); return; }
+    var lines = ['Nombre\tEmail\tRol\tPassword'];
+    rows.forEach(function(tr) {
+        var cells = tr.querySelectorAll('td');
+        lines.push([cells[1].innerText, cells[2].innerText, cells[3].innerText, cells[4].innerText.trim()].join('\t'));
+    });
+    var txt = lines.join('\n');
+    navigator.clipboard.writeText(txt).then(function() {
+        alert('Credenciales copiadas al portapapeles (formato TSV — pegalas en Excel/Sheets).');
+    }, function() {
+        // fallback
+        var ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('Credenciales copiadas.');
+    });
+}
+</script>
+{% endif %}
+{% endblock %}

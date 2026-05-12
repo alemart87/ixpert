@@ -1,10 +1,191 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
+import csv
+import io
+import secrets
+import string
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, Response
 from flask_login import login_required, current_user
 from models import db, User, Content, Category, ChatConversation, ChatMessage
 from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime, timezone
+
+
+# Alfabeto sin caracteres ambiguos (0/O, 1/l/I) para passwords legibles
+_PWD_ALPHABET = (
+    'abcdefghijkmnopqrstuvwxyz'  # sin l
+    'ABCDEFGHJKLMNPQRSTUVWXYZ'   # sin I, O
+    '23456789'                    # sin 0, 1
+)
+
+
+def _generate_password(length=10):
+    """Genera una password segura sin caracteres ambiguos."""
+    return ''.join(secrets.choice(_PWD_ALPHABET) for _ in range(length))
+
+
+# Mapeo flexible de headers del CSV (acepta acentos, mayusculas, sinonimos)
+_HEADER_ALIASES = {
+    'nombre': ('nombre', 'nombre apellido', 'nombre y apellido', 'name', 'full name', 'apellido y nombre'),
+    'email':  ('email', 'correo', 'mail', 'e-mail', 'correo electronico', 'correo electrónico'),
+    'role':   ('rol', 'role', 'perfil', 'tipo'),
+    'password': ('password', 'contrasena', 'contraseña', 'clave', 'pass'),
+}
+_VALID_ROLES = ('analista', 'supervisor', 'asesor')
+
+
+def _normalize_header(h):
+    """Pasa a minusculas + quita acentos y espacios extra para matchear aliases."""
+    if not h:
+        return ''
+    h = h.strip().lower().replace('﻿', '')  # quitar BOM
+    # quitar acentos basicos
+    replacements = {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n'}
+    for k, v in replacements.items():
+        h = h.replace(k, v)
+    return h
+
+
+def _map_headers(fieldnames):
+    """Recibe los headers del CSV y devuelve un dict canonico → header original.
+    Devuelve None si falta algun campo requerido (nombre, email, role).
+    """
+    mapped = {}
+    normalized = {_normalize_header(h): h for h in (fieldnames or []) if h}
+    for canonical, aliases in _HEADER_ALIASES.items():
+        for alias in aliases:
+            if alias in normalized:
+                mapped[canonical] = normalized[alias]
+                break
+    if 'nombre' not in mapped or 'email' not in mapped or 'role' not in mapped:
+        return None
+    return mapped
+
+
+def _parse_users_csv(file_storage):
+    """Parsea el CSV subido y devuelve lista de dicts con resultado por fila.
+
+    Cada item tiene:
+      row_num, nombre, email, role, password_effective (la final que se usa),
+      status: 'created' | 'error',
+      message: detalle del error si status='error',
+      generated: True si la password fue auto-generada
+    """
+    # Leer bytes y decodificar tolerante a BOM/UTF-8/Latin-1
+    try:
+        raw = file_storage.read()
+    except Exception as e:
+        return None, f'No pude leer el archivo: {e}'
+
+    if not raw:
+        return None, 'El archivo está vacío.'
+
+    text = None
+    for encoding in ('utf-8-sig', 'utf-8', 'latin-1'):
+        try:
+            text = raw.decode(encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+    if text is None:
+        return None, 'No pude decodificar el archivo (probá guardarlo como UTF-8).'
+
+    # Auto-detectar delimitador (, o ;)
+    sample = text[:4096]
+    try:
+        dialect = csv.Sniffer().sniff(sample, delimiters=',;\t')
+    except csv.Error:
+        dialect = csv.excel
+
+    reader = csv.DictReader(io.StringIO(text), dialect=dialect)
+    headers = _map_headers(reader.fieldnames)
+    if not headers:
+        return None, (
+            'El CSV no tiene los headers necesarios. '
+            'Se esperan al menos: nombre, email, rol. '
+            f'Encontrados: {", ".join(reader.fieldnames or [])}'
+        )
+
+    results = []
+    seen_emails = set()
+    for i, raw_row in enumerate(reader, start=2):  # fila 2 = primera fila de datos
+        row = {k: (raw_row.get(v) or '').strip() for k, v in headers.items()}
+        item = {
+            'row_num': i,
+            'nombre': row.get('nombre', ''),
+            'email': (row.get('email', '') or '').lower(),
+            'role': (row.get('role', '') or '').lower(),
+            'password_effective': '',
+            'generated': False,
+            'status': 'pending',
+            'message': '',
+        }
+
+        # Validaciones
+        if not item['nombre'] or not item['email'] or not item['role']:
+            item['status'] = 'error'
+            item['message'] = 'Faltan campos requeridos (nombre, email o rol).'
+            results.append(item)
+            continue
+
+        if '@' not in item['email'] or '.' not in item['email']:
+            item['status'] = 'error'
+            item['message'] = 'Email con formato inválido.'
+            results.append(item)
+            continue
+
+        if item['role'] not in _VALID_ROLES:
+            item['status'] = 'error'
+            item['message'] = f'Rol "{item["role"]}" inválido. Use: {", ".join(_VALID_ROLES)}.'
+            results.append(item)
+            continue
+
+        if item['email'] in seen_emails:
+            item['status'] = 'error'
+            item['message'] = 'Email duplicado en el mismo CSV.'
+            results.append(item)
+            continue
+        seen_emails.add(item['email'])
+
+        if User.query.filter_by(email=item['email']).first():
+            item['status'] = 'error'
+            item['message'] = 'Email ya existe en la base de datos.'
+            results.append(item)
+            continue
+
+        # Password: si vino, usarla; si no, generar
+        pwd = (row.get('password') or '').strip()
+        if not pwd:
+            pwd = _generate_password()
+            item['generated'] = True
+        item['password_effective'] = pwd
+
+        # Crear usuario
+        try:
+            u = User(
+                email=item['email'],
+                name=item['nombre'],
+                role=item['role'],
+                is_active_user=True,
+            )
+            u.set_password(pwd)
+            db.session.add(u)
+            db.session.flush()
+            item['status'] = 'created'
+        except Exception as e:
+            db.session.rollback()
+            item['status'] = 'error'
+            item['message'] = f'Error al crear: {e}'
+
+        results.append(item)
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return None, f'Error al guardar en la base: {e}'
+
+    return results, None
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -177,6 +358,61 @@ def category_delete(cat_id):
 def user_list():
     users = User.query.order_by(User.created_at.desc()).all()
     return render_template('admin/users.html', users=users)
+
+
+@admin_bp.route('/users/template.csv')
+@superadmin_required
+def user_bulk_template():
+    """Descarga un CSV de ejemplo con los headers y 3 filas de muestra."""
+    at = chr(64)  # '@' construido en runtime para evitar problemas de display
+    rows = [
+        ['nombre', 'email', 'rol', 'password'],
+        ['Juan Pérez',      f'juan.perez{at}ejemplo.com',      'asesor',     ''],
+        ['María González',  f'maria.gonzalez{at}ejemplo.com',  'supervisor', 'MiClave2026'],
+        ['Pedro Rodríguez', f'pedro.rodriguez{at}ejemplo.com', 'analista',   ''],
+    ]
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    for r in rows:
+        w.writerow(r)
+    csv_bytes = ('﻿' + buf.getvalue()).encode('utf-8')  # BOM para Excel
+    return Response(
+        csv_bytes,
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename="usuarios_ejemplo.csv"'}
+    )
+
+
+@admin_bp.route('/users/bulk', methods=['GET', 'POST'])
+@superadmin_required
+def user_bulk():
+    """Carga masiva de usuarios desde CSV. Solo SuperAdmin."""
+    if request.method == 'GET':
+        return render_template('admin/users_bulk.html', results=None)
+
+    if 'csv_file' not in request.files:
+        flash('No se recibió ningún archivo.', 'error')
+        return redirect(url_for('admin.user_bulk'))
+    f = request.files['csv_file']
+    if not f or not f.filename:
+        flash('Seleccioná un archivo CSV.', 'error')
+        return redirect(url_for('admin.user_bulk'))
+    if not f.filename.lower().endswith('.csv'):
+        flash('El archivo debe tener extensión .csv', 'error')
+        return redirect(url_for('admin.user_bulk'))
+
+    results, err = _parse_users_csv(f)
+    if err:
+        flash(err, 'error')
+        return redirect(url_for('admin.user_bulk'))
+
+    stats = {
+        'total': len(results),
+        'created': sum(1 for r in results if r['status'] == 'created'),
+        'errors': sum(1 for r in results if r['status'] == 'error'),
+        'generated': sum(1 for r in results if r['generated']),
+    }
+    return render_template('admin/users_bulk.html', results=results, stats=stats)
 
 
 @admin_bp.route('/users/save', methods=['POST'])
