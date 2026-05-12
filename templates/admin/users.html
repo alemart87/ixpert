@@ -16,6 +16,19 @@
         <a href="{{ url_for('training.vex_dashboard') }}" class="btn btn-secondary">Vex Predictive</a>
     </div>
 
+    {% if current_user.is_superadmin %}
+    <!-- Carga masiva (solo SuperAdmin) -->
+    <div style="background:linear-gradient(135deg,#fff8f0,#fff);border:2px solid #ff6600;border-radius:12px;padding:16px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+            <h3 style="margin:0 0 4px;color:#004080">📤 Carga masiva desde CSV</h3>
+            <p style="margin:0;color:#666;font-size:13px">Creá muchos usuarios de una vez subiendo un archivo CSV. Incluye descarga del formato de ejemplo.</p>
+        </div>
+        <a href="{{ url_for('admin.user_bulk') }}" class="btn btn-primary" style="white-space:nowrap">
+            Cargar usuarios desde CSV →
+        </a>
+    </div>
+    {% endif %}
+
     <h2>Crear Nuevo Usuario</h2>
     <form method="POST" action="{{ url_for('admin.user_save') }}" class="inline-form">
         <div class="form-row">
