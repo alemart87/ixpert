@@ -50,9 +50,10 @@ def migrate_pre():
         _ensure_column('contents', 'content_data', 'TEXT')
         _ensure_column('contents', 'source_hash', 'VARCHAR(64)')
 
-        # training_sessions — campo agregado en v5
+        # training_sessions — campos agregados en v5 y v12
         if _table_exists('training_sessions'):
             _ensure_column('training_sessions', 'avg_response_time', 'DOUBLE PRECISION DEFAULT 0')
+            _ensure_column('training_sessions', 'last_activity_at', 'TIMESTAMP')
 
         # training_scenarios — campos agregados en v6 y v7
         if _table_exists('training_scenarios'):

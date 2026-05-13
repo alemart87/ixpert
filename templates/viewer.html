@@ -12,7 +12,19 @@
         {% if content.category %}
         <a href="{{ url_for('view_category', slug=content.category.slug) }}" class="badge">{{ content.category.name }}</a>
         {% endif %}
+        {% if content.updated_at %}
+        <div class="content-updated-meta" title="Fecha y hora de la última edición de este artículo">
+            🕒 Última actualización: <strong>{{ content.updated_at.strftime('%d/%m/%Y %H:%M') }}</strong>
+        </div>
+        {% endif %}
     </div>
+    {% else %}
+    {# Para iframes (trivia/raw_html), un meta delgado arriba del frame con la fecha #}
+    {% if content.updated_at %}
+    <div class="content-updated-meta content-updated-meta--iframe">
+        🕒 Última actualización: <strong>{{ content.updated_at.strftime('%d/%m/%Y %H:%M') }}</strong>
+    </div>
+    {% endif %}
     {% endif %}
     {# Decision de render:
        - 'trivia'    → iframe con la plantilla stock + preguntas inyectadas

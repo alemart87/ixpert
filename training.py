@@ -5,7 +5,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from models import (db, User, TrainingScenario, TrainingBatch, TrainingSession,
                     TrainingMessage, TrainingViewPermission, VexProfile)
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+
+# Minutos de inactividad antes de auto-cerrar una sesion de entrenamiento.
+# Pensado para cuando el asesor abre un chat y se distrae / cierra la pestaña
+# sin pulsar "Cerrar interaccion".
+TRAINING_AUTO_CLOSE_MINUTES = 30
 from functools import wraps
 
 
@@ -23,6 +29,129 @@ from chat import call_openai
 import random
 
 training_bp = Blueprint('training', __name__)
+
+
+# ============================================================================
+#  Auto-cierre de sesiones de entrenamiento abandonadas
+# ============================================================================
+
+def _touch_session_activity(session):
+    """Marca la sesion como 'activa ahora'. Se llama cada vez que hay un
+    mensaje (del asesor o del cliente simulado) para postergar el auto-cierre.
+    """
+    session.last_activity_at = datetime.utcnow()
+
+
+def _last_activity(session):
+    """Devuelve el ultimo timestamp registrado de la sesion.
+    Para sesiones legacy sin last_activity_at, usa started_at como fallback.
+    """
+    lat = getattr(session, 'last_activity_at', None)
+    if lat:
+        return lat.replace(tzinfo=None) if lat.tzinfo else lat
+    if session.started_at:
+        st = session.started_at
+        return st.replace(tzinfo=None) if st.tzinfo else st
+    return None
+
+
+def _auto_close_stale_sessions(user_id=None, timeout_minutes=None):
+    """Cierra automaticamente sesiones de entrenamiento 'active' cuyo
+    last_activity_at supera el timeout.
+
+    Args:
+      user_id: si se pasa, solo procesa sesiones de ese usuario. Si None,
+               procesa TODAS las activas (cleanup global, util para el admin
+               desde el CX dashboard).
+      timeout_minutes: minutos de inactividad para auto-cerrar. Default
+               TRAINING_AUTO_CLOSE_MINUTES (30).
+
+    No llama a OpenAI: las sesiones cerradas por timeout reciben un feedback
+    fijo. Si tuvieron interaccion suficiente (>=2 mensajes, >=8 palabras del
+    asesor), reciben puntaje neutro (NPS=4); si fueron abandonadas casi sin
+    actividad, caen en el flujo auto-fail (NPS=1, response_correct=False)
+    igual que cuando el asesor cierra sin haber escrito.
+
+    Devuelve el numero de sesiones cerradas.
+    """
+    cutoff = datetime.utcnow() - timedelta(minutes=(timeout_minutes or TRAINING_AUTO_CLOSE_MINUTES))
+
+    q = TrainingSession.query.filter_by(status='active')
+    if user_id is not None:
+        q = q.filter_by(user_id=user_id)
+
+    candidates = q.all()
+    closed = 0
+    for s in candidates:
+        last = _last_activity(s)
+        if last is None or last >= cutoff:
+            continue
+
+        # Cerrar la sesion siguiendo el mismo esquema que end_session pero sin
+        # llamar a OpenAI. Marcamos como completada con NPS=1 si fue abandono
+        # severo, NPS=4 (pasivo neutro) si tuvo algo de interaccion previa.
+        # Usamos los counters de la sesion (sincronizados al insert de cada
+        # mensaje) como fuente de verdad — son mas rapidos y robustos que
+        # recorrer s.messages para cada candidata.
+        n_msgs = (s.total_messages or 0)
+        n_words = (s.total_words_user or 0)
+
+        now = datetime.utcnow()
+        s.ended_at = now
+        s.duration_seconds = int(safe_elapsed(s.started_at))
+
+        if n_msgs < 2 or n_words < 8:
+            # Abandono casi total — mismo flujo que el auto-fail manual
+            s.nps_score = 1
+            s.response_correct = False
+            s.spelling_errors = 0
+            s.ai_feedback = json.dumps({
+                'feedback': f'Sesion cerrada automaticamente por inactividad (mas de '
+                            f'{timeout_minutes or TRAINING_AUTO_CLOSE_MINUTES} minutos sin actividad). '
+                            f'El asesor envio {n_msgs} mensaje(s) con {n_words} palabras totales.',
+                'strengths': 'No hay actividad suficiente para evaluar.',
+                'improvements': 'Cerrar manualmente la sesion al terminar y mantener interaccion sostenida con el cliente.',
+                'auto_closed': True,
+            }, ensure_ascii=False)
+        else:
+            # Hubo interaccion sustantiva pero se olvidaron de cerrarla
+            s.nps_score = 4  # pasivo bajo
+            s.response_correct = False
+            s.ai_feedback = json.dumps({
+                'feedback': f'Sesion cerrada automaticamente por inactividad despues de '
+                            f'{timeout_minutes or TRAINING_AUTO_CLOSE_MINUTES} minutos sin nuevos mensajes. '
+                            f'Hubo {n_msgs} mensaje(s) del asesor con {n_words} palabras totales pero no se finalizo.',
+                'strengths': 'Se inicio la interaccion con el cliente.',
+                'improvements': 'Cerrar manualmente al terminar para que la sesion sea evaluada normalmente. Asignar al menos 5-10 minutos por chat activo.',
+                'auto_closed': True,
+            }, ensure_ascii=False)
+
+        s.status = 'completed'
+
+        # Si pertenece a un batch, cerrar el batch tambien si correspondiera
+        if s.batch_id:
+            batch = TrainingBatch.query.get(s.batch_id)
+            if batch and batch.status == 'active':
+                sibling_sessions = TrainingSession.query.filter_by(batch_id=batch.id).all()
+                all_done = all(ss.status == 'completed' for ss in sibling_sessions)
+                all_spawned = len(sibling_sessions) >= batch.max_concurrent
+                if all_done and all_spawned:
+                    batch.status = 'completed'
+                    batch.ended_at = now
+                    batch.duration_seconds = int(safe_elapsed(batch.started_at))
+                    nps_scores = [ss.nps_score for ss in sibling_sessions if ss.nps_score is not None]
+                    batch.overall_nps = round(sum(nps_scores) / len(nps_scores), 1) if nps_scores else 0
+                    correct = sum(1 for ss in sibling_sessions if ss.response_correct)
+                    batch.overall_correct_rate = round(correct / len(sibling_sessions) * 100, 1)
+                    batch.tokens_used = sum(ss.tokens_used or 0 for ss in sibling_sessions)
+
+        closed += 1
+        print(f'[AUTO-CLOSE] session {s.id} (user {s.user_id}) cerrada por inactividad '
+              f'(last activity: {last})', flush=True)
+
+    if closed:
+        db.session.commit()
+    return closed
 
 
 def parse_cases(scenario):
@@ -99,6 +228,10 @@ def can_view_training(f):
 @training_bp.route('/training')
 @login_required
 def index():
+    # Cleanup oportuno: si el asesor abandono sesiones, cerrarlas antes de
+    # mostrar la lista (asi no ve "tenes una activa" cuando ya esta vencida).
+    _auto_close_stale_sessions(user_id=current_user.id)
+
     scenarios = TrainingScenario.query.filter_by(is_active=True).all()
     my_batches = TrainingBatch.query.filter_by(
         user_id=current_user.id
@@ -140,6 +273,7 @@ def _create_interaction(batch, scenario, interaction_num):
         case_idx = random.choice(available)
     case = cases[case_idx]
 
+    now = datetime.utcnow()
     session = TrainingSession(
         batch_id=batch.id,
         interaction_number=interaction_num,
@@ -147,7 +281,8 @@ def _create_interaction(batch, scenario, interaction_num):
         scenario_id=scenario.id,
         user_id=batch.user_id,
         status='active',
-        started_at=datetime.utcnow()
+        started_at=now,
+        last_activity_at=now,   # arranca como "activo ahora" para el auto-cierre
     )
     db.session.add(session)
     db.session.flush()
@@ -316,11 +451,19 @@ def queue_message():
     if not message or not session_id:
         return jsonify({'error': 'Datos incompletos'}), 400
 
+    # Defensa: si la sesion del usuario lleva >30min inactiva, cerrarla
+    # antes de procesar este mensaje. Asi un cliente con la pestaña abierta
+    # toda la noche no continua mañana como si nada.
+    _auto_close_stale_sessions(user_id=current_user.id)
+
     session = TrainingSession.query.filter_by(
         id=session_id, user_id=current_user.id, status='active'
     ).first()
     if not session:
-        return jsonify({'error': 'Sesion no encontrada o finalizada'}), 404
+        return jsonify({
+            'error': 'Sesion no encontrada o finalizada',
+            'auto_closed': True,
+        }), 404
 
     word_count = len(message.split())
     user_msg = TrainingMessage(
@@ -329,6 +472,7 @@ def queue_message():
         content=message,
         word_count=word_count
     )
+    _touch_session_activity(session)
     db.session.add(user_msg)
     session.total_messages = (session.total_messages or 0) + 1
     session.total_words_user = (session.total_words_user or 0) + word_count
@@ -415,6 +559,7 @@ REGLAS:
     )
     db.session.add(client_msg)
     session.tokens_used = (session.tokens_used or 0) + tokens
+    _touch_session_activity(session)
     db.session.commit()
 
     return jsonify({
@@ -1141,6 +1286,11 @@ def admin_session_detail(session_id):
 @training_bp.route('/admin/api/training/live')
 @can_view_training
 def api_training_live():
+    # Cleanup global: si hay sesiones de otros usuarios pasadas de 30min,
+    # cerrarlas antes de devolver el listado. Esto se ejecuta cada ~10s
+    # (poll del CX dashboard), asi que actua como "cron" sin requerir worker.
+    _auto_close_stale_sessions()
+
     batches = TrainingBatch.query.filter_by(status='active').all()
     result = []
     for b in batches:
