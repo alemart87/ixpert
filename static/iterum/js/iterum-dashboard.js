@@ -8,6 +8,7 @@
 
 async function load() {
     const data = await IterumAPI.get('/iterum/api/analytics/dashboard', IterumFilters.queryParams());
+    window.IterumNpsTarget = data.nps_target || 77;
     renderKpis(data.kpis);
     renderAction(data.kpis);
     renderComposition(data.kpis);
@@ -35,33 +36,56 @@ function renderKpis(k) {
     document.getElementById('kpiConCausa').textContent = k.con_causa_raiz;
 }
 
+/* Logica textualmente replicada del Iterum original (function estadoInfo).
+   Objetivo del canal viene del backend (window.IterumNpsTarget). */
+function estadoInfo(nps) {
+    const target = window.IterumNpsTarget || 77;
+    const dif = Math.max(0, target - nps);
+    if (nps >= target) {
+        return {
+            label: 'META ALCANZADA', color: 'ok',
+            title: `NPS alineado al objetivo del canal (${target}%)`,
+            desc: 'Resultado igual o superior a la meta. Mantener buenas prácticas, proteger promotores y sostener la consistencia del servicio.',
+        };
+    }
+    if (nps >= 70) {
+        return {
+            label: 'CERCA DE LA META', color: 'warn',
+            title: `NPS cercano al objetivo del canal (${target}%)`,
+            desc: `Faltan ${dif.toFixed(1)} puntos para llegar a la meta. Enfocar el seguimiento en detractores recuperables, resolución y motivos recurrentes.`,
+        };
+    }
+    if (nps >= 60) {
+        return {
+            label: 'EN SEGUIMIENTO', color: 'warn',
+            title: `NPS por debajo del objetivo del canal (${target}%)`,
+            desc: `La diferencia es de ${dif.toFixed(1)} puntos. Se requiere revisar causa raíz, experiencia de atención, resolución y repetición del problema por asesor/proceso.`,
+        };
+    }
+    return {
+        label: 'ACCIÓN PRIORITARIA', color: 'err',
+        title: `NPS lejos del objetivo del canal (${target}%)`,
+        desc: `La diferencia es de ${dif.toFixed(1)} puntos. Priorizar detractores, casos sin causa raíz y problemas de servicio que generan insatisfacción.`,
+    };
+}
+
 function renderAction(k) {
     const el = document.getElementById('dashAction');
-    if (k.total === 0) { el.style.display = 'none'; return; }
+    if (k.total === 0 || k.nps === null) { el.style.display = 'none'; return; }
     el.style.display = 'flex';
-    document.getElementById('dashActionNps').textContent = (k.nps ?? '—');
-    let label = 'ACCIÓN PRIORITARIA';
-    let title = 'NPS estable';
-    let text = '';
-    if (k.nps === null) {
-        title = 'Sin datos suficientes';
-    } else if (k.nps < 20) {
-        title = `NPS lejos del objetivo del canal (77%)`;
-        text = `La diferencia es de ${(77 - k.nps).toFixed(1)} puntos. Priorizar detractores, casos sin causa raíz y problemas de servicio que generan insatisfacción. · `;
-    } else if (k.nps < 50) {
-        title = 'NPS en zona de mejora';
-        text = `Hay margen para superar la media del canal. Focus en reducir detractores. · `;
-    } else if (k.nps < 70) {
-        title = 'NPS sólido';
-        text = `Cerca del objetivo del canal. Mantener foco en resolución y empatía. · `;
-    } else {
-        title = 'NPS excelente';
-        text = `Por encima del objetivo del canal. Replicar buenas prácticas. · `;
-    }
-    text += `${k.total} encuestas · ${k.promotores} promotores · ${k.detractores} detractores`;
+
+    // Color theme segun estado
+    el.classList.remove('iterum-action-ok', 'iterum-action-warn', 'iterum-action-err');
+    const s = estadoInfo(k.nps);
+    el.classList.add('iterum-action-' + s.color);
+
+    document.getElementById('dashActionNps').textContent = k.nps;
+    document.getElementById('dashActionLabel').textContent = s.label;
+    document.getElementById('dashActionTitle').textContent = s.title;
+
+    let text = s.desc + ` · ${k.total} encuestas · ${k.promotores} promotores · ${k.detractores} detractores`;
     if (k.resolucion_pct !== null) text += ` · Resolución: ${k.resolucion_pct}%`;
     if (k.avg_score !== null) text += ` · Nota promedio: ${k.avg_score}`;
-    document.getElementById('dashActionTitle').textContent = title;
     document.getElementById('dashActionText').textContent = text;
 }
 

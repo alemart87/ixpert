@@ -681,28 +681,44 @@
    ACTION BANNER (dashboard)
    ============================================================================ */
 .iterum-action-banner {
-    background: linear-gradient(135deg, #fef2f2, #fff);
-    border: 1px solid #fecaca;
-    border-left: 4px solid var(--it-detractor);
     border-radius: 12px;
     padding: 18px 22px;
     display: flex;
     align-items: center;
     gap: 22px;
 }
+.iterum-action-err {
+    background: linear-gradient(135deg, #fef2f2, #fff);
+    border: 1px solid #fecaca;
+    border-left: 4px solid var(--it-detractor);
+}
+.iterum-action-warn {
+    background: linear-gradient(135deg, #fffbeb, #fff);
+    border: 1px solid #fde68a;
+    border-left: 4px solid var(--it-pasivo);
+}
+.iterum-action-ok {
+    background: linear-gradient(135deg, #f0fdf4, #fff);
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid var(--it-promotor);
+}
 .iterum-action-circle {
     width: 92px; height: 92px;
-    background: #fee2e2;
-    color: var(--it-detractor);
     border-radius: 50%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     flex-shrink: 0;
 }
+.iterum-action-err .iterum-action-circle { background: #fee2e2; color: var(--it-detractor); }
+.iterum-action-warn .iterum-action-circle { background: #fef3c7; color: var(--it-pasivo); }
+.iterum-action-ok .iterum-action-circle { background: #dcfce7; color: var(--it-promotor); }
 .iterum-action-circle span { font-size: 22px; font-weight: 800; }
 .iterum-action-circle small { font-size: 9px; color: var(--it-muted); text-transform: uppercase; letter-spacing: 1px; }
 .iterum-action-body { flex: 1; }
-.iterum-action-label { font-size: 10px; color: var(--it-detractor); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.iterum-action-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.iterum-action-err .iterum-action-label { color: var(--it-detractor); }
+.iterum-action-warn .iterum-action-label { color: var(--it-pasivo); }
+.iterum-action-ok .iterum-action-label { color: var(--it-promotor); }
 .iterum-action-body h2 { margin: 4px 0 6px; color: var(--it-text); font-size: 18px; }
 .iterum-action-body p { margin: 0; color: var(--it-muted); font-size: 13px; line-height: 1.5; }
 

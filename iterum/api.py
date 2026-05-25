@@ -301,6 +301,7 @@ def api_analytics_dashboard():
         'effort': analytics.effort_distribution(**filters),
         'resolution': analytics.resolution_stats(**filters),
         'composition': scoring.dashboard_kpis(**filters),
+        'nps_target': analytics.OBJETIVO_NPS_CANAL,
     })
 
 

@@ -4,11 +4,16 @@ Replica la logica del Iterum legacy con queries SQLAlchemy en Postgres/SQLite.
 """
 from __future__ import annotations
 
+import os
 from collections import Counter, defaultdict
 from sqlalchemy import func, or_
 
 from models import db
 from iterum.models import NPSSurvey
+
+
+# Objetivo NPS del canal. Configurable via env, default 77 (banco PY).
+OBJETIVO_NPS_CANAL = int(os.environ.get('ITERUM_NPS_TARGET', '77'))
 
 
 # ============================================================================
