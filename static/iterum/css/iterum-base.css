@@ -963,17 +963,24 @@
     border-radius: 99px;
     transition: width 0.3s;
 }
-.rank-nps-ok { background: var(--it-promotor); color: var(--it-promotor); }
-.rank-nps-warn { background: var(--it-pasivo); color: var(--it-pasivo); }
-.rank-nps-err { background: var(--it-detractor); color: var(--it-detractor); }
+/* Bar fill: solo background del color del estado */
+.iterum-rank-bar-fill.rank-bar-ok { background: var(--it-promotor); }
+.iterum-rank-bar-fill.rank-bar-warn { background: var(--it-pasivo); }
+.iterum-rank-bar-fill.rank-bar-err { background: var(--it-detractor); }
+/* Numero: solo color de texto + chip suave para contraste */
 .iterum-rank-nps {
     font-family: 'SF Mono', Consolas, monospace;
     font-size: 13px;
-    font-weight: 600;
-    width: 60px;
+    font-weight: 700;
+    width: 70px;
     text-align: right;
     flex-shrink: 0;
+    padding: 3px 8px;
+    border-radius: 6px;
 }
+.iterum-rank-nps.rank-text-ok { color: var(--it-promotor); background: var(--it-promotor-soft); }
+.iterum-rank-nps.rank-text-warn { color: var(--it-pasivo); background: var(--it-pasivo-soft); }
+.iterum-rank-nps.rank-text-err { color: var(--it-detractor); background: var(--it-detractor-soft); }
 
 /* ============================================================================
    AUDIT

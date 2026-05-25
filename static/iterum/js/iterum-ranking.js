@@ -44,10 +44,14 @@ function render(ranking) {
         const globalPos = start + i + 1;
         const initials = (a.agent_name || a.agent_doc || '?').slice(0, 2).toUpperCase();
         const color = AVATAR_COLORS[(start + i) % AVATAR_COLORS.length];
-        const npsCls = a.nps >= 50 ? 'rank-nps-ok' : a.nps >= 0 ? 'rank-nps-warn' : 'rank-nps-err';
+        // Bar y texto usan colores distintos (mismo estado, props distintas)
+        const stateKey = a.nps >= 50 ? 'ok' : a.nps >= 0 ? 'warn' : 'err';
+        const barCls = 'rank-bar-' + stateKey;
+        const textCls = 'rank-text-' + stateKey;
         const barPct = Math.max(3, (Math.abs(a.nps) / maxAbsNps) * 100);
         const medal = globalPos === 1 ? '🥇' : globalPos === 2 ? '🥈' : globalPos === 3 ? '🥉' : globalPos;
         const channelIcon = a.channel === 'whatsapp' ? '💬 WA' : a.channel === 'call' ? '📞 Llamadas' : (a.channel || '—');
+        const resPart = a.resolution_pct > 0 ? ` · Res: ${a.resolution_pct}%` : '';
 
         return `
         <div class="iterum-rank-item">
@@ -57,14 +61,13 @@ function render(ranking) {
                 <div class="iterum-rank-name">${IterumUtils.escapeHtml(a.agent_name || a.agent_doc)}</div>
                 <div class="iterum-rank-sub">
                     ${IterumUtils.escapeHtml(a.cell || '—')} · ${channelIcon}
-                    · ${a.total} enc. · ${a.promotor}P ${a.detractor}D
-                    · Res: ${a.resolution_pct}%
+                    · ${a.total} enc. · ${a.promotor}P ${a.detractor}D${resPart}
                 </div>
             </div>
             <div class="iterum-rank-bar-bg">
-                <div class="iterum-rank-bar-fill ${npsCls}" style="width:${barPct.toFixed(0)}%"></div>
+                <div class="iterum-rank-bar-fill ${barCls}" style="width:${barPct.toFixed(0)}%"></div>
             </div>
-            <div class="iterum-rank-nps ${npsCls}">${a.nps.toFixed(1)}%</div>
+            <div class="iterum-rank-nps ${textCls}">${a.nps.toFixed(1)}%</div>
         </div>`;
     }).join('');
 
