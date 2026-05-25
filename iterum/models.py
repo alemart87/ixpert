@@ -62,6 +62,30 @@ class NPSSurvey(db.Model):
     category = db.Column(db.String(20), index=True)        # promotor | pasivo | detractor
     comment = db.Column(db.Text)
 
+    # === Campos enriquecidos desde XLSX del banco ===
+    client_name = db.Column(db.String(200))
+    client_doc = db.Column(db.String(50))
+    gender = db.Column(db.String(20))                      # Femenino | Masculino | No Detectado
+    effort = db.Column(db.String(30))                      # Muy facil | Facil | Neutro | Dificil | Muy dificil
+    resolution = db.Column(db.String(20))                  # Si | No | Parcial (de RESOLUCION)
+    resolved = db.Column(db.String(20))                    # de Se_Resolvio (Si/No/Parcial)
+    motive = db.Column(db.String(200))                     # Motivo_Cliente
+    gestion_type = db.Column(db.String(100))               # Tipo_Gestion
+    origin = db.Column(db.String(150))                     # Origen_Principal
+    problem_description = db.Column(db.Text)               # Problema_Descrito
+    why_1 = db.Column(db.Text)                             # Porque_1
+    why_2 = db.Column(db.Text)                             # Porque_2
+    why_3 = db.Column(db.Text)                             # Porque_3_Raiz
+    root_cause_type = db.Column(db.String(100))            # Tipo_Causa_Raiz
+    responsibility = db.Column(db.String(50))              # Depende_de (asesor/proceso/externo)
+
+    # Auditoria de etiquetado (revisado por analista)
+    review_status = db.Column(db.String(20), default='sin_revisar', index=True)
+    # sin_revisar | correcto | dudoso | incorrecto
+    review_note = db.Column(db.Text)
+    reviewed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    reviewed_at = db.Column(db.DateTime)
+
     # Dedupe a nivel respuesta (hash de date+agent+score+comment+channel)
     unique_hash = db.Column(db.String(64), unique=True, index=True)
 

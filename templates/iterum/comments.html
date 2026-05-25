@@ -4,37 +4,27 @@
 
 {% block iterum_filters %}
 <div class="iterum-filters" id="iterumFilters">
+    <select id="filterCategory" class="iterum-filter">
+        <option value="">Todos los tipos</option>
+        <option value="detractor">Detractores</option>
+        <option value="pasivo">Pasivos</option>
+        <option value="promotor">Promotores</option>
+    </select>
     <select id="filterChannel" class="iterum-filter"><option value="">Todos los canales</option></select>
     <select id="filterCell" class="iterum-filter"><option value="">Todas las células</option></select>
-    <select id="filterCategory" class="iterum-filter">
-        <option value="">Todas las categorías</option>
-        <option value="promotor">Promotores</option>
-        <option value="pasivo">Pasivos</option>
-        <option value="detractor">Detractores</option>
-    </select>
     <input type="text" id="filterSearch" class="iterum-filter iterum-filter-wide" placeholder="Buscar texto en comentario…">
-    <input type="date" id="filterFrom" class="iterum-filter" title="Desde">
-    <input type="date" id="filterTo" class="iterum-filter" title="Hasta">
+    <input type="date" id="filterFrom" class="iterum-filter">
+    <input type="date" id="filterTo" class="iterum-filter">
     <button id="filterApply" class="iterum-btn iterum-btn-primary">Aplicar</button>
     <button id="filterClear" class="iterum-btn iterum-btn-ghost">Limpiar</button>
 </div>
 {% endblock %}
 
 {% block iterum_content %}
-<h1 class="iterum-h1">Comentarios</h1>
+<h1 class="iterum-h1">Comentarios de clientes</h1>
 
-<div class="iterum-card">
-    <table class="iterum-table" id="commentsTable">
-        <thead>
-            <tr>
-                <th>Fecha</th><th>Canal</th><th>Célula</th><th>Asesor</th>
-                <th>NPS</th><th>Comentario</th><th>Veredicto</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div class="iterum-pagination" id="commentsPagination"></div>
-</div>
+<div id="commentsList" class="iterum-comments-list"></div>
+<div class="iterum-pagination" id="commentsPagination"></div>
 {% endblock %}
 
 {% block iterum_scripts %}

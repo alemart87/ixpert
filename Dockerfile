@@ -46,6 +46,7 @@ CMD ["sh", "-c", "\
   python migrate_v11.py && \
   python migrate_v12.py && \
   python migrate_iterum.py && \
+  python migrate_iterum_extended.py && \
   python migrate_iterum_retire_legacy.py && \
   python migrate_iterum_normalize_cells.py && \
   python update_keywords.py && \
