@@ -218,6 +218,7 @@ def ai_send_message(chat_id):
                     reasoning_buf = []
                     last_canvas_version = c.canvas.version if c.canvas else 0
                     total_tokens = 0
+                    tool_calls_by_id: dict[str, str] = {}  # call_id -> tool_name
 
                     async for event in result.stream_events():
                         ev_type = getattr(event, 'type', None)
@@ -246,6 +247,9 @@ def ai_send_message(chat_id):
                                 raw = getattr(item, 'raw_item', None)
                                 tname = getattr(raw, 'name', 'tool')
                                 targs = getattr(raw, 'arguments', None)
+                                call_id = getattr(raw, 'call_id', None) or getattr(raw, 'id', None)
+                                if call_id and tname:
+                                    tool_calls_by_id[call_id] = tname
                                 try:
                                     targs_parsed = json.loads(targs) if isinstance(targs, str) else targs
                                 except Exception:
@@ -264,7 +268,15 @@ def ai_send_message(chat_id):
                                     db.session.commit()
                             elif item_type == 'tool_call_output_item':
                                 out = getattr(item, 'output', None)
-                                tname = getattr(getattr(item, 'raw_item', None), 'name', '') if hasattr(item, 'raw_item') else ''
+                                # Resolver tool name desde el raw_item (que es tool_call_output
+                                # con call_id) buscando en el historial de calls del run.
+                                raw = getattr(item, 'raw_item', None)
+                                tname = getattr(raw, 'name', None) or ''
+                                if not tname and raw is not None:
+                                    call_id = getattr(raw, 'call_id', None) or (
+                                        raw.get('call_id') if isinstance(raw, dict) else None)
+                                    if call_id and call_id in tool_calls_by_id:
+                                        tname = tool_calls_by_id[call_id]
                                 q.put({'event': 'tool_output', 'data': {
                                     'name': tname,
                                     'result': out if isinstance(out, (dict, list)) else str(out)[:2000],
@@ -277,17 +289,17 @@ def ai_send_message(chat_id):
                                         model=MODEL_NAME,
                                     ))
                                     db.session.commit()
-                                # Si el tool fue del canvas, notificar la nueva version
-                                if tname in ('canvas_write', 'canvas_append'):
-                                    with app_obj.app_context():
-                                        canvas = IterumAICanvas.query.filter_by(chat_id=chat_id).first()
-                                        if canvas and canvas.version != last_canvas_version:
-                                            last_canvas_version = canvas.version
-                                            q.put({'event': 'canvas_update', 'data': {
-                                                'version': canvas.version,
-                                                'content_md': canvas.content_md or '',
-                                                'title': canvas.title,
-                                            }})
+                                # Chequear canvas DESPUES de cualquier tool — el modelo
+                                # puede modificar el workspace sin que coincida el tname
+                                with app_obj.app_context():
+                                    canvas = IterumAICanvas.query.filter_by(chat_id=chat_id).first()
+                                    if canvas and (canvas.version or 0) != last_canvas_version:
+                                        last_canvas_version = canvas.version
+                                        q.put({'event': 'canvas_update', 'data': {
+                                            'version': canvas.version,
+                                            'content_md': canvas.content_md or '',
+                                            'title': canvas.title,
+                                        }})
 
                     # Cerrar: guardar el mensaje final del assistant
                     final_text = ''.join(assistant_text).strip()

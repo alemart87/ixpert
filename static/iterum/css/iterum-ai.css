@@ -1,13 +1,22 @@
 /* Iterum AI Analyst — layout 3 columnas (sidebar + chat + canvas). */
 
+/* En la pagina AI, escapamos de los wrappers globales para usar full screen. */
+html.iterum-ai-mode footer { display: none !important; }
+html.iterum-ai-mode main {
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+html.iterum-ai-mode body { overflow: hidden; }
+
 .ai-shell {
     display: grid;
-    grid-template-columns: 260px 1fr 480px;
+    grid-template-columns: 260px minmax(0, 1fr) minmax(420px, 520px);
     gap: 0;
-    height: calc(100vh - 220px);
-    min-height: 600px;
-    max-width: 1800px;
-    margin: 0 auto;
+    /* Full height del viewport menos header (~95px) y nav (~55px) */
+    height: calc(100vh - 150px);
+    min-height: 500px;
     background: var(--it-bg);
 }
 
@@ -284,6 +293,23 @@
     overflow-y: auto;
     font-family: inherit;
     font-size: 12.5px;
+}
+/* Cursor blinking al final del streaming activo */
+.ai-reasoning.streaming .ai-reasoning-body::after {
+    content: '▍';
+    color: #f59e0b;
+    animation: ai-cursor-blink 0.8s steps(2) infinite;
+    margin-left: 2px;
+}
+@keyframes ai-cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.ai-msg-bubble.streaming::after {
+    content: '▍';
+    color: var(--it-brand);
+    animation: ai-cursor-blink 0.8s steps(2) infinite;
+    margin-left: 2px;
 }
 
 /* ===== Tools strip (compacto, agrupado) ===== */
