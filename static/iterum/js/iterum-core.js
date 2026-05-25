@@ -1,4 +1,4 @@
-/* Iterum core - estado compartido, fetch wrapper, helpers de filtros.
+/* Iterum core - estado compartido, fetch wrapper, helpers de filtros, loader.
    Cada pagina-JS depende SOLO de este modulo. */
 
 window.IterumState = {
@@ -10,53 +10,130 @@ window.IterumState = {
     },
 };
 
+/* Loader con contador: si hay multiples fetches en paralelo, solo se oculta
+   cuando todos terminan. */
+window.IterumLoader = (function () {
+    let counter = 0;
+    let el = null;
+    function ensure() {
+        if (el) return el;
+        el = document.createElement('div');
+        el.id = 'iterumLoader';
+        el.className = 'iterum-loader-overlay';
+        el.innerHTML = '<div class="iterum-spinner-box"><div class="iterum-spinner"></div><span>Cargando…</span></div>';
+        el.style.display = 'none';
+        document.body.appendChild(el);
+        return el;
+    }
+    return {
+        show() {
+            counter++;
+            ensure().style.display = 'flex';
+        },
+        hide() {
+            counter = Math.max(0, counter - 1);
+            if (counter === 0 && el) el.style.display = 'none';
+        },
+        forceHide() {
+            counter = 0;
+            if (el) el.style.display = 'none';
+        },
+    };
+})();
+
+/* Cuando el usuario hace click en un link del sidebar, mostrar el loader
+   inmediatamente (antes de que el navegador haga la transicion) */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.iterum-nav-link').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            if (a.classList.contains('active')) return;
+            // Solo si es navegacion (no modifier keys)
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+            IterumLoader.show();
+        });
+    });
+});
+
+/* Si la pagina termina de cargar (DOMContentLoaded), asegurarse de ocultar el
+   loader que pudo quedar de la transicion previa. */
+window.addEventListener('pageshow', function () { IterumLoader.forceHide(); });
+
 window.IterumAPI = {
     async get(path, params) {
-        const url = new URL(path, window.location.origin);
-        if (params) {
-            Object.entries(params).forEach(([k, v]) => {
-                if (v !== '' && v !== null && v !== undefined) url.searchParams.set(k, v);
-            });
-        }
-        const res = await fetch(url, { credentials: 'same-origin' });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ error: res.statusText }));
-            throw new Error(err.error || 'Error');
-        }
-        return res.json();
+        IterumLoader.show();
+        try {
+            const url = new URL(path, window.location.origin);
+            if (params) {
+                Object.entries(params).forEach(([k, v]) => {
+                    if (v !== '' && v !== null && v !== undefined) url.searchParams.set(k, v);
+                });
+            }
+            const res = await fetch(url, { credentials: 'same-origin' });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(err.error || 'Error');
+            }
+            return await res.json();
+        } finally { IterumLoader.hide(); }
     },
     async post(path, body) {
-        const res = await fetch(path, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body || {}),
-        });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({ error: res.statusText }));
-            throw new Error(err.error || 'Error');
-        }
-        return res.json();
+        IterumLoader.show();
+        try {
+            const res = await fetch(path, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body || {}),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(err.error || 'Error');
+            }
+            return await res.json();
+        } finally { IterumLoader.hide(); }
     },
     async patch(path, body) {
-        const res = await fetch(path, {
-            method: 'PATCH',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body || {}),
-        });
-        if (!res.ok) throw new Error('Error');
-        return res.json();
+        IterumLoader.show();
+        try {
+            const res = await fetch(path, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body || {}),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(err.error || 'Error');
+            }
+            return await res.json();
+        } finally { IterumLoader.hide(); }
+    },
+    async del(path) {
+        IterumLoader.show();
+        try {
+            const res = await fetch(path, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(err.error || 'Error');
+            }
+            return await res.json();
+        } finally { IterumLoader.hide(); }
     },
     async postForm(path, formData) {
-        const res = await fetch(path, {
-            method: 'POST',
-            credentials: 'same-origin',
-            body: formData,
-        });
-        const out = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(out.error || 'Error');
-        return out;
+        IterumLoader.show();
+        try {
+            const res = await fetch(path, {
+                method: 'POST',
+                credentials: 'same-origin',
+                body: formData,
+            });
+            const out = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(out.error || 'Error');
+            return out;
+        } finally { IterumLoader.hide(); }
     },
 };
 

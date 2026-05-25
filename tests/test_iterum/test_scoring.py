@@ -84,3 +84,30 @@ def test_coaching_urgency(app, db_session):
     ])
     # 2 detractores / 3 = 66% → high
     assert scoring.coaching_urgency('111') == 'high'
+
+
+def test_ranking_works_with_only_agent_name(app, db_session):
+    """Regression: el XLSX del banco solo trae AGENTE_ATENCION (username),
+    no agent_doc. El ranking debe identificar agentes por name si no hay doc."""
+    from iterum.models import NPSSurvey
+    from iterum.services.dedup import survey_hash
+    from datetime import datetime
+
+    objs = []
+    for i in range(3):
+        d = datetime(2026, 5, 1 + i)
+        objs.append(NPSSurvey(
+            response_date=d, channel='whatsapp', nps_score=10,
+            category='promotor', comment=f'c{i}',
+            agent_name='GERARDOB', agent_doc=None,
+            unique_hash=survey_hash(d, None, 10, f'c{i}', 'whatsapp'),
+        ))
+    db_session.bulk_save_objects(objs)
+    db_session.commit()
+
+    from iterum.services import scoring
+    r = scoring.agent_ranking()
+    assert len(r) == 1
+    assert r[0]['agent_name'] == 'GERARDOB'
+    assert r[0]['total'] == 3
+    assert r[0]['nps'] == 100.0

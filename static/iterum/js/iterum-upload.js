@@ -121,7 +121,7 @@
         if (!tbody) return;
         const data = await IterumAPI.get('/iterum/api/uploads');
         if (!data.uploads.length) {
-            tbody.innerHTML = '<tr><td colspan="8" class="iterum-empty">Sin cargas previas</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="iterum-empty">Sin cargas previas</td></tr>';
             return;
         }
         tbody.innerHTML = data.uploads.map(u => {
@@ -140,12 +140,25 @@
                     <td>${u.rows_invalid}</td>
                     <td>${IterumUtils.escapeHtml(u.uploaded_by || '')}</td>
                     <td class="iterum-meta">${IterumUtils.fmtDate(u.created_at)}</td>
+                    <td><button class="iterum-btn iterum-btn-sm iterum-btn-danger" data-action="delete" data-id="${u.id}" data-rows="${u.rows_new}" data-filename="${IterumUtils.escapeHtml(u.filename || '')}">🗑</button></td>
                 </tr>`;
         }).join('');
         tbody.querySelectorAll('.iterum-error-toggle').forEach(btn => {
             btn.addEventListener('click', () => {
                 const el = document.getElementById(btn.dataset.id);
                 if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+        tbody.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                const rows = btn.dataset.rows;
+                const fname = btn.dataset.filename;
+                if (!confirm(`¿Eliminar "${fname}" y sus ${rows} encuestas asociadas?\n\nEsta acción es irreversible.`)) return;
+                try {
+                    await IterumAPI.del(`/iterum/api/upload/${id}`);
+                    await loadHistory();
+                } catch (e) { alert('Error: ' + e.message); }
             });
         });
     }

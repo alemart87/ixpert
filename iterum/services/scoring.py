@@ -118,7 +118,14 @@ def nps_timeseries(granularity='day', **filters) -> list[dict]:
 
 
 def agent_ranking(limit=50, **filters) -> list[dict]:
-    """Ranking de agentes por NPS. Solo agentes con >= 3 respuestas."""
+    """Ranking de agentes por NPS. Solo agentes con >= 3 respuestas.
+
+    Identifica al agente por (agent_doc, agent_name). Si no hay agent_doc
+    (data del banco que solo trae username), usa agent_name como identificador.
+    Para que el ranking funcione con cualquier fuente de datos.
+    """
+    from sqlalchemy import or_
+
     q = _apply_filters(
         db.session.query(
             NPSSurvey.agent_doc,
@@ -127,25 +134,31 @@ def agent_ranking(limit=50, **filters) -> list[dict]:
             func.count(NPSSurvey.id),
         ),
         **filters,
-    ).filter(NPSSurvey.agent_doc.isnot(None)).group_by(
-        NPSSurvey.agent_doc, NPSSurvey.agent_name, NPSSurvey.category)
+    ).filter(
+        or_(NPSSurvey.agent_doc.isnot(None), NPSSurvey.agent_name.isnot(None))
+    ).group_by(NPSSurvey.agent_doc, NPSSurvey.agent_name, NPSSurvey.category)
 
     by_agent: dict = defaultdict(lambda: {
-        'name': '', 'promotor': 0, 'pasivo': 0, 'detractor': 0,
+        'name': '', 'doc': '', 'promotor': 0, 'pasivo': 0, 'detractor': 0,
     })
     for doc, name, cat, n in q.all():
-        by_agent[doc]['name'] = name or ''
+        # Clave: doc si existe, sino name
+        key = doc if doc else (name or '')
+        if not key:
+            continue
+        by_agent[key]['doc'] = doc or ''
+        by_agent[key]['name'] = name or ''
         if cat in ('promotor', 'pasivo', 'detractor'):
-            by_agent[doc][cat] = n
+            by_agent[key][cat] += n
 
     rows = []
-    for doc, d in by_agent.items():
+    for key, d in by_agent.items():
         total = d['promotor'] + d['pasivo'] + d['detractor']
         if total < 3:
             continue
         nps = round(100 * (d['promotor'] - d['detractor']) / total, 1)
         rows.append({
-            'agent_doc': doc,
+            'agent_doc': d['doc'],
             'agent_name': d['name'],
             'total': total,
             'nps': nps,
@@ -212,10 +225,17 @@ def channel_breakdown(**filters) -> list[dict]:
 
 
 def coaching_urgency(agent_doc: str, **filters) -> str:
-    """Urgencia de coaching basada en proporcion de detractores recientes."""
+    """Urgencia de coaching basada en proporcion de detractores recientes.
+
+    `agent_doc` puede ser el documento real o el username/nombre del agente
+    (data del banco usa username en AGENTE_ATENCION).
+    """
+    from sqlalchemy import or_
     q = _apply_filters(
         db.session.query(NPSSurvey.category, func.count(NPSSurvey.id)),
-        agent_doc=agent_doc, **filters,
+        **filters,
+    ).filter(
+        or_(NPSSurvey.agent_doc == agent_doc, NPSSurvey.agent_name == agent_doc)
     ).group_by(NPSSurvey.category)
     counts = {'promotor': 0, 'pasivo': 0, 'detractor': 0}
     for cat, n in q.all():

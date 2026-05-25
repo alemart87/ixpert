@@ -47,5 +47,6 @@ CMD ["sh", "-c", "\
   python migrate_v12.py && \
   python migrate_iterum.py && \
   python migrate_iterum_retire_legacy.py && \
+  python migrate_iterum_normalize_cells.py && \
   python update_keywords.py && \
   gunicorn --bind 0.0.0.0:10000 --timeout 120 app:app"]

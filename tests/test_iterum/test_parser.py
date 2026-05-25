@@ -76,3 +76,19 @@ def test_file_hash(sample_xlsx):
     h2 = file_hash(sample_xlsx)
     assert h1 == h2
     assert len(h1) == 64  # sha256 hex
+
+
+def test_normalize_cell_pb_to_personal_bank():
+    """PB es alias de PERSONAL BANK (data del banco trae ambas formas)."""
+    from iterum.services.excel_parser import _normalize_cell
+    assert _normalize_cell('PB') == 'PERSONAL BANK'
+    assert _normalize_cell('pb') == 'PERSONAL BANK'
+    assert _normalize_cell(' PB ') == 'PERSONAL BANK'
+    assert _normalize_cell('PERSONAL BANK') == 'PERSONAL BANK'
+    assert _normalize_cell('Personal Bank') == 'PERSONAL BANK'
+    assert _normalize_cell('personalbank') == 'PERSONAL BANK'
+    # Otras celulas: solo strip + colapsa espacios
+    assert _normalize_cell('Célula 0917') == 'Célula 0917'
+    assert _normalize_cell('  Célula   1422  ') == 'Célula 1422'
+    assert _normalize_cell(None) is None
+    assert _normalize_cell('') is None

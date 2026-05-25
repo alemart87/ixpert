@@ -107,6 +107,29 @@ def _categorize_nps(score: int | None) -> str | None:
     return None
 
 
+def _normalize_cell(raw) -> str | None:
+    """Normaliza el nombre de la celula. Aplica mapeo de aliases conocidos
+    y limpia espacios. Mantener este map sincronizado con
+    iterum/migrations/normalize_cells.py para datos historicos.
+    """
+    if raw is None:
+        return None
+    s = str(raw).strip()
+    if not s:
+        return None
+    # Colapsar espacios multiples
+    s = re.sub(r'\s+', ' ', s)
+    # Mapeo de aliases (clave: forma normalizada upper sin espacios, valor: forma canonica)
+    upper_compact = re.sub(r'\s+', '', s.upper())
+    aliases = {
+        'PB': 'PERSONAL BANK',
+        'PERSONALBANK': 'PERSONAL BANK',
+    }
+    if upper_compact in aliases:
+        return aliases[upper_compact]
+    return s
+
+
 def _normalize_channel(raw) -> str | None:
     if raw is None:
         return None
@@ -199,7 +222,7 @@ def parse_xlsx_stream(path: str) -> Iterable[dict]:
             yield {
                 'response_date': response_date,
                 'channel': _normalize_channel(get('channel')),
-                'cell': (str(get('cell')).strip() if get('cell') else None),
+                'cell': _normalize_cell(get('cell')),
                 'agent_name': (str(get('agent_name')).strip() if get('agent_name') else None),
                 'agent_doc': (str(get('agent_doc')).strip() if get('agent_doc') else None),
                 'nps_score': score,
