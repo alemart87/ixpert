@@ -5,24 +5,25 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-base.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-ai.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('iterum-ai-mode');</script>
 {% endblock %}
 
 {% block content %}
 <div class="ai-shell">
-    <!-- Sidebar: historial de chats -->
-    <aside class="ai-sidebar">
+    <!-- Sidebar -->
+    <div class="ai-sidebar">
         <div class="ai-brand">
-            <div class="ai-brand-icon">🤖</div>
+            <div class="ai-brand-icon">iX</div>
             <div>
                 <h2>AI Analyst</h2>
-                <p>Iterum · gpt-5.4</p>
+                <p>Iterum · GPT-5.4</p>
             </div>
         </div>
-        <button id="aiNewChat" class="ai-btn ai-btn-primary ai-btn-block">＋ Nueva conversación</button>
+        <button id="aiNewChat" class="ai-btn ai-btn-primary ai-btn-block">+ Nueva conversación</button>
         <div class="ai-chats-list" id="aiChatsList"></div>
         <a href="{{ url_for('iterum.dashboard') }}" class="ai-back-link">← Volver al dashboard</a>
-    </aside>
+    </div>
 
     <!-- Chat central -->
     <section class="ai-chat-col">
@@ -30,28 +31,29 @@
             <h1 id="aiChatTitle">Seleccioná o creá una conversación</h1>
             <div class="ai-chat-meta">
                 <span id="aiChatTokens" class="ai-meta-chip"></span>
-                <button id="aiRenameChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Renombrar">✏️</button>
-                <button id="aiArchiveChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Archivar">🗑</button>
-                <button id="aiToggleCanvas" class="ai-btn ai-btn-ghost ai-btn-sm" title="Mostrar/ocultar canvas">📋</button>
+                <button id="aiRenameChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Renombrar">Renombrar</button>
+                <button id="aiArchiveChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Archivar">Archivar</button>
+                <button id="aiToggleCanvas" class="ai-btn ai-btn-ghost ai-btn-sm" title="Mostrar/ocultar canvas">Canvas</button>
             </div>
         </header>
 
         <div class="ai-messages" id="aiMessages">
             <div class="ai-welcome">
-                <h2>👋 Hola SuperAdmin</h2>
-                <p>Soy tu analista IA de Iterum. Pensemos juntos cómo mejorar el NPS.</p>
+                <h2>Bienvenido, SuperAdmin</h2>
+                <p>Tu analista IA está listo para revisar el NPS, detectar causa raíz y armar planes de acción.</p>
                 <div class="ai-suggestions">
-                    <button class="ai-suggestion">📊 Resumime la semana</button>
-                    <button class="ai-suggestion">🚨 Qué asesores necesitan coaching urgente</button>
-                    <button class="ai-suggestion">📉 Por qué bajó el NPS</button>
-                    <button class="ai-suggestion">🎯 Plan de acción para PERSONAL BANK</button>
-                    <button class="ai-suggestion">🔍 Top 5 detractores con causa raíz</button>
+                    <button class="ai-suggestion">Resumime la semana</button>
+                    <button class="ai-suggestion">Asesores que necesitan coaching urgente</button>
+                    <button class="ai-suggestion">Por qué bajó el NPS</button>
+                    <button class="ai-suggestion">Plan de acción para PERSONAL BANK</button>
+                    <button class="ai-suggestion">Mapa mental de causas raíz</button>
+                    <button class="ai-suggestion">Ruta crítica para alcanzar el objetivo 77%</button>
                 </div>
             </div>
         </div>
 
         <div class="ai-input-area">
-            <textarea id="aiInput" placeholder="Escribí tu pregunta... (Enter para enviar, Shift+Enter nueva línea)" rows="2"></textarea>
+            <textarea id="aiInput" placeholder="Escribí tu pregunta… (Enter para enviar, Shift+Enter nueva línea)" rows="2"></textarea>
             <button id="aiSend" class="ai-btn ai-btn-primary" title="Enviar (Enter)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/></svg>
             </button>
@@ -60,17 +62,48 @@
 
     <!-- Canvas / Workspace -->
     <aside class="ai-canvas-col" id="aiCanvasCol">
+        <div class="ai-canvas-resizer" id="aiCanvasResizer" title="Arrastrar para redimensionar"></div>
         <header class="ai-canvas-header">
             <input type="text" id="aiCanvasTitle" class="ai-canvas-title-input" placeholder="Workspace">
             <span class="ai-canvas-version" id="aiCanvasVersion">v0</span>
-            <button id="aiCanvasSave" class="ai-btn ai-btn-ghost ai-btn-sm">💾 Guardar</button>
+            <button id="aiCanvasFullscreen" class="ai-btn ai-btn-ghost ai-btn-sm" title="Pantalla completa">⛶</button>
+            <button id="aiCanvasSave" class="ai-btn ai-btn-primary ai-btn-sm">Guardar</button>
         </header>
-        <textarea id="aiCanvas" class="ai-canvas-textarea"
-            placeholder="El AI Analyst va a escribir acá planes de acción, listados, drafts...&#10;&#10;Vos también podés editar — todo queda en esta conversación."></textarea>
-        <div class="ai-canvas-preview" id="aiCanvasPreview"></div>
+        <div class="ai-canvas-tabs">
+            <button class="ai-canvas-tab active" data-tab="preview">Vista</button>
+            <button class="ai-canvas-tab" data-tab="editor">Editor</button>
+            <button class="ai-canvas-tab" data-tab="split">Dividir</button>
+        </div>
+        <div class="ai-canvas-body">
+            <textarea id="aiCanvas" class="ai-canvas-textarea ai-canvas-hidden-pane"
+                placeholder="El AI Analyst va a escribir aquí planes de acción, listados, drafts, mapas mentales…&#10;&#10;Vos también podés editar manualmente."></textarea>
+            <div id="aiCanvasPreview" class="ai-canvas-preview"></div>
+        </div>
     </aside>
 </div>
-</div>
 
+<!-- Mermaid para diagramas (mind maps, flowcharts, gantt) -->
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+            primaryColor: '#002776',
+            primaryTextColor: '#ffffff',
+            primaryBorderColor: '#c8a247',
+            lineColor: '#64748b',
+            secondaryColor: '#c8a247',
+            tertiaryColor: '#f1f5f9',
+            background: '#ffffff',
+            mainBkg: '#002776',
+            secondBkg: '#c8a247',
+            fontFamily: 'Inter, sans-serif',
+        },
+    });
+    window.IterumMermaid = mermaid;
+    // Notificar al main script
+    window.dispatchEvent(new Event('mermaid-ready'));
+</script>
 <script src="{{ url_for('static', filename='iterum/js/iterum-ai.js') }}"></script>
 {% endblock %}
