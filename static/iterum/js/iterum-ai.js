@@ -219,6 +219,36 @@ async function loadChat(id) {
     await loadChatsList();
 }
 
+const SUGGESTIONS = [
+    'Resumime la semana',
+    'Asesores que necesitan coaching urgente',
+    'Por qué bajó el NPS',
+    'Plan de acción para PERSONAL BANK',
+    'Mapa mental de causas raíz',
+    'Ruta crítica para alcanzar el objetivo 77%',
+];
+
+function renderWelcome(intro = 'Tu analista IA está listo para revisar el NPS, detectar causa raíz y armar planes de acción.') {
+    return `<div class="ai-welcome">
+        <h2>Bienvenido, SuperAdmin</h2>
+        <p>${intro}</p>
+        <div class="ai-suggestions">
+            ${SUGGESTIONS.map(s => `<button class="ai-suggestion">${s}</button>`).join('')}
+        </div>
+    </div>`;
+}
+
+function bindSuggestions(container) {
+    container.querySelectorAll('.ai-suggestion').forEach(b => {
+        b.addEventListener('click', () => {
+            $('aiInput').value = b.textContent.trim();
+            $('aiInput').focus();
+            $('aiInput').style.height = 'auto';
+            $('aiInput').style.height = Math.min(160, $('aiInput').scrollHeight) + 'px';
+        });
+    });
+}
+
 /**
  * Agrupa los items del historial en "turnos": cada turno tiene
  * - 1 user message
@@ -229,10 +259,8 @@ async function loadChat(id) {
 function renderMessagesGrouped(messages) {
     const el = $('aiMessages');
     if (!messages || !messages.length) {
-        el.innerHTML = `<div class="ai-welcome">
-            <h2>👋 Conversación lista</h2>
-            <p>Escribí tu pregunta para empezar.</p>
-        </div>`;
+        el.innerHTML = renderWelcome('Escribí tu pregunta para empezar, o usá una de estas sugerencias:');
+        bindSuggestions(el);
         return;
     }
     el.innerHTML = '';
@@ -561,7 +589,13 @@ async function sendMessage() {
 // ============================================================================
 async function init() {
     await loadChatsList();
-    if (State.chats.length) await loadChat(State.chats[0].id);
+    if (State.chats.length) {
+        await loadChat(State.chats[0].id);
+    } else {
+        // Sin chats: mostrar welcome con sugerencias
+        $('aiMessages').innerHTML = renderWelcome();
+        bindSuggestions($('aiMessages'));
+    }
 
     $('aiNewChat').addEventListener('click', async () => {
         const c = await API.createChat();
@@ -576,12 +610,8 @@ async function init() {
         e.target.style.height = 'auto';
         e.target.style.height = Math.min(160, e.target.scrollHeight) + 'px';
     });
-    document.querySelectorAll('.ai-suggestion').forEach(b => {
-        b.addEventListener('click', () => {
-            $('aiInput').value = b.textContent.replace(/^\S+\s/, '');
-            $('aiInput').focus();
-        });
-    });
+    // Sugerencias se bindean dinamicamente en renderWelcome/bindSuggestions
+    // porque el welcome se re-renderiza al crear nueva conversacion.
     $('aiCanvas').addEventListener('input', () => {
         State.canvasDirty = true; updateCanvasPreview();
     });
@@ -645,27 +675,39 @@ async function init() {
     const resizer = $('aiCanvasResizer');
     if (resizer) {
         let dragging = false;
-        resizer.addEventListener('mousedown', e => {
-            dragging = true;
-            resizer.classList.add('dragging');
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-            e.preventDefault();
-        });
-        document.addEventListener('mousemove', e => {
+        const onMove = (e) => {
             if (!dragging) return;
-            const w = Math.max(340, Math.min(window.innerWidth - 600, window.innerWidth - e.clientX));
+            // Si esta en fullscreen, ignorar
+            if ($('aiCanvasCol').classList.contains('fullscreen')) return;
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const w = Math.max(340, Math.min(window.innerWidth - 520, window.innerWidth - x));
             document.documentElement.style.setProperty('--ai-canvas-width', w + 'px');
-        });
-        document.addEventListener('mouseup', () => {
+            e.preventDefault();
+        };
+        const stop = () => {
             if (!dragging) return;
             dragging = false;
             resizer.classList.remove('dragging');
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
+            document.body.classList.remove('ai-resizing');  // libera cursor global
             const w = getComputedStyle(document.documentElement).getPropertyValue('--ai-canvas-width').trim();
             if (w) localStorage.setItem('iterum_ai_canvas_width', parseInt(w));
+        };
+        resizer.addEventListener('mousedown', e => {
+            dragging = true;
+            resizer.classList.add('dragging');
+            document.body.classList.add('ai-resizing');  // fuerza col-resize en TODOS los elementos
+            e.preventDefault();
         });
+        resizer.addEventListener('touchstart', e => {
+            dragging = true;
+            resizer.classList.add('dragging');
+            document.body.classList.add('ai-resizing');
+        });
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('mouseup', stop);
+        document.addEventListener('touchend', stop);
+        document.addEventListener('mouseleave', stop);
     }
 
     // === Canvas: fullscreen ===
