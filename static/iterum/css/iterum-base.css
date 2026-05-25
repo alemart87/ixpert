@@ -911,6 +911,71 @@
 .iterum-chain-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 
 /* ============================================================================
+   RANKING (cards estilo original)
+   ============================================================================ */
+.iterum-rank-wrap { padding: 8px 16px; }
+.iterum-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+.iterum-rank-item:last-child { border-bottom: none; }
+.iterum-rank-pos {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 13px;
+    color: var(--it-muted);
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.iterum-rank-pos.gold { color: #d97706; font-weight: 700; font-size: 18px; }
+.iterum-rank-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+.iterum-rank-info { flex: 1; min-width: 0; }
+.iterum-rank-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--it-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.iterum-rank-sub {
+    font-size: 11px;
+    color: var(--it-muted);
+    margin-top: 2px;
+}
+.iterum-rank-bar-bg {
+    width: 100px;
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 99px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.iterum-rank-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s;
+}
+.rank-nps-ok { background: var(--it-promotor); color: var(--it-promotor); }
+.rank-nps-warn { background: var(--it-pasivo); color: var(--it-pasivo); }
+.rank-nps-err { background: var(--it-detractor); color: var(--it-detractor); }
+.iterum-rank-nps {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ============================================================================
    AUDIT
    ============================================================================ */
 .iterum-audit-stats {

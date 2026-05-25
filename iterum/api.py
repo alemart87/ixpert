@@ -407,8 +407,14 @@ def api_kpi_ranking():
         filters = parse_filters(request.args)
     except ValidationError as e:
         return jsonify({'error': str(e)}), 400
-    limit = min(200, max(10, int(request.args.get('limit', 50))))
-    return jsonify({'ranking': scoring.agent_ranking(limit=limit, **filters)})
+    sort = request.args.get('sort', 'nps')
+    min_resp = max(1, int(request.args.get('min_responses', 1)))
+    limit_arg = request.args.get('limit')
+    limit = int(limit_arg) if limit_arg else None
+    return jsonify({
+        'ranking': scoring.agent_ranking(
+            limit=limit, min_responses=min_resp, sort=sort, **filters),
+    })
 
 
 # ============================================================================
