@@ -45,6 +45,32 @@ def test_survey_hash_distinct():
     assert h1 != h2
 
 
+def test_map_headers_bank_real_format():
+    """Cobertura del formato real del XLSX exportado por el sistema upstream
+    del banco. Headers con sufijos de timezone, _ATENCION, etc."""
+    headers = [
+        'FECHA_REGISTRADA (-04:00 GMT)', 'NOTA', 'TIPO_RESPUESTA', 'NRO_CLIENTE',
+        'NOMBRE', 'COMENTARIO_COMPLETO', 'SEGMENTO', 'PROVEEDOR_ATENCION',
+        'AGENTE_ATENCION', 'SUCURSAL_ATENCION', 'ESFUERZO', 'RESOLUCION',
+        'ENCUESTA', 'YY', 'MM', 'DD', 'SEM', 'Celula',
+    ]
+    m = _map_headers(headers)
+    assert m['response_date'] == 0  # FECHA_REGISTRADA
+    assert m['nps_score'] == 1      # NOTA
+    assert m['comment'] == 5        # COMENTARIO_COMPLETO
+    assert m['agent_name'] == 8     # AGENTE_ATENCION
+    assert m['channel'] == 9        # SUCURSAL_ATENCION (en esta data trae WHATSAPP)
+    assert m['cell'] == 17          # Celula
+
+
+def test_no_false_positives_on_misc_columns():
+    """Columnas genericas no deben capturar un campo canonico."""
+    headers = ['Tipo_Gestion', 'Motivo_Cliente', 'Origen_Principal',
+               'Problema_Descrito', 'Historial del chat']
+    m = _map_headers(headers)
+    assert m == {}
+
+
 def test_file_hash(sample_xlsx):
     h1 = file_hash(sample_xlsx)
     h2 = file_hash(sample_xlsx)
