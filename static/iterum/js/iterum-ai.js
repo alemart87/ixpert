@@ -378,6 +378,7 @@ async function sendMessage() {
                     turn.reasoning.style.display = 'block';
                     turn.reasoning.open = true;
                 }
+                turn.reasoning.classList.add('streaming');
                 turn.reasoningBody.textContent += payload.delta;
                 turn.reasoningBody.scrollTop = turn.reasoningBody.scrollHeight;
                 setStatus('Razonando…');
@@ -432,14 +433,20 @@ async function sendMessage() {
             }
             else if (event === 'assistant_delta') {
                 status.style.display = 'none';
-                // Colapsar reasoning cuando arranca la respuesta
+                // Stop streaming cursor en reasoning + colapsar
+                turn.reasoning.classList.remove('streaming');
                 if (turn.reasoning.open) turn.reasoning.open = false;
+                turn.bubble.classList.add('streaming');
                 assistantText += payload.delta;
                 turn.bubble.innerHTML = mdToHtml(assistantText);
+                // Reaplicar clase porque innerHTML la pisa? No, classList persiste
+                turn.bubble.classList.add('streaming');
                 scrollBottom();
             }
             else if (event === 'done') {
                 status.style.display = 'none';
+                turn.reasoning.classList.remove('streaming');
+                turn.bubble.classList.remove('streaming');
                 turn.root.querySelectorAll('.ai-pulse').forEach(p => p.remove());
                 if (payload.title) $('aiChatTitle').textContent = payload.title;
             }

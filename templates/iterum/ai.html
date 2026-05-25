@@ -5,10 +5,10 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-base.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-ai.css') }}">
+<script>document.documentElement.classList.add('iterum-ai-mode');</script>
 {% endblock %}
 
 {% block content %}
-<div class="iterum-fullbleed">
 <div class="ai-shell">
     <!-- Sidebar: historial de chats -->
     <aside class="ai-sidebar">
