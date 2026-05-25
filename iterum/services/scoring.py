@@ -117,58 +117,84 @@ def nps_timeseries(granularity='day', **filters) -> list[dict]:
     return out
 
 
-def agent_ranking(limit=50, **filters) -> list[dict]:
-    """Ranking de agentes por NPS. Solo agentes con >= 3 respuestas.
+def agent_ranking(limit=None, min_responses=1, sort='nps', **filters) -> list[dict]:
+    """Ranking de agentes por NPS.
 
-    Identifica al agente por (agent_doc, agent_name). Si no hay agent_doc
-    (data del banco que solo trae username), usa agent_name como identificador.
-    Para que el ranking funcione con cualquier fuente de datos.
+    - Identifica al agente por (agent_doc, agent_name); usa name si no hay doc.
+    - Por defecto incluye todos los agentes con al menos 1 respuesta
+      (replicando el comportamiento del Iterum original).
+    - Calcula resolution_pct y effort_pct (% Muy facil + Facil) por agente.
+    - Devuelve celula y canal dominante por agente (mode).
+    - Ordenable por: nps | promotores | detractores | resolucion | esfuerzo.
     """
-    from sqlalchemy import or_
-
-    q = _apply_filters(
-        db.session.query(
-            NPSSurvey.agent_doc,
-            NPSSurvey.agent_name,
-            NPSSurvey.category,
-            func.count(NPSSurvey.id),
-        ),
-        **filters,
-    ).filter(
-        or_(NPSSurvey.agent_doc.isnot(None), NPSSurvey.agent_name.isnot(None))
-    ).group_by(NPSSurvey.agent_doc, NPSSurvey.agent_name, NPSSurvey.category)
+    base = _apply_filters(db.session.query(NPSSurvey), **filters)
+    surveys = base.filter(
+        (NPSSurvey.agent_doc.isnot(None)) | (NPSSurvey.agent_name.isnot(None))
+    ).all()
 
     by_agent: dict = defaultdict(lambda: {
         'name': '', 'doc': '', 'promotor': 0, 'pasivo': 0, 'detractor': 0,
+        'resolved': 0, 'easy': 0,
+        'cells': defaultdict(int), 'channels': defaultdict(int),
     })
-    for doc, name, cat, n in q.all():
-        # Clave: doc si existe, sino name
-        key = doc if doc else (name or '')
+    for s in surveys:
+        key = s.agent_doc if s.agent_doc else (s.agent_name or '')
         if not key:
             continue
-        by_agent[key]['doc'] = doc or ''
-        by_agent[key]['name'] = name or ''
-        if cat in ('promotor', 'pasivo', 'detractor'):
-            by_agent[key][cat] += n
+        a = by_agent[key]
+        a['doc'] = s.agent_doc or ''
+        a['name'] = s.agent_name or ''
+        if s.category in ('promotor', 'pasivo', 'detractor'):
+            a[s.category] += 1
+        if s.resolution == 'Si':
+            a['resolved'] += 1
+        if s.effort in ('Muy facil', 'Facil'):
+            a['easy'] += 1
+        if s.cell:
+            a['cells'][s.cell] += 1
+        if s.channel:
+            a['channels'][s.channel] += 1
 
     rows = []
     for key, d in by_agent.items():
         total = d['promotor'] + d['pasivo'] + d['detractor']
-        if total < 3:
+        if total < min_responses:
             continue
         nps = round(100 * (d['promotor'] - d['detractor']) / total, 1)
+        # Celula y canal dominante (modo)
+        top_cell = max(d['cells'].items(), key=lambda x: x[1])[0] if d['cells'] else None
+        top_channel = max(d['channels'].items(), key=lambda x: x[1])[0] if d['channels'] else None
         rows.append({
             'agent_doc': d['doc'],
             'agent_name': d['name'],
+            'cell': top_cell,
+            'channel': top_channel,
             'total': total,
             'nps': nps,
             'promotor': d['promotor'],
             'pasivo': d['pasivo'],
             'detractor': d['detractor'],
+            'resolution_pct': round(100 * d['resolved'] / total, 0),
+            'effort_easy_pct': round(100 * d['easy'] / total, 0),
         })
 
-    rows.sort(key=lambda r: (-r['nps'], -r['total']))
-    return rows[:limit]
+    # Ordenable
+    if sort == 'promotores':
+        rows.sort(key=lambda r: -r['promotor'])
+    elif sort == 'detractores':
+        rows.sort(key=lambda r: -r['detractor'])
+    elif sort == 'resolucion':
+        rows.sort(key=lambda r: -r['resolution_pct'])
+    elif sort == 'esfuerzo':
+        rows.sort(key=lambda r: -r['effort_easy_pct'])
+    elif sort == 'total':
+        rows.sort(key=lambda r: -r['total'])
+    else:  # nps
+        rows.sort(key=lambda r: (-r['nps'], -r['total']))
+
+    if limit:
+        rows = rows[:limit]
+    return rows
 
 
 def cell_breakdown(**filters) -> list[dict]:

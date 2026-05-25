@@ -2,21 +2,31 @@
 
 {% block title %}Iterum · Ranking{% endblock %}
 
+{% block iterum_filters %}
+<div class="iterum-filters" id="iterumFilters">
+    <select id="filterChannel" class="iterum-filter"><option value="">Todos los canales</option></select>
+    <select id="filterCell" class="iterum-filter"><option value="">Todas las células</option></select>
+    <select id="filterSort" class="iterum-filter">
+        <option value="nps">Ordenar por: NPS</option>
+        <option value="promotores">Ordenar por: Promotores</option>
+        <option value="detractores">Ordenar por: Detractores</option>
+        <option value="resolucion">Ordenar por: Resolución</option>
+        <option value="esfuerzo">Ordenar por: Esfuerzo (fácil)</option>
+        <option value="total">Ordenar por: Cantidad</option>
+    </select>
+    <input type="date" id="filterFrom" class="iterum-filter">
+    <input type="date" id="filterTo" class="iterum-filter">
+    <button id="filterApply" class="iterum-btn iterum-btn-primary">Aplicar</button>
+    <button id="filterClear" class="iterum-btn iterum-btn-ghost">Limpiar</button>
+</div>
+{% endblock %}
+
 {% block iterum_content %}
 <h1 class="iterum-h1">Ranking de asesores</h1>
-<p class="iterum-meta">Solo se muestran asesores con 3 o más respuestas en el período filtrado.</p>
+<p class="iterum-meta" id="rankingMeta">Cargando…</p>
 
-<div class="iterum-card">
-    <table class="iterum-table" id="rankingTable">
-        <thead>
-            <tr>
-                <th>#</th><th>Asesor</th><th>Documento</th><th>NPS</th>
-                <th>Total</th><th>Promotores</th><th>Pasivos</th><th>Detractores</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody><tr><td colspan="9" class="iterum-meta" style="text-align:center">Sin datos</td></tr></tbody>
-    </table>
+<div class="iterum-card iterum-rank-wrap">
+    <div id="rankingList"></div>
 </div>
 {% endblock %}
 
