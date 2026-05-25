@@ -334,20 +334,29 @@ def ai_send_message(chat_id):
 
     @stream_with_context
     def _sse():
+        # 2KB de padding fuerza al browser y al proxy a abrir el stream
+        yield ':' + ' ' * 2048 + '\n\n'
         # Emit user_msg primero (ya persistido)
         yield _sse_event('user_msg', {'id': user_msg_id, 'content': user_text})
+        # Bucle con keep-alive cada 5s para evitar buffering en proxies
         while True:
             try:
-                item = q.get(timeout=120)
+                item = q.get(timeout=5)
             except Empty:
-                yield _sse_event('error', {'error': 'timeout'})
-                return
+                # keep-alive comment (no event) — fuerza el flush
+                yield ': keepalive\n\n'
+                continue
             if item is None:
                 return
             yield _sse_event(item['event'], item['data'])
 
     return Response(_sse(), mimetype='text/event-stream',
-                    headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
+                    headers={
+                        'Cache-Control': 'no-cache, no-transform',
+                        'X-Accel-Buffering': 'no',
+                        'Connection': 'keep-alive',
+                        'Content-Encoding': 'identity',  # evita gzip que bufferea
+                    })
 
 
 def _sse_event(event: str, data: dict) -> str:
