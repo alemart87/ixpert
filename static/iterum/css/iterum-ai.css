@@ -189,11 +189,11 @@
     border-radius: 14px;
     padding: 12px 16px;
     box-shadow: var(--it-shadow);
-    max-width: 78%;
     line-height: 1.55;
     font-size: 14px;
     color: var(--it-text);
 }
+.ai-msg-bubble:empty { display: none; }
 .ai-msg-bubble p { margin: 0 0 8px; }
 .ai-msg-bubble p:last-child { margin-bottom: 0; }
 .ai-msg-bubble strong { color: var(--it-text); }
@@ -228,92 +228,203 @@
     flex-shrink: 0;
 }
 
-/* Razonamiento (collapsable) */
+/* ===== Body del asistente: agrupa reasoning + tools + bubble ===== */
+.ai-msg-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; max-width: 86%; }
+
+/* ===== Status pill (mostrando que esta haciendo) ===== */
+.ai-thinking-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #eef2ff, #faf5ff);
+    border: 1px solid #c7d2fe;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #4338ca;
+    width: fit-content;
+}
+.ai-thinking-label { font-weight: 500; }
+
+/* ===== Razonamiento (panel ambar, streaming visible) ===== */
 .ai-reasoning {
-    background: #fffbeb;
+    background: linear-gradient(180deg, #fffbeb, #fff);
     border: 1px solid #fde68a;
+    border-left: 3px solid #f59e0b;
     border-radius: 10px;
-    padding: 10px 14px;
-    margin: 4px 0 4px 42px;  /* aligned with bubble */
+    padding: 0;
     font-size: 13px;
-    max-width: 78%;
+    overflow: hidden;
 }
 .ai-reasoning summary {
     cursor: pointer;
     color: #92400e;
-    font-weight: 600;
     user-select: none;
+    padding: 8px 14px;
+    list-style: none;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
+.ai-reasoning summary::-webkit-details-marker { display: none; }
+.ai-reasoning summary::before {
+    content: '▸';
+    transition: transform 0.15s;
+    font-size: 10px;
+    color: #92400e;
+}
+.ai-reasoning[open] summary::before { transform: rotate(90deg); }
+.ai-reasoning summary strong { font-weight: 600; }
 .ai-reasoning-body {
-    margin-top: 8px;
+    padding: 0 14px 12px;
     color: #78350f;
     white-space: pre-wrap;
-    line-height: 1.5;
-    max-height: 320px;
-    overflow-y: auto;
-    font-family: 'SF Pro Text', sans-serif;
-}
-.ai-reasoning-streaming { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3); }
-
-/* Tool calls (collapsable) */
-.ai-tool {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 10px;
-    padding: 8px 14px;
-    margin: 4px 0 4px 42px;
-    font-size: 12px;
-    max-width: 78%;
-}
-.ai-tool-output { background: #f0fdf4; border-color: #bbf7d0; }
-.ai-tool summary {
-    cursor: pointer;
-    color: #1e40af;
-    font-weight: 600;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.ai-tool-output summary { color: #166534; }
-.ai-tool-icon { font-size: 14px; }
-.ai-tool-body {
-    margin: 8px 0 0;
-    background: #fff;
-    padding: 10px;
-    border-radius: 6px;
-    font-family: 'SF Mono', Consolas, monospace;
-    font-size: 11px;
-    color: var(--it-text);
+    line-height: 1.55;
     max-height: 280px;
     overflow-y: auto;
+    font-family: inherit;
+    font-size: 12.5px;
+}
+
+/* ===== Tools strip (compacto, agrupado) ===== */
+.ai-tools-strip {
+    background: linear-gradient(180deg, #eff6ff, #fff);
+    border: 1px solid #bfdbfe;
+    border-left: 3px solid #3b82f6;
+    border-radius: 10px;
+    padding: 0;
+    overflow: hidden;
+}
+.ai-tools-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #1e40af;
+}
+.ai-tools-icon { font-size: 14px; }
+.ai-tools-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid #93c5fd;
+    color: #1e40af;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.ai-tools-toggle:hover { background: #dbeafe; }
+.ai-tools-list {
+    padding: 4px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid #dbeafe;
+}
+
+.ai-tool-chip {
+    background: #fff;
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11.5px;
+}
+.ai-tool-chip-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.ai-tool-chip-head code {
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #1e40af;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+}
+.ai-tool-chip-args {
+    color: var(--it-muted);
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 10.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+}
+.ai-tool-chip-size {
+    margin-left: auto;
+    background: #f0fdf4;
+    color: #166534;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+.ai-tool-chip-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.ai-tool-chip-dot.running {
+    background: #fbbf24;
+    animation: ai-tool-pulse 0.8s infinite;
+}
+.ai-tool-chip-dot.done { background: #16a34a; }
+@keyframes ai-tool-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.15); }
+}
+
+.ai-tool-chip-result {
+    margin-top: 6px;
+}
+.ai-tool-chip-result summary {
+    cursor: pointer;
+    color: #1e40af;
+    font-size: 11px;
+    padding: 2px 0;
+    user-select: none;
+}
+.ai-tool-chip-result pre {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 10.5px;
+    color: var(--it-text);
+    max-height: 240px;
+    overflow: auto;
+    margin: 6px 0 0;
     white-space: pre-wrap;
     word-break: break-word;
 }
 
-/* Pulse animado */
+/* Pulse animado en summary de reasoning */
 .ai-pulse {
-    color: #ef4444;
-    font-size: 8px;
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #ef4444;
+    border-radius: 50%;
+    margin-left: 4px;
     animation: ai-pulse 1s infinite;
 }
 @keyframes ai-pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Thinking spinner */
+/* Thinking spinner (3 dots) */
 .ai-thinking-spinner {
-    display: flex;
-    gap: 4px;
-    padding: 4px 0;
+    display: inline-flex;
+    gap: 3px;
 }
 .ai-thinking-spinner span {
-    width: 8px; height: 8px;
-    background: #a855f7;
+    width: 6px; height: 6px;
+    background: #6366f1;
     border-radius: 50%;
     animation: ai-bounce 1.4s infinite ease-in-out both;
 }
