@@ -87,6 +87,9 @@
                         {% endif %}
                         <a href="{{ url_for('iterum.coaching') }}">Coaching</a>
                         <a href="{{ url_for('iterum.report') }}">Reporte ejecutivo</a>
+                        {% if current_user.is_superadmin %}
+                        <a href="{{ url_for('iterum.ai_page') }}" class="nav-ai-link">🤖 AI Analyst</a>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}

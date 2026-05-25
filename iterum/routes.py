@@ -93,3 +93,5 @@ def report():
 
 # ===== Importar API endpoints (registran rutas en el mismo blueprint) =====
 from . import api  # noqa: E402,F401
+# ===== Importar AI Analyst (registra rutas /ai y /api/ai/*) =====
+from . import ai  # noqa: E402,F401
