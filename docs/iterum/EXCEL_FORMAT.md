@@ -3,24 +3,61 @@
 El parser (`iterum/services/excel_parser.py`) detecta automáticamente variaciones
 de nombres de columnas. La detección es **case-insensitive** y **acento-insensitive**.
 
+## Matching de columnas (token-based)
+
+El parser **tokeniza** cada header (lo divide en palabras alfanuméricas) y busca
+tokens disparadores. Esto significa que "FECHA_REGISTRADA (-04:00 GMT)" matchea
+por el token `fecha`, "AGENTE_ATENCION" por `agente`, "COMENTARIO_COMPLETO" por
+`comentario`, etc.
+
 ## Columnas obligatorias
 
-| Canónica | Aliases reconocidos |
+| Canónica | Tokens disparadores |
 |---|---|
-| `response_date` | fecha, fecha respuesta, fecha de respuesta, fecha encuesta, date, timestamp, fecha hora, fecha y hora |
-| `nps_score` | nps, score, puntaje, nota, calificación, rating, puntuación |
+| `response_date` | `fecha`, `date`, `timestamp` |
+| `nps_score` | `nps`, `nota`, `puntaje`, `calificacion`, `rating`, `puntuacion`, `score` |
 
-Si faltan, el upload falla con HTTP 400 antes de procesar.
+Si faltan, el upload falla en `processing` y se marca como `failed` con mensaje
+explicativo.
 
 ## Columnas opcionales
 
-| Canónica | Aliases reconocidos |
+| Canónica | Tokens disparadores |
 |---|---|
-| `channel` | canal, channel, medio, tipo, tipo canal, canal contacto |
-| `cell` | célula, celula, cell, equipo, grupo, sector, célula operativa |
-| `agent_name` | asesor, agente, agent, nombre asesor, nombre agente, operador, representante, ejecutivo |
-| `agent_doc` | documento, doc, dni, cédula, cedula, ci, legajo, id asesor, id agente |
-| `comment` | comentario, comment, feedback, observación, observacion, opinión, opinion, mensaje |
+| `channel` | `canal`, `channel`, `medio`, `sucursal` |
+| `cell` | `celula`, `equipo`, `sector` |
+| `agent_name` | `asesor`, `agente`, `agent`, `operador`, `representante`, `ejecutivo` |
+| `agent_doc` | `documento`, `dni`, `cedula`, `legajo` |
+| `comment` | `comentario`, `comment`, `feedback`, `observacion`, `opinion`, `mensaje` |
+
+**Nota sobre `sucursal`:** algunos sistemas del banco guardan el canal (WHATSAPP,
+LLAMADA) en la columna llamada `SUCURSAL_ATENCION`. Por eso `sucursal` se incluye
+como disparador de `channel`. Los valores se normalizan después a `whatsapp` o `call`.
+
+## Prioridad de matching
+
+Los campos se procesan en este orden para evitar conflictos:
+1. `agent_doc` (más específico: doc, dni, cédula)
+2. `response_date`
+3. `nps_score`
+4. `comment`
+5. `cell`
+6. `channel`
+7. `agent_name`
+
+Una vez que una columna se asigna a un campo, no se considera para los siguientes.
+Esto evita que `DOC_ASESOR` matchee primero `agent_name` por la palabra "asesor".
+
+## Columnas que NO matchean (por diseño)
+
+Estas columnas del export real del banco son ignoradas, lo cual es correcto:
+- `TIPO_RESPUESTA`, `NRO_CLIENTE`, `NOMBRE` (cliente, no asesor), `SEGMENTO`
+- `PROVEEDOR_ATENCION`, `ESFUERZO`, `RESOLUCION`, `ENCUESTA`
+- `YY`, `MM`, `DD`, `SEM` (descomposición de fecha — usamos `FECHA_REGISTRADA`)
+- `Tipo_Gestion`, `Motivo_Cliente`, `Origen_Principal`, `Problema_Descrito`
+- `Porque_1`, `Porque_2`, `Porque_3_Raiz` (5 porqués operativos — se cargan
+  manualmente desde la UI de Causa Raíz, no del upload)
+- `Historial del chat`, `Cliente recurrente en WP`
 
 ## Formatos de fecha aceptados
 

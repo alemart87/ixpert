@@ -1,8 +1,9 @@
 """Parser de XLSX a filas normalizadas de NPS.
 
 Tolera variaciones de columnas (banco no controla exactamente como exporta el
-sistema upstream). Reusa el patron de _map_headers / _normalize_header de
-admin.py para mapear flexible -> canonico.
+sistema upstream). Matching token-based: se busca cualquier token disparador
+en los tokens del header (separados por espacios/underscores/parentesis), asi
+"FECHA_REGISTRADA (-04:00 GMT)" matchea por 'fecha'.
 
 Columnas canonicas esperadas:
 - response_date  : datetime
@@ -25,35 +26,26 @@ from typing import Iterable
 import openpyxl  # type: ignore
 
 
-# Aliases tolerantes para mapeo de columnas. Todos en lowercase sin acentos.
-HEADER_ALIASES = {
-    'response_date': {
-        'fecha', 'fecha respuesta', 'fecha de respuesta', 'fecha encuesta',
-        'date', 'timestamp', 'fecha hora', 'fecha y hora',
-    },
-    'channel': {
-        'canal', 'channel', 'medio', 'tipo', 'tipo canal', 'canal contacto',
-    },
-    'cell': {
-        'celula', 'célula', 'cell', 'equipo', 'grupo', 'sector', 'celula operativa',
-    },
-    'agent_name': {
-        'asesor', 'agente', 'agent', 'nombre asesor', 'nombre agente',
-        'operador', 'representante', 'ejecutivo',
-    },
-    'agent_doc': {
-        'documento', 'doc', 'dni', 'cedula', 'cédula', 'ci', 'legajo',
-        'id asesor', 'id agente',
-    },
-    'nps_score': {
-        'nps', 'score', 'puntaje', 'nota', 'calificacion', 'calificación',
-        'rating', 'puntuacion', 'puntuación',
-    },
-    'comment': {
-        'comentario', 'comment', 'feedback', 'observacion', 'observación',
-        'opinion', 'opinión', 'mensaje',
-    },
+# Tokens disparadores por campo canonico. Cualquier match en los tokens del
+# header alcanza para mapear la columna. Order = prioridad si un header
+# matchea multiples campos (mas especifico primero).
+TRIGGER_TOKENS: dict[str, set[str]] = {
+    # agent_doc primero: si una columna dice "DOC_ASESOR", queremos doc no name
+    'agent_doc': {'documento', 'dni', 'cedula', 'legajo'},
+    'response_date': {'fecha', 'date', 'timestamp'},
+    'nps_score': {'nps', 'nota', 'puntaje', 'calificacion', 'rating',
+                  'puntuacion', 'score'},
+    'comment': {'comentario', 'comment', 'feedback', 'observacion',
+                'opinion', 'mensaje'},
+    'cell': {'celula', 'equipo', 'sector'},
+    # 'sucursal' incluido porque algunos bancos usan esa columna para guardar
+    # el canal (WHATSAPP, LLAMADA) en vez de la sucursal fisica.
+    'channel': {'canal', 'channel', 'medio', 'sucursal'},
+    'agent_name': {'asesor', 'agente', 'agent', 'operador', 'representante',
+                   'ejecutivo'},
 }
+
+FIELD_PRIORITY = list(TRIGGER_TOKENS.keys())
 
 
 def _normalize_header(s: str) -> str:
@@ -67,16 +59,37 @@ def _normalize_header(s: str) -> str:
     return s
 
 
+def _tokens(header: str) -> set[str]:
+    """Devuelve el set de tokens (palabras alfanumericas) del header normalizado.
+
+    Ej: "FECHA_REGISTRADA (-04:00 GMT)" -> {'fecha','registrada','04','00','gmt'}
+    """
+    norm = _normalize_header(header)
+    # Split en cualquier separador no alfanumerico
+    return {t for t in re.split(r'[^a-z0-9]+', norm) if t}
+
+
 def _map_headers(headers: list[str]) -> dict[str, int]:
-    """Devuelve {campo_canonico: indice_columna}."""
+    """Devuelve {campo_canonico: indice_columna}.
+
+    Estrategia: para cada campo canonico (en orden de prioridad), buscar el
+    primer header NO usado que contenga alguno de sus tokens disparadores.
+    Asi evitamos que un header se asigne a multiples campos.
+    """
     mapping: dict[str, int] = {}
-    for idx, raw in enumerate(headers):
-        norm = _normalize_header(raw)
-        for canonical, aliases in HEADER_ALIASES.items():
-            if canonical in mapping:
+    used_indices: set[int] = set()
+
+    # Pre-tokenizar cada header una sola vez
+    header_tokens = [(idx, _tokens(h)) for idx, h in enumerate(headers)]
+
+    for canonical in FIELD_PRIORITY:
+        triggers = TRIGGER_TOKENS[canonical]
+        for idx, toks in header_tokens:
+            if idx in used_indices:
                 continue
-            if norm == canonical or norm in aliases:
+            if toks & triggers:  # interseccion no vacia
                 mapping[canonical] = idx
+                used_indices.add(idx)
                 break
     return mapping
 
