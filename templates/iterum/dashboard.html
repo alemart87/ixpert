@@ -3,62 +3,86 @@
 {% block title %}Iterum · Dashboard{% endblock %}
 
 {% block iterum_content %}
-<h1 class="iterum-h1">Dashboard NPS</h1>
-<p class="iterum-meta" id="iterumLastUpdated"></p>
+<div id="dashAction" class="iterum-action-banner" style="display:none">
+    <div class="iterum-action-circle"><span id="dashActionNps">—</span><small>NPS</small></div>
+    <div class="iterum-action-body">
+        <div class="iterum-action-label" id="dashActionLabel">ACCIÓN PRIORITARIA</div>
+        <h2 id="dashActionTitle">—</h2>
+        <p id="dashActionText"></p>
+    </div>
+</div>
 
+<!-- Row 1: 6 KPI cards -->
 <div class="iterum-kpi-grid">
-    <div class="iterum-kpi-card iterum-kpi-main">
-        <span class="iterum-kpi-label">NPS</span>
-        <span class="iterum-kpi-value" id="kpiNps">—</span>
-        <span class="iterum-kpi-sub" id="kpiTotal">0 respuestas</span>
-    </div>
-    <div class="iterum-kpi-card iterum-kpi-promotor">
-        <span class="iterum-kpi-label">Promotores</span>
-        <span class="iterum-kpi-value" id="kpiPromotor">—</span>
-        <span class="iterum-kpi-sub" id="kpiPromotorPct">0%</span>
-    </div>
-    <div class="iterum-kpi-card iterum-kpi-pasivo">
-        <span class="iterum-kpi-label">Pasivos</span>
-        <span class="iterum-kpi-value" id="kpiPasivo">—</span>
-        <span class="iterum-kpi-sub" id="kpiPasivoPct">0%</span>
-    </div>
-    <div class="iterum-kpi-card iterum-kpi-detractor">
-        <span class="iterum-kpi-label">Detractores</span>
-        <span class="iterum-kpi-value" id="kpiDetractor">—</span>
-        <span class="iterum-kpi-sub" id="kpiDetractorPct">0%</span>
-    </div>
-    <div class="iterum-kpi-card">
-        <span class="iterum-kpi-label">Score promedio</span>
-        <span class="iterum-kpi-value" id="kpiAvg">—</span>
-        <span class="iterum-kpi-sub">0 a 10</span>
-    </div>
+    <div class="iterum-kpi-card"><span class="iterum-kpi-label">Total</span><span class="iterum-kpi-value" id="kpiTotal">—</span><span class="iterum-kpi-sub">encuestas</span></div>
+    <div class="iterum-kpi-card iterum-kpi-promotor"><span class="iterum-kpi-label">Promotores</span><span class="iterum-kpi-value" id="kpiPromotores">—</span><span class="iterum-kpi-sub" id="kpiPromotoresPct">0%</span></div>
+    <div class="iterum-kpi-card iterum-kpi-detractor"><span class="iterum-kpi-label">Detractores</span><span class="iterum-kpi-value" id="kpiDetractores">—</span><span class="iterum-kpi-sub" id="kpiDetractoresPct">0%</span></div>
+    <div class="iterum-kpi-card iterum-kpi-promotor"><span class="iterum-kpi-label">Resolución</span><span class="iterum-kpi-value" id="kpiResolucion">—</span><span class="iterum-kpi-sub" id="kpiResolucionSub">0 resueltos</span></div>
+    <div class="iterum-kpi-card iterum-kpi-main"><span class="iterum-kpi-label">Nota promedio</span><span class="iterum-kpi-value" id="kpiAvg">—</span><span class="iterum-kpi-sub">sobre 10</span></div>
+    <div class="iterum-kpi-card iterum-kpi-detractor"><span class="iterum-kpi-label">Muy difícil</span><span class="iterum-kpi-value" id="kpiMuyDificil">—</span><span class="iterum-kpi-sub">esfuerzo alto</span></div>
 </div>
 
-<div class="iterum-grid-2">
-    <div class="iterum-card">
-        <h3>NPS por canal</h3>
-        <div id="byChannel" class="iterum-bar-list"></div>
-    </div>
-    <div class="iterum-card">
-        <h3>NPS por célula</h3>
-        <div id="byCell" class="iterum-bar-list"></div>
-    </div>
+<!-- Row 2: 4 KPI cards -->
+<div class="iterum-kpi-grid">
+    <div class="iterum-kpi-card"><span class="iterum-kpi-label">Con comentario</span><span class="iterum-kpi-value" id="kpiConComentario">—</span><span class="iterum-kpi-sub" id="kpiConComentarioPct">0% de encuestas</span></div>
+    <div class="iterum-kpi-card iterum-kpi-detractor"><span class="iterum-kpi-label">Top motivo detractor</span><span class="iterum-kpi-value iterum-kpi-text" id="kpiTopMotivo">—</span><span class="iterum-kpi-sub" id="kpiTopMotivoSub"></span></div>
+    <div class="iterum-kpi-card iterum-kpi-pasivo"><span class="iterum-kpi-label">Principal responsable</span><span class="iterum-kpi-value iterum-kpi-text" id="kpiTopResp">—</span><span class="iterum-kpi-sub" id="kpiTopRespSub"></span></div>
+    <div class="iterum-kpi-card iterum-kpi-promotor"><span class="iterum-kpi-label">Con causa raíz</span><span class="iterum-kpi-value" id="kpiConCausa">—</span><span class="iterum-kpi-sub">detractores analizados</span></div>
 </div>
 
+<!-- Composición -->
 <div class="iterum-card">
-    <h3>Evolución temporal (NPS semanal)</h3>
-    <div id="timeseries" class="iterum-timeseries"></div>
+    <h3>Composición de respuestas</h3>
+    <div class="iterum-stack-bar">
+        <div class="iterum-stack-d" id="stackD" style="width:0%"><span id="stackDLabel">0%</span></div>
+        <div class="iterum-stack-p" id="stackP" style="width:0%"><span id="stackPLabel">0%</span></div>
+        <div class="iterum-stack-pr" id="stackPr" style="width:0%"><span id="stackPrLabel">0%</span></div>
+    </div>
+    <div class="iterum-stack-legend">
+        <span><b>Detractores:</b> <span id="stackDCount">0</span></span>
+        <span><b>Pasivos:</b> <span id="stackPCount">0</span></span>
+        <span><b>Promotores:</b> <span id="stackPrCount">0</span></span>
+    </div>
 </div>
 
+<!-- Género -->
+<div class="iterum-card">
+    <h3>Participación y comportamiento por género</h3>
+    <p class="iterum-meta">Distribución de participación basada en la predicción del nombre del cliente.</p>
+    <table class="iterum-table iterum-table-sm" id="genderTable">
+        <thead>
+            <tr><th>Género</th><th>Participación</th><th style="color:#16a34a">Promotores</th><th style="color:#d97706">Neutros</th><th style="color:#dc2626">Detractores</th><th>NPS gen</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="iterum-unknown-box" id="unknownBox" style="display:none">
+        <h4>Nombres no identificados para corregir género</h4>
+        <p class="iterum-meta">Estos son primeros nombres que el sistema no pudo clasificar. Agregalos luego en NOM_FEM / NOM_MASC.</p>
+        <div id="unknownPills" class="iterum-pills"></div>
+    </div>
+</div>
+
+<!-- Esfuerzo percibido -->
+<div class="iterum-card">
+    <h3>Esfuerzo percibido</h3>
+    <div class="iterum-effort-bar" id="effortBar"></div>
+</div>
+
+<!-- Tasa de resolución -->
+<div class="iterum-card">
+    <h3>Tasa de resolución</h3>
+    <div class="iterum-progress" style="height:14px"><div class="iterum-progress-bar" id="resolBar" style="background:#16a34a"></div></div>
+    <div class="iterum-stack-legend">
+        <span><b>Resueltos:</b> <span id="resolOk">0</span> (<span id="resolOkPct">0%</span>)</span>
+        <span style="margin-left:auto"><b>Sin resolver:</b> <span id="resolNo">0</span></span>
+    </div>
+</div>
+
+<!-- Últimas cargas -->
 <div class="iterum-card">
     <h3>Últimas cargas</h3>
     <table class="iterum-table" id="uploadsTable">
-        <thead>
-            <tr>
-                <th>Archivo</th><th>Estado</th><th>Nuevas</th>
-                <th>Duplicadas</th><th>Inválidas</th><th>Usuario</th><th>Fecha</th>
-            </tr>
-        </thead>
+        <thead><tr><th>Archivo</th><th>Estado</th><th>Nuevas</th><th>Duplicadas</th><th>Usuario</th><th>Fecha</th></tr></thead>
         <tbody></tbody>
     </table>
 </div>

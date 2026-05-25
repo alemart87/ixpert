@@ -30,6 +30,7 @@ from .schemas import (
 )
 from .services import scoring, audit as audit_svc, root_cause as rc_svc, coaching as coach_svc
 from .services import reports as report_svc
+from .services import analytics
 from .services.dedup import file_hash
 from .services.jobs import submit_upload_processing
 
@@ -225,6 +226,17 @@ def api_surveys():
             'nps_score': s.nps_score,
             'category': s.category,
             'comment': s.comment,
+            'client_name': s.client_name,
+            'gender': s.gender,
+            'effort': s.effort,
+            'resolution': s.resolution,
+            'motive': s.motive,
+            'gestion_type': s.gestion_type,
+            'origin': s.origin,
+            'problem_description': s.problem_description,
+            'why_1': s.why_1, 'why_2': s.why_2, 'why_3': s.why_3,
+            'root_cause_type': s.root_cause_type,
+            'responsibility': s.responsibility,
             'audit': {
                 'verdict': s.audit.verdict if s.audit else None,
                 'classification': s.audit.classification if s.audit else None,
@@ -270,6 +282,119 @@ def api_kpi_dashboard():
         'cells': scoring.cell_breakdown(**filters),
         'timeseries': scoring.nps_timeseries(
             granularity=request.args.get('granularity', 'day'), **filters),
+    })
+
+
+@iterum_bp.route('/api/analytics/dashboard')
+@login_required
+@iterum_required
+def api_analytics_dashboard():
+    """Dashboard enriquecido completo: KPIs + género + esfuerzo + resolución."""
+    try:
+        filters = parse_filters(request.args)
+    except ValidationError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({
+        'kpis': analytics.dashboard_full(**filters),
+        'gender': analytics.gender_breakdown(**filters),
+        'unknown_names': analytics.unknown_gender_names(**filters),
+        'effort': analytics.effort_distribution(**filters),
+        'resolution': analytics.resolution_stats(**filters),
+        'composition': scoring.dashboard_kpis(**filters),
+    })
+
+
+@iterum_bp.route('/api/analytics/patterns')
+@login_required
+@iterum_required
+def api_analytics_patterns():
+    try:
+        filters = parse_filters(request.args)
+    except ValidationError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({
+        'keywords': analytics.keyword_patterns(**filters),
+        'origin': analytics.origin_breakdown(**filters),
+        'top_alerts': analytics.top_alert_agents(**filters),
+        'critical_cases': [{
+            'id': r['id'], 'agent_name': r['agent_name'],
+            'problem_description': r['problem_description'],
+            'comment_snippet': (r['problem_description'] or '')[:200],
+        } for r in analytics.root_cause_chain(**filters)[:5]],
+    })
+
+
+@iterum_bp.route('/api/analytics/root-cause')
+@login_required
+@iterum_required
+def api_analytics_root_cause():
+    try:
+        filters = parse_filters(request.args)
+    except ValidationError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({
+        'charts': analytics.root_cause_analytics(**filters),
+        'chain': analytics.root_cause_chain(**filters),
+    })
+
+
+@iterum_bp.route('/api/analytics/audit-review')
+@login_required
+@iterum_required
+def api_analytics_audit_review():
+    """Stats + lista de detractores para revisar etiquetado."""
+    try:
+        filters = parse_filters(request.args)
+    except ValidationError as e:
+        return jsonify({'error': str(e)}), 400
+    stats = analytics.audit_review_stats(**filters)
+    review_filter = request.args.get('review_status')
+    q = NPSSurvey.query.filter(NPSSurvey.category == 'detractor')
+    if filters.get('cell'): q = q.filter(NPSSurvey.cell == filters['cell'])
+    if filters.get('channel'): q = q.filter(NPSSurvey.channel == filters['channel'])
+    if filters.get('from_date'): q = q.filter(NPSSurvey.response_date >= filters['from_date'])
+    if filters.get('to_date'): q = q.filter(NPSSurvey.response_date < filters['to_date'])
+    if review_filter:
+        q = q.filter(NPSSurvey.review_status == review_filter)
+    rows = q.order_by(NPSSurvey.response_date.desc()).limit(100).all()
+    return jsonify({
+        'stats': stats,
+        'cases': [_survey_review_dict(s) for s in rows],
+    })
+
+
+@iterum_bp.route('/api/analytics/audit-review/<int:survey_id>', methods=['POST'])
+@login_required
+@iterum_editor_required
+def api_audit_review_set(survey_id):
+    """Marca un survey como correcto/dudoso/incorrecto."""
+    from datetime import datetime, timezone
+    data = request.get_json(silent=True) or {}
+    status = (data.get('status') or '').strip().lower()
+    if status not in ('sin_revisar', 'correcto', 'dudoso', 'incorrecto'):
+        return jsonify({'error': 'status invalido'}), 400
+    s = db.session.get(NPSSurvey, survey_id)
+    if not s: return jsonify({'error': 'No encontrado'}), 404
+    s.review_status = status
+    s.review_note = data.get('note') or None
+    s.reviewed_by_id = current_user.id
+    s.reviewed_at = datetime.now(timezone.utc)
+    db.session.commit()
+    log_access('update', 'survey_review', s.id, {'status': status})
+    return jsonify({'status': status})
+
+
+@iterum_bp.route('/api/analytics/coaching')
+@login_required
+@iterum_required
+def api_analytics_coaching():
+    try:
+        filters = parse_filters(request.args)
+    except ValidationError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({
+        'stats': analytics.coaching_stats(**filters),
+        'agents': analytics.coaching_by_agent(**filters),
     })
 
 
@@ -552,6 +677,25 @@ def api_meta_filters():
 # ============================================================================
 # Serializadores helpers
 # ============================================================================
+def _survey_review_dict(s):
+    return {
+        'id': s.id,
+        'agent_name': s.agent_name,
+        'client_name': s.client_name,
+        'cell': s.cell,
+        'channel': s.channel,
+        'response_date': s.response_date.isoformat() if s.response_date else None,
+        'nps_score': s.nps_score,
+        'motive': s.motive,
+        'origin': s.origin,
+        'responsibility': s.responsibility,
+        'root_cause_type': s.root_cause_type,
+        'why_1': s.why_1, 'why_2': s.why_2, 'why_3': s.why_3,
+        'review_status': s.review_status or 'sin_revisar',
+        'review_note': s.review_note,
+    }
+
+
 def _audit_to_dict(a):
     if not a:
         return None

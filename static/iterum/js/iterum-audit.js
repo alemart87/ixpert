@@ -1,83 +1,81 @@
-/* Auditoria: lista detractores/pasivos sin auditar + modal de veredicto. */
-
-let currentPage = 1;
-let modalSurveyId = null;
+/* Auditoría: lista detractores + revisión con estado correcto/dudoso/incorrecto. */
 
 (async function () {
-    await IterumFilters.init(() => { currentPage = 1; load(); });
-    const verdictSel = document.getElementById('filterVerdict');
-    if (verdictSel) verdictSel.addEventListener('change', () => { currentPage = 1; load(); });
-
-    document.getElementById('auditCancel').addEventListener('click', closeModal);
-    document.getElementById('auditSave').addEventListener('click', save);
-    document.getElementById('auditModal').addEventListener('click', e => {
-        if (e.target.id === 'auditModal') closeModal();
-    });
-
+    await IterumFilters.init(load);
+    const sel = document.getElementById('filterReviewStatus');
+    if (sel) sel.addEventListener('change', load);
     await load();
 })();
 
 async function load() {
     const params = IterumFilters.queryParams();
-    params.page = currentPage;
-    params.per_page = 50;
-    const data = await IterumAPI.get('/iterum/api/surveys', params);
-    const tbody = document.querySelector('#auditTable tbody');
-    if (!data.surveys.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="iterum-meta" style="text-align:center">Sin resultados</td></tr>';
-        return;
-    }
-    tbody.innerHTML = data.surveys.map(s => `
-        <tr data-id="${s.id}">
-            <td class="iterum-meta">${IterumUtils.fmtDateShort(s.response_date)}</td>
-            <td>${IterumUtils.escapeHtml(s.channel || '—')}</td>
-            <td>${IterumUtils.escapeHtml(s.agent_name || s.agent_doc || '—')}</td>
-            <td><strong>${s.nps_score}</strong> ${IterumUtils.categoryBadge(s.category)}</td>
-            <td>${IterumUtils.escapeHtml(IterumUtils.truncate(s.comment || '', 150))}</td>
-            <td>${s.audit ? IterumUtils.verdictBadge(s.audit.verdict) : '<span class="iterum-meta">sin auditar</span>'}</td>
-            <td><button class="iterum-btn iterum-btn-sm iterum-btn-primary" data-action="audit">Auditar</button></td>
-        </tr>`).join('');
-    tbody.querySelectorAll('button[data-action="audit"]').forEach(b => {
-        b.addEventListener('click', () => openModal(parseInt(b.closest('tr').dataset.id)));
-    });
+    const sel = document.getElementById('filterReviewStatus');
+    if (sel && sel.value) params.review_status = sel.value;
+    const data = await IterumAPI.get('/iterum/api/analytics/audit-review', params);
+    renderStats(data.stats);
+    renderCases(data.cases);
 }
 
-async function openModal(surveyId) {
-    modalSurveyId = surveyId;
-    const s = await IterumAPI.get(`/iterum/api/surveys/${surveyId}`);
-    document.getElementById('modalSurveyId').textContent = s.id;
-    document.getElementById('modalSurveyInfo').innerHTML = `
-        <strong>${IterumUtils.fmtDate(s.response_date)}</strong> · ${IterumUtils.escapeHtml(s.channel || '')} · ${IterumUtils.escapeHtml(s.agent_name || s.agent_doc || '')}<br>
-        NPS <strong>${s.nps_score}</strong> ${IterumUtils.categoryBadge(s.category)}<br>
-        <em>${IterumUtils.escapeHtml(s.comment || 'Sin comentario')}</em>
+function renderStats(s) {
+    document.getElementById('auditStats').innerHTML = `
+        <div class="iterum-stat-pill"><strong>${s.total}</strong><small>CASOS</small></div>
+        <div class="iterum-stat-pill" style="color:#16a34a"><strong>${s.correctos}</strong><small>CORRECTOS</small></div>
+        <div class="iterum-stat-pill" style="color:#d97706"><strong>${s.dudosos}</strong><small>DUDOSOS</small></div>
+        <div class="iterum-stat-pill" style="color:#dc2626"><strong>${s.incorrectos}</strong><small>INCORRECTOS</small></div>
+        <div class="iterum-stat-pill"><strong>${s.sin_revisar}</strong><small>SIN REVISAR</small></div>
+        <div class="iterum-stat-progress">
+            Progreso de revisión<br>
+            <div class="iterum-progress"><div class="iterum-progress-bar" style="width:${s.progreso_pct}%;background:#16a34a"></div></div>
+            <small>${s.progreso_pct}% revisado</small>
+        </div>
     `;
-    document.getElementById('auditClassification').value = s.audit?.classification || '';
-    document.getElementById('auditNotes').value = s.audit?.notes || '';
-    document.querySelectorAll('input[name="verdict"]').forEach(r => {
-        r.checked = (s.audit?.verdict === r.value);
-    });
-    document.getElementById('auditModal').style.display = 'flex';
 }
 
-function closeModal() {
-    document.getElementById('auditModal').style.display = 'none';
-    modalSurveyId = null;
-}
+function renderCases(cases) {
+    const el = document.getElementById('auditCases');
+    if (!cases.length) { el.innerHTML = '<div class="iterum-card iterum-empty">Sin casos para revisar</div>'; return; }
+    el.innerHTML = cases.map(c => {
+        const statusClass = 'iterum-audit-' + (c.review_status || 'sin_revisar');
+        return `
+        <div class="iterum-card iterum-audit-case ${statusClass}" data-id="${c.id}">
+            <div class="iterum-audit-head">
+                <span class="iterum-audit-score">${c.nps_score ?? '—'}</span>
+                <div>
+                    <strong>${IterumUtils.escapeHtml(c.agent_name || '—')}</strong>
+                    · Cliente: ${IterumUtils.escapeHtml(c.client_name || '—')}
+                    · ${IterumUtils.escapeHtml(c.cell || '')}
+                    · ${IterumUtils.fmtDateShort(c.response_date)}
+                </div>
+                <div style="margin-left:auto">
+                    ${c.review_status === 'sin_revisar' ? '<span class="iterum-chip">Sin revisar</span>' :
+                      c.review_status === 'correcto' ? '<span class="iterum-chip chip-ok">✓ Correcto</span>' :
+                      c.review_status === 'dudoso' ? '<span class="iterum-chip chip-warn">⚠ Dudoso</span>' :
+                      '<span class="iterum-chip chip-err">✗ Incorrecto</span>'}
+                </div>
+            </div>
+            ${c.motive || c.root_cause_type || c.responsibility ? `
+            <div class="iterum-audit-tags">
+                ${c.motive ? `<span class="iterum-chip">${IterumUtils.escapeHtml(c.motive)}</span>` : ''}
+                ${c.root_cause_type ? `<span class="iterum-chip chip-warn">${IterumUtils.escapeHtml(c.root_cause_type)}</span>` : ''}
+                ${c.responsibility ? `<span class="iterum-chip">${IterumUtils.escapeHtml(c.responsibility)}</span>` : ''}
+                ${c.origin ? `<span class="iterum-chip">${IterumUtils.escapeHtml(c.origin)}</span>` : ''}
+            </div>` : '<div class="iterum-meta">Sin causa raíz</div>'}
+            <div class="iterum-audit-actions">
+                <button class="iterum-btn iterum-btn-sm" data-status="correcto" style="background:#16a34a;color:#fff">✓ Correcto</button>
+                <button class="iterum-btn iterum-btn-sm" data-status="dudoso" style="background:#d97706;color:#fff">⚠ Dudoso</button>
+                <button class="iterum-btn iterum-btn-sm" data-status="incorrecto" style="background:#dc2626;color:#fff">✗ Incorrecto</button>
+            </div>
+        </div>`;
+    }).join('');
 
-async function save() {
-    if (!modalSurveyId) return;
-    const verdict = document.querySelector('input[name="verdict"]:checked')?.value;
-    if (!verdict) { alert('Seleccioná un veredicto'); return; }
-
-    try {
-        await IterumAPI.post(`/iterum/api/audit/${modalSurveyId}`, {
-            verdict,
-            classification: document.getElementById('auditClassification').value,
-            notes: document.getElementById('auditNotes').value,
+    el.querySelectorAll('[data-status]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = btn.closest('.iterum-audit-case').dataset.id;
+            const status = btn.dataset.status;
+            try {
+                await IterumAPI.post(`/iterum/api/analytics/audit-review/${id}`, { status });
+                load();
+            } catch (e) { alert('Error: ' + e.message); }
         });
-        closeModal();
-        load();
-    } catch (e) {
-        alert('Error al guardar: ' + e.message);
-    }
+    });
 }

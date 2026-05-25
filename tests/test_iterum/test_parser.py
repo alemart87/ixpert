@@ -64,11 +64,37 @@ def test_map_headers_bank_real_format():
 
 
 def test_no_false_positives_on_misc_columns():
-    """Columnas genericas no deben capturar un campo canonico."""
+    """Las columnas misc no deben matchear campos principales (response_date,
+    nps_score, channel, cell, agent_*, comment). Pueden matchear campos
+    extendidos cuando el nombre coincide (Motivo_Cliente -> motive)."""
     headers = ['Tipo_Gestion', 'Motivo_Cliente', 'Origen_Principal',
                'Problema_Descrito', 'Historial del chat']
     m = _map_headers(headers)
-    assert m == {}
+    # Ninguno de los principales debe haberse mapeado
+    main_fields = {'response_date', 'nps_score', 'channel', 'cell',
+                   'agent_name', 'agent_doc', 'comment'}
+    assert not (set(m.keys()) & main_fields), \
+        f"No deberian matchear principales, pero matchearon: {set(m.keys()) & main_fields}"
+
+
+def test_extended_fields_mapping():
+    """Los campos extendidos del XLSX del banco se capturan."""
+    headers = ['FECHA_REGISTRADA', 'NOTA', ' Motivo_Cliente ',
+               ' Tipo_Gestion ', ' Origen_Principal ', ' Porque_1 ',
+               ' Porque_3_Raiz ', ' Tipo_Causa_Raiz ',
+               ' Depende_de (Asesor/Proceso/Externo) ', 'ESFUERZO',
+               'RESOLUCION', 'NOMBRE']
+    m = _map_headers(headers)
+    assert 'motive' in m
+    assert 'gestion_type' in m
+    assert 'origin' in m
+    assert 'why_1' in m
+    assert 'why_3' in m
+    assert 'root_cause_type' in m
+    assert 'responsibility' in m
+    assert 'effort' in m
+    assert 'resolution' in m
+    assert 'client_name' in m
 
 
 def test_file_hash(sample_xlsx):

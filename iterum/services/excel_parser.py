@@ -48,6 +48,28 @@ TRIGGER_TOKENS: dict[str, set[str]] = {
 FIELD_PRIORITY = list(TRIGGER_TOKENS.keys())
 
 
+# Campos enriquecidos del XLSX del banco: matching por nombre exacto del header
+# (despues de normalizar a snake_case lower). Si la columna no esta, queda None.
+# Estos NO compiten con los principales — se mapean en paralelo.
+EXTENDED_FIELD_MAP: dict[str, list[str]] = {
+    # canonical -> lista de nombres alternativos posibles
+    'client_name': ['nombre', 'cliente', 'nombre_cliente'],
+    'client_doc': ['nro_cliente', 'documento_cliente', 'doc_cliente', 'cliente_doc'],
+    'effort': ['esfuerzo', 'effort'],
+    'resolution': ['resolucion', 'resolution'],
+    'resolved': ['se_resolvio', 'resuelto'],
+    'motive': ['motivo_cliente', 'motivo'],
+    'gestion_type': ['tipo_gestion', 'gestion'],
+    'origin': ['origen_principal', 'origen'],
+    'problem_description': ['problema_descrito', 'problema', 'descripcion'],
+    'why_1': ['porque_1', 'porque1', 'why_1'],
+    'why_2': ['porque_2', 'porque2', 'why_2'],
+    'why_3': ['porque_3_raiz', 'porque_3', 'porque3', 'why_3'],
+    'root_cause_type': ['tipo_causa_raiz', 'tipo_causa', 'causa_raiz'],
+    'responsibility': ['depende_de', 'depende', 'responsabilidad'],
+}
+
+
 def _normalize_header(s: str) -> str:
     """minusculas + sin acentos + colapsa espacios."""
     if s is None:
@@ -69,28 +91,56 @@ def _tokens(header: str) -> set[str]:
     return {t for t in re.split(r'[^a-z0-9]+', norm) if t}
 
 
-def _map_headers(headers: list[str]) -> dict[str, int]:
-    """Devuelve {campo_canonico: indice_columna}.
+def _snake_normalize(s: str) -> str:
+    """'  Tipo_Gestion ' -> 'tipo_gestion'."""
+    s = _normalize_header(s)
+    # reemplaza no-alfanumericos por _
+    s = re.sub(r'[^a-z0-9]+', '_', s)
+    return s.strip('_')
 
-    Estrategia: para cada campo canonico (en orden de prioridad), buscar el
-    primer header NO usado que contenga alguno de sus tokens disparadores.
-    Asi evitamos que un header se asigne a multiples campos.
+
+def _map_headers(headers: list[str]) -> dict[str, int]:
+    """Devuelve {campo_canonico: indice_columna} incluyendo campos enriquecidos.
+
+    Orden de matching:
+    1. Campos extendidos (matching de nombre exacto en snake_case): mas
+       especificos. Asi 'Depende_de (Asesor/...)' va a responsibility, no
+       a agent_name por la palabra 'asesor' que aparece en el sufijo.
+    2. Campos principales (token-based con prioridad).
     """
     mapping: dict[str, int] = {}
     used_indices: set[int] = set()
 
-    # Pre-tokenizar cada header una sola vez
-    header_tokens = [(idx, _tokens(h)) for idx, h in enumerate(headers)]
+    # 1) Extendidos: match si snake_header == alias o startswith alias + '_'
+    snake_headers = [(idx, _snake_normalize(h)) for idx, h in enumerate(headers)]
+    for canonical, aliases in EXTENDED_FIELD_MAP.items():
+        for idx, snake in snake_headers:
+            if idx in used_indices:
+                continue
+            matched = False
+            for alias in aliases:
+                if snake == alias or snake.startswith(alias + '_'):
+                    matched = True
+                    break
+            if matched:
+                mapping[canonical] = idx
+                used_indices.add(idx)
+                break
 
+    # 2) Principales (token-based)
+    header_tokens = [(idx, _tokens(h)) for idx, h in enumerate(headers)]
     for canonical in FIELD_PRIORITY:
+        if canonical in mapping:
+            continue
         triggers = TRIGGER_TOKENS[canonical]
         for idx, toks in header_tokens:
             if idx in used_indices:
                 continue
-            if toks & triggers:  # interseccion no vacia
+            if toks & triggers:
                 mapping[canonical] = idx
                 used_indices.add(idx)
                 break
+
     return mapping
 
 
@@ -128,6 +178,40 @@ def _normalize_cell(raw) -> str | None:
     if upper_compact in aliases:
         return aliases[upper_compact]
     return s
+
+
+def _normalize_effort(raw) -> str | None:
+    """Normaliza ESFUERZO a 5 buckets canonicos."""
+    if raw is None: return None
+    s = _normalize_header(str(raw))
+    if 'muy' in s and ('facil' in s or 'fácil' in s): return 'Muy facil'
+    if 'muy' in s and ('dificil' in s or 'difícil' in s): return 'Muy dificil'
+    if 'facil' in s or 'fácil' in s: return 'Facil'
+    if 'dificil' in s or 'difícil' in s: return 'Dificil'
+    if 'neutro' in s or 'normal' in s: return 'Neutro'
+    return str(raw).strip()[:30] or None
+
+
+def _normalize_yes_no(raw) -> str | None:
+    """Normaliza Si/No/Parcial."""
+    if raw is None: return None
+    s = _normalize_header(str(raw))
+    if not s: return None
+    if s in ('si', 'sí', 's', 'yes', 'y', 'true', '1'): return 'Si'
+    if s in ('no', 'n', 'false', '0'): return 'No'
+    if 'parcial' in s: return 'Parcial'
+    return str(raw).strip()[:20] or None
+
+
+def _normalize_responsibility(raw) -> str | None:
+    """Asesor / Proceso / Externo / Servicio."""
+    if raw is None: return None
+    s = _normalize_header(str(raw))
+    if 'asesor' in s: return 'Asesor'
+    if 'proceso' in s: return 'Proceso'
+    if 'externo' in s: return 'Externo'
+    if 'servicio' in s: return 'Servicio'
+    return str(raw).strip()[:50] or None
 
 
 def _normalize_channel(raw) -> str | None:
@@ -219,15 +303,43 @@ def parse_xlsx_stream(path: str) -> Iterable[dict]:
                 yield {'_invalid': True}
                 continue
 
+            from iterum.services.gender import predict_gender
+
+            def _s(key, max_len=None):
+                v = get(key)
+                if v is None or v == '': return None
+                s = str(v).strip()
+                if not s or s == '-': return None
+                return s[:max_len] if max_len else s
+
+            client_name = _s('client_name', 200)
+            gender, _hint = predict_gender(client_name) if client_name else ('No Detectado', None)
+
             yield {
                 'response_date': response_date,
                 'channel': _normalize_channel(get('channel')),
                 'cell': _normalize_cell(get('cell')),
-                'agent_name': (str(get('agent_name')).strip() if get('agent_name') else None),
-                'agent_doc': (str(get('agent_doc')).strip() if get('agent_doc') else None),
+                'agent_name': _s('agent_name', 150),
+                'agent_doc': _s('agent_doc', 50),
                 'nps_score': score,
                 'category': _categorize_nps(score),
-                'comment': (str(get('comment')).strip() if get('comment') else None),
+                'comment': _s('comment'),
+                # Enriquecidos
+                'client_name': client_name,
+                'client_doc': _s('client_doc', 50),
+                'gender': gender,
+                'effort': _normalize_effort(get('effort')),
+                'resolution': _normalize_yes_no(get('resolution')),
+                'resolved': _normalize_yes_no(get('resolved')),
+                'motive': _s('motive', 200),
+                'gestion_type': _s('gestion_type', 100),
+                'origin': _s('origin', 150),
+                'problem_description': _s('problem_description'),
+                'why_1': _s('why_1'),
+                'why_2': _s('why_2'),
+                'why_3': _s('why_3'),
+                'root_cause_type': _s('root_cause_type', 100),
+                'responsibility': _normalize_responsibility(get('responsibility')),
             }
     finally:
         wb.close()

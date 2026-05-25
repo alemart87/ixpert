@@ -678,6 +678,310 @@
 }
 
 /* ============================================================================
+   ACTION BANNER (dashboard)
+   ============================================================================ */
+.iterum-action-banner {
+    background: linear-gradient(135deg, #fef2f2, #fff);
+    border: 1px solid #fecaca;
+    border-left: 4px solid var(--it-detractor);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+.iterum-action-circle {
+    width: 92px; height: 92px;
+    background: #fee2e2;
+    color: var(--it-detractor);
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.iterum-action-circle span { font-size: 22px; font-weight: 800; }
+.iterum-action-circle small { font-size: 9px; color: var(--it-muted); text-transform: uppercase; letter-spacing: 1px; }
+.iterum-action-body { flex: 1; }
+.iterum-action-label { font-size: 10px; color: var(--it-detractor); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.iterum-action-body h2 { margin: 4px 0 6px; color: var(--it-text); font-size: 18px; }
+.iterum-action-body p { margin: 0; color: var(--it-muted); font-size: 13px; line-height: 1.5; }
+
+.iterum-kpi-text { font-size: 14px !important; line-height: 1.2; }
+
+/* ============================================================================
+   COMPOSITION STACK
+   ============================================================================ */
+.iterum-stack-bar {
+    display: flex;
+    height: 32px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+.iterum-stack-d { background: var(--it-detractor); }
+.iterum-stack-p { background: var(--it-pasivo); }
+.iterum-stack-pr { background: var(--it-promotor); }
+.iterum-stack-d, .iterum-stack-p, .iterum-stack-pr {
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 700;
+    transition: width 0.4s;
+}
+.iterum-stack-legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--it-muted);
+}
+.iterum-stack-legend b { color: var(--it-text); margin-right: 4px; }
+
+/* ============================================================================
+   GENDER / UNKNOWN PILLS
+   ============================================================================ */
+.iterum-unknown-box {
+    margin-top: 16px;
+    padding: 14px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+}
+.iterum-unknown-box h4 { margin: 0 0 4px; color: #92400e; font-size: 13px; }
+.iterum-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.iterum-pill {
+    background: #fff;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ============================================================================
+   EFFORT BAR
+   ============================================================================ */
+.iterum-effort-bar {
+    display: flex;
+    height: 50px;
+    border-radius: 6px;
+    overflow: hidden;
+    gap: 2px;
+}
+.iterum-effort-seg {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #fff; font-size: 11px;
+    min-width: 60px;
+}
+.iterum-effort-seg strong { font-size: 16px; }
+.iterum-effort-seg small { opacity: 0.9; }
+
+/* ============================================================================
+   COMMENT CARDS
+   ============================================================================ */
+.iterum-comments-list { display: flex; flex-direction: column; gap: 10px; }
+.iterum-comment-card { border-left: 3px solid #d1d5db; }
+.iterum-comment-detractor { border-left-color: var(--it-detractor); }
+.iterum-comment-pasivo { border-left-color: var(--it-pasivo); }
+.iterum-comment-promotor { border-left-color: var(--it-promotor); }
+.iterum-comment-header {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.iterum-comment-date { margin-left: auto; }
+.iterum-comment-text {
+    font-style: italic;
+    color: var(--it-text);
+    margin: 8px 0;
+    line-height: 1.5;
+}
+.iterum-comment-structured {
+    background: #fef2f2;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 13px;
+}
+.iterum-comment-structured div { margin: 4px 0; }
+.iterum-comment-structured strong { color: var(--it-detractor); }
+.iterum-porques { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.iterum-porque-pill {
+    background: #fee2e2; color: var(--it-detractor);
+    padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 500;
+}
+.iterum-comment-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.iterum-chip {
+    background: #f3f4f6; color: var(--it-text);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 500;
+    white-space: nowrap;
+}
+.iterum-chip.chip-ok { background: var(--it-promotor-soft); color: var(--it-promotor); }
+.iterum-chip.chip-warn { background: var(--it-pasivo-soft); color: var(--it-pasivo); }
+.iterum-chip.chip-err { background: var(--it-detractor-soft); color: var(--it-detractor); }
+
+/* ============================================================================
+   PATTERNS
+   ============================================================================ */
+.iterum-card-accent { border-left: 3px solid var(--it-brand); background: #fff7ed; }
+.iterum-action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.iterum-action-grid strong { color: var(--it-brand); font-size: 13px; }
+.iterum-action-grid small { color: var(--it-muted); }
+
+.iterum-stat-pink { background: #fef2f2; border-color: #fecaca; text-align: center; }
+.iterum-stat-yellow { background: #fffbeb; border-color: #fde68a; text-align: center; }
+.iterum-big-number {
+    font-size: 38px; font-weight: 800;
+    color: var(--it-detractor);
+    display: block;
+}
+.iterum-stat-yellow .iterum-big-number { color: var(--it-pasivo); }
+
+.iterum-pattern-row {
+    background: #fff;
+    border: 1px solid var(--it-border);
+    border-left: 4px solid #d1d5db;
+    border-radius: 6px;
+    padding: 12px 14px;
+}
+.iterum-pattern-count { float: right; font-weight: 700; }
+
+.iterum-keyword-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+    border-left: 3px solid var(--it-brand);
+    padding-left: 12px;
+    margin-bottom: 8px;
+}
+.iterum-keyword-pct {
+    margin-left: auto;
+    font-size: 18px; font-weight: 700;
+    color: var(--it-brand);
+}
+
+/* ============================================================================
+   RESPONSABILIDAD GRID (root cause)
+   ============================================================================ */
+.iterum-resp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+.iterum-resp-cell { text-align: center; padding: 12px; }
+.iterum-resp-icon { font-size: 24px; margin-bottom: 4px; }
+.iterum-resp-pct { font-size: 24px; font-weight: 800; }
+.iterum-resp-label { font-size: 12px; font-weight: 600; color: var(--it-text); }
+
+/* ============================================================================
+   CHAIN LIST (root cause)
+   ============================================================================ */
+.iterum-chain-list { display: flex; flex-direction: column; gap: 10px; }
+.iterum-chain-card {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+.iterum-chain-card.iterum-chain-empatia { border-left: 4px solid var(--it-detractor); }
+.iterum-chain-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+
+/* ============================================================================
+   AUDIT
+   ============================================================================ */
+.iterum-audit-stats {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.iterum-stat-pill {
+    text-align: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+.iterum-stat-pill strong { display: block; font-size: 22px; font-weight: 800; }
+.iterum-stat-pill small { font-size: 10px; color: var(--it-muted); text-transform: uppercase; letter-spacing: 1px; }
+.iterum-stat-progress { flex: 1; min-width: 200px; font-size: 12px; color: var(--it-muted); }
+
+.iterum-audit-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.iterum-audit-case { padding: 14px 18px; }
+.iterum-audit-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.iterum-audit-score {
+    width: 32px; height: 32px;
+    background: #fee2e2; color: var(--it-detractor);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px;
+    flex-shrink: 0;
+}
+.iterum-audit-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.iterum-audit-actions { display: flex; gap: 6px; margin-top: 10px; }
+.iterum-audit-correcto { border-left: 4px solid var(--it-promotor); }
+.iterum-audit-dudoso { border-left: 4px solid var(--it-pasivo); }
+.iterum-audit-incorrecto { border-left: 4px solid var(--it-detractor); }
+.iterum-audit-sin_revisar { border-left: 4px solid #d1d5db; }
+
+/* ============================================================================
+   COACHING
+   ============================================================================ */
+.iterum-coach-card { padding: 16px 20px; }
+.iterum-coach-urgente { border-left: 4px solid var(--it-detractor); }
+.iterum-coach-riesgo { border-left: 4px solid var(--it-pasivo); }
+.iterum-coach-normal { border-left: 4px solid var(--it-promotor); }
+.iterum-coach-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.iterum-coach-name { font-size: 16px; color: var(--it-detractor); }
+.iterum-coach-summary {
+    background: #f9fafb;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.iterum-coach-case {
+    background: #fef2f2;
+    border-left: 3px solid var(--it-detractor);
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.iterum-coach-case-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.iterum-coach-case-head > strong { background: var(--it-detractor); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+.iterum-coach-comment {
+    font-style: italic; color: var(--it-muted);
+    margin-top: 6px; font-size: 13px;
+}
+.iterum-coach-fortalezas {
+    background: var(--it-promotor-soft);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 14px;
+}
+.iterum-coach-fortalezas h4, .iterum-coach-fortalezas h5 { color: var(--it-promotor); margin: 0 0 8px; }
+.iterum-coach-stats-mini { display: flex; gap: 16px; margin-bottom: 10px; }
+.iterum-coach-stats-mini > div { text-align: center; background: #fff; padding: 8px 14px; border-radius: 6px; }
+.iterum-coach-stats-mini strong { font-size: 18px; font-weight: 800; display: block; color: var(--it-promotor); }
+.iterum-coach-stats-mini small { font-size: 10px; color: var(--it-muted); text-transform: uppercase; }
+.iterum-coach-voice {
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 4px 0;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--it-text);
+}
+
+/* ============================================================================
    LOADER OVERLAY
    ============================================================================ */
 .iterum-loader-overlay {

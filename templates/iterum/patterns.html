@@ -3,17 +3,52 @@
 {% block title %}Iterum · Patrones{% endblock %}
 
 {% block iterum_content %}
-<h1 class="iterum-h1">Patrones</h1>
-<p class="iterum-meta">Análisis de palabras frecuentes en comentarios de detractores (top 30).</p>
+<h1 class="iterum-h1">Análisis de patrones operativos</h1>
+<p class="iterum-meta">Monitoreá las métricas de dificultad para el cliente cruzadas y analizá la causa raíz semántica de los comentarios de tus detractores.</p>
 
-<div class="iterum-card">
-    <h3>Palabras más frecuentes en comentarios</h3>
-    <div id="wordCloud" class="iterum-wordcloud"></div>
+<div class="iterum-card iterum-card-accent">
+    <h3>📋 Guía de causa raíz & plan de acción</h3>
+    <div class="iterum-action-grid">
+        <div><strong>1. Motivo del cliente</strong><br><small>Es lo que el cliente pidió o reclamó. Ej.: activación, demora, bloqueo, transferencia, información.</small></div>
+        <div><strong>2. Origen principal</strong><br><small>Es dónde nació el problema: atención, sistema, política, canal externo o gestión pendiente.</small></div>
+        <div><strong>3. Depende de</strong><br><small>Define responsabilidad: Asesor si podía gestionarlo mejor; Proceso si el flujo limita; Externo si sale del control del canal.</small></div>
+        <div><strong>4. Tipo de causa raíz</strong><br><small>Elegí la categoría final: empatía/comunicación, conocimiento, proceso mal diseñado, error sistémico o política restrictiva.</small></div>
+        <div><strong>5. Porqués</strong><br><small>Cada porqué debe explicar el anterior. Debe poder leerse como una cadena lógica.</small></div>
+        <div><strong>6. Acción de coaching</strong><br><small>Si depende del asesor, definir conducta a corregir. Si no, definir contención, comunicación o escalamiento.</small></div>
+    </div>
+</div>
+
+<div class="iterum-grid-2">
+    <div class="iterum-card iterum-stat-pink">
+        <span class="iterum-big-number" id="indexNoResuelto">—</span>
+        <span class="iterum-meta">ÍNDICE NO RESUELTO</span>
+    </div>
+    <div class="iterum-card iterum-stat-yellow">
+        <span class="iterum-big-number" id="indexEsfuerzo">—</span>
+        <span class="iterum-meta">ALTO ESFUERZO PERCIBIDO</span>
+    </div>
+</div>
+
+<div class="iterum-grid-2">
+    <div class="iterum-card">
+        <h3>📁 Tipología de reclamos</h3>
+        <div id="patternsList" class="iterum-bar-list"></div>
+    </div>
+    <div class="iterum-card">
+        <h3>🚨 Feedback (top alertas)</h3>
+        <table class="iterum-table iterum-table-sm" id="topAlertsTable">
+            <thead><tr><th>Asesor</th><th>Alertas</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <div class="iterum-card">
-    <h3>Clasificaciones más usadas</h3>
-    <div id="classificationStats" class="iterum-bar-list"></div>
+    <h3>📊 Distribución de keywords en detractores</h3>
+    <h4 style="margin-top:16px">Origen principal (datos estructurados)</h4>
+    <div id="originList" class="iterum-bar-list"></div>
+    <h4 style="margin-top:24px">Keywords detectadas en comentarios libres</h4>
+    <div id="keywordsList" class="iterum-bar-list"></div>
 </div>
 {% endblock %}
 

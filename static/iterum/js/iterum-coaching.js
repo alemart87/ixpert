@@ -1,114 +1,85 @@
-/* Coaching: lista + alta + cambio de estado. */
+/* Coaching: cards por asesor con detalle de detractores + promotores. */
 
-let coachingId = null;
+let urgencyFilter = '';
 
-(function () {
-    const newBtn = document.getElementById('newCoaching');
-    if (newBtn) newBtn.addEventListener('click', () => openModal());
-
-    document.getElementById('coachCancel').addEventListener('click', closeModal);
-    document.getElementById('coachSave').addEventListener('click', save);
-    document.getElementById('coachingModal').addEventListener('click', e => {
-        if (e.target.id === 'coachingModal') closeModal();
-    });
-
-    const statusSel = document.getElementById('filterStatus');
-    const agentInp = document.getElementById('filterAgent');
-    const apply = document.getElementById('filterApply');
-    const clear = document.getElementById('filterClear');
-    if (apply) apply.addEventListener('click', load);
-    if (clear) clear.addEventListener('click', () => {
-        if (statusSel) statusSel.value = '';
-        if (agentInp) agentInp.value = '';
-        load();
-    });
-
-    // Pre-llenar agent_doc de la URL si viene de ranking
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('agent_doc')) {
-        if (agentInp) agentInp.value = params.get('agent_doc');
-    }
-
-    load();
+(async function () {
+    await IterumFilters.init(load);
+    const sel = document.getElementById('filterUrgency');
+    if (sel) sel.addEventListener('change', () => { urgencyFilter = sel.value; load(); });
+    await load();
 })();
 
 async function load() {
-    const params = {};
-    const s = document.getElementById('filterStatus');
-    const a = document.getElementById('filterAgent');
-    if (s && s.value) params.status = s.value;
-    if (a && a.value) params.agent_doc = a.value.trim();
-
-    const data = await IterumAPI.get('/iterum/api/coaching', params);
-    const tbody = document.querySelector('#coachingTable tbody');
-    if (!data.coaching.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="iterum-meta" style="text-align:center">Sin sesiones</td></tr>';
-        return;
-    }
-    tbody.innerHTML = data.coaching.map(c => `
-        <tr data-id="${c.id}">
-            <td>${IterumUtils.escapeHtml(c.agent_name || c.agent_doc)}</td>
-            <td>${IterumUtils.escapeHtml(c.coach_name || '')}</td>
-            <td>${IterumUtils.escapeHtml(c.topic || '—')}</td>
-            <td>${IterumUtils.urgencyBadge(c.urgency)}</td>
-            <td>${IterumUtils.statusBadge(c.status)}</td>
-            <td class="iterum-meta">${IterumUtils.fmtDate(c.scheduled_at)}</td>
-            <td>
-                ${c.status === 'pending'
-                    ? `<button class="iterum-btn iterum-btn-sm iterum-btn-primary" data-action="done">Completar</button>
-                       <button class="iterum-btn iterum-btn-sm iterum-btn-ghost" data-action="skip">Omitir</button>`
-                    : '—'}
-            </td>
-        </tr>`).join('');
-    tbody.querySelectorAll('[data-action]').forEach(b => {
-        b.addEventListener('click', () => {
-            const id = parseInt(b.closest('tr').dataset.id);
-            const status = b.dataset.action === 'done' ? 'done' : 'skipped';
-            updateStatus(id, status);
-        });
-    });
+    const data = await IterumAPI.get('/iterum/api/analytics/coaching', IterumFilters.queryParams());
+    renderStats(data.stats);
+    renderAgents(data.agents);
 }
 
-function openModal() {
-    coachingId = null;
-    document.getElementById('coachingModalTitle').textContent = 'Nueva sesión de coaching';
-    document.getElementById('coachAgentDoc').value = '';
-    document.getElementById('coachAgentName').value = '';
-    document.getElementById('coachTopic').value = '';
-    document.getElementById('coachUrgency').value = 'med';
-    document.getElementById('coachScheduledAt').value = '';
-    document.getElementById('coachNotes').value = '';
-    document.getElementById('coachingModal').style.display = 'flex';
+function renderStats(s) {
+    document.getElementById('coachStats').innerHTML = `
+        <div class="iterum-kpi-card"><span class="iterum-kpi-label">Asesores con detractores</span><span class="iterum-kpi-value">${s.asesores_con_detractores}</span></div>
+        <div class="iterum-kpi-card iterum-kpi-detractor"><span class="iterum-kpi-label">⚡ Urgentes</span><span class="iterum-kpi-value">${s.urgentes}</span></div>
+        <div class="iterum-kpi-card iterum-kpi-pasivo"><span class="iterum-kpi-label">⚠ En riesgo</span><span class="iterum-kpi-value">${s.en_riesgo}</span></div>
+        <div class="iterum-kpi-card"><span class="iterum-kpi-label">Sin causa raíz asignada</span><span class="iterum-kpi-value">${s.sin_causa_raiz}</span></div>
+        <div class="iterum-kpi-card iterum-kpi-promotor"><span class="iterum-kpi-label">⭐ Solo promotores</span><span class="iterum-kpi-value">${s.solo_promotores}</span></div>
+    `;
 }
 
-function closeModal() {
-    document.getElementById('coachingModal').style.display = 'none';
+function renderAgents(agents) {
+    let filtered = agents;
+    if (urgencyFilter) filtered = agents.filter(a => a.urgency === urgencyFilter);
+    const el = document.getElementById('coachAgentsList');
+    if (!filtered.length) { el.innerHTML = '<div class="iterum-card iterum-empty">Sin asesores</div>'; return; }
+    el.innerHTML = filtered.map(agentCard).join('');
 }
 
-async function save() {
-    const payload = {
-        agent_doc: document.getElementById('coachAgentDoc').value.trim(),
-        agent_name: document.getElementById('coachAgentName').value.trim(),
-        topic: document.getElementById('coachTopic').value.trim(),
-        urgency: document.getElementById('coachUrgency').value,
-        scheduled_at: document.getElementById('coachScheduledAt').value || null,
-        notes: document.getElementById('coachNotes').value.trim(),
-    };
-    if (!payload.agent_doc) { alert('Documento del asesor requerido'); return; }
-    try {
-        await IterumAPI.post('/iterum/api/coaching', payload);
-        closeModal();
-        load();
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
-}
+function agentCard(a) {
+    const urgencyBadge = a.urgency === 'urgente' ? '<span class="iterum-chip chip-err">🔴 URGENTE</span>'
+        : a.urgency === 'riesgo' ? '<span class="iterum-chip chip-warn">⚠ EN RIESGO</span>'
+        : '<span class="iterum-chip chip-ok">NORMAL</span>';
 
-async function updateStatus(id, status) {
-    try {
-        await IterumAPI.patch(`/iterum/api/coaching/${id}`, { status });
-        load();
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
+    const detractorCases = a.detractor_cases.map(c => `
+        <div class="iterum-coach-case">
+            <div class="iterum-coach-case-head">
+                <strong>${c.nps_score ?? '—'}</strong>
+                <span>${IterumUtils.escapeHtml(c.motive || '—')}</span>
+                <span class="iterum-meta">· ${IterumUtils.fmtDateShort(c.response_date)}</span>
+                ${c.responsibility ? `<span class="iterum-chip">${IterumUtils.escapeHtml(c.responsibility)}</span>` : ''}
+                ${c.resolution ? `<span class="iterum-chip ${c.resolution === 'Si' ? 'chip-ok' : 'chip-err'}">Resolvió: ${c.resolution}</span>` : ''}
+            </div>
+            ${c.problem_description ? `<p>${IterumUtils.escapeHtml(c.problem_description)}</p>` : ''}
+            ${c.comment ? `<p class="iterum-coach-comment">"${IterumUtils.escapeHtml(c.comment)}"</p>` : ''}
+        </div>`).join('');
+
+    const promoterBlock = a.promotores_count > 0 ? `
+        <div class="iterum-coach-fortalezas">
+            <h4>⭐ Fortalezas detectadas — ${a.promotores_count} promotores</h4>
+            <div class="iterum-coach-stats-mini">
+                <div><strong>${a.promotores_count}</strong><small>Promotores</small></div>
+                <div><strong>${a.avg_promoter_score ?? '—'}</strong><small>Nota media</small></div>
+            </div>
+            <div class="iterum-coach-voices">
+                <h5>Voz del cliente</h5>
+                ${a.promoter_voices.map(v => `<div class="iterum-coach-voice">⭐ "${IterumUtils.escapeHtml(v)}"</div>`).join('')}
+            </div>
+        </div>` : '';
+
+    return `
+    <div class="iterum-card iterum-coach-card iterum-coach-${a.urgency}">
+        <div class="iterum-coach-head">
+            <strong class="iterum-coach-name">${IterumUtils.escapeHtml(a.agent_name)}</strong>
+            ${urgencyBadge}
+            <span class="iterum-chip">${a.detractores_count} detractores</span>
+            ${a.promotores_count > 0 ? `<span class="iterum-chip chip-ok">⭐ ${a.promotores_count} promotores</span>` : ''}
+        </div>
+        <div class="iterum-coach-summary">
+            🔴 <strong>${a.detractores_count}</strong> detractores ·
+            ❌ <strong>${a.sin_resolver}</strong> sin resolver ·
+            ⚠ <strong>${a.sin_causa_raiz}</strong> sin causa raíz ·
+            ${a.top_motive ? `<strong>${IterumUtils.escapeHtml(a.top_motive)}</strong> (${a.top_motive_count})` : ''}
+        </div>
+        <h4>Casos detractores</h4>
+        ${detractorCases || '<div class="iterum-meta">Sin casos</div>'}
+        ${promoterBlock}
+    </div>`;
 }

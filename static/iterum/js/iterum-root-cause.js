@@ -1,101 +1,66 @@
-/* Causa Raiz: lista acciones abiertas + detractores sin analizar + modal 5 whys. */
-
-let rcSurveyId = null;
+/* Causa Raíz: 4 charts + cadena de porqués. */
 
 (async function () {
-    document.getElementById('rcCancel').addEventListener('click', closeModal);
-    document.getElementById('rcSave').addEventListener('click', save);
-    document.getElementById('rcModal').addEventListener('click', e => {
-        if (e.target.id === 'rcModal') closeModal();
-    });
-    await loadOpen();
-    await loadPending();
+    await IterumFilters.init(load);
+    await load();
 })();
 
-async function loadOpen() {
-    const data = await IterumAPI.get('/iterum/api/root-causes');
-    const tbody = document.querySelector('#rcTable tbody');
-    if (!data.root_causes.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="iterum-meta" style="text-align:center">Sin acciones abiertas</td></tr>';
-        return;
-    }
-    tbody.innerHTML = data.root_causes.map(rc => `
-        <tr data-survey="${rc.survey_id}">
-            <td><a href="#" data-action="edit">#${rc.survey_id}</a></td>
-            <td>${IterumUtils.escapeHtml(rc.root_cause || '—')}</td>
-            <td>${IterumUtils.escapeHtml(rc.action_owner_name || '—')}</td>
-            <td>${IterumUtils.fmtDateShort(rc.due_date)}</td>
-            <td>${IterumUtils.statusBadge(rc.status)}</td>
-            <td><button class="iterum-btn iterum-btn-sm iterum-btn-ghost" data-action="edit">Editar</button></td>
-        </tr>`).join('');
-    tbody.querySelectorAll('[data-action="edit"]').forEach(b => {
-        b.addEventListener('click', e => {
-            e.preventDefault();
-            openModal(parseInt(b.closest('tr').dataset.survey));
-        });
-    });
+async function load() {
+    const data = await IterumAPI.get('/iterum/api/analytics/root-cause', IterumFilters.queryParams());
+    bar('chartTipo', data.charts.tipo_causa, ['#dc2626', '#f97316']);
+    respGrid('chartResp', data.charts.responsabilidad);
+    bar('chartMotivo', data.charts.motivo, ['#dc2626', '#fbbf24']);
+    bar('chartOrigen', data.charts.origen, ['#dc2626', '#3b82f6']);
+    chain('chainList', data.chain);
 }
 
-async function loadPending() {
-    const data = await IterumAPI.get('/iterum/api/surveys', { category: 'detractor', per_page: 20 });
-    const tbody = document.querySelector('#rcPending tbody');
-    if (!data.surveys.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="iterum-meta" style="text-align:center">Sin detractores recientes</td></tr>';
-        return;
-    }
-    tbody.innerHTML = data.surveys.map(s => `
-        <tr data-id="${s.id}">
-            <td class="iterum-meta">${IterumUtils.fmtDateShort(s.response_date)}</td>
-            <td>${IterumUtils.escapeHtml(s.agent_name || s.agent_doc || '—')}</td>
-            <td><strong>${s.nps_score}</strong></td>
-            <td>${IterumUtils.escapeHtml(IterumUtils.truncate(s.comment || '', 150))}</td>
-            <td><button class="iterum-btn iterum-btn-sm iterum-btn-primary" data-action="analyze">Analizar</button></td>
-        </tr>`).join('');
-    tbody.querySelectorAll('[data-action="analyze"]').forEach(b => {
-        b.addEventListener('click', () => openModal(parseInt(b.closest('tr').dataset.id)));
-    });
+function bar(id, rows, colors) {
+    const el = document.getElementById(id);
+    if (!rows.length) { el.innerHTML = '<div class="iterum-empty">Sin datos</div>'; return; }
+    const max = rows[0]?.count || 1;
+    el.innerHTML = rows.map(r => `
+        <div class="iterum-bar-row" style="grid-template-columns:160px 1fr 40px 40px">
+            <div title="${IterumUtils.escapeHtml(r.label)}">${IterumUtils.escapeHtml(r.label)}</div>
+            <div class="iterum-bar-track"><div style="width:${100*r.count/max}%;height:100%;background:linear-gradient(90deg,${colors[0]},${colors[1]})"></div></div>
+            <div><strong>${r.count}</strong></div>
+            <div class="iterum-meta">${r.pct}%</div>
+        </div>`).join('');
 }
 
-async function openModal(surveyId) {
-    rcSurveyId = surveyId;
-    const s = await IterumAPI.get(`/iterum/api/surveys/${surveyId}`);
-    document.getElementById('rcSurveyId').textContent = s.id;
-    document.getElementById('rcSurveyInfo').innerHTML = `
-        <strong>${IterumUtils.fmtDate(s.response_date)}</strong> · ${IterumUtils.escapeHtml(s.agent_name || s.agent_doc || '')}<br>
-        NPS <strong>${s.nps_score}</strong> ${IterumUtils.categoryBadge(s.category)}<br>
-        <em>${IterumUtils.escapeHtml(s.comment || 'Sin comentario')}</em>
-    `;
-    const rc = s.root_cause || {};
-    ['why_1', 'why_2', 'why_3', 'why_4', 'why_5'].forEach((k, i) => {
-        document.getElementById(`why${i + 1}`).value = rc[k] || '';
-    });
-    document.getElementById('rcRootCause').value = rc.root_cause || '';
-    document.getElementById('rcDueDate').value = rc.due_date || '';
-    document.getElementById('rcStatus').value = rc.status || 'open';
-
-    document.getElementById('rcModal').style.display = 'flex';
+function respGrid(id, rows) {
+    const icons = { 'Asesor': '🎧', 'Externo': '🌐', 'Proceso': '⚙', 'Servicio': '🔧' };
+    const el = document.getElementById(id);
+    if (!rows.length) { el.innerHTML = '<div class="iterum-empty">Sin datos</div>'; return; }
+    const total = rows.reduce((s, r) => s + r.count, 0);
+    const colors = { 'Asesor': '#dc2626', 'Externo': '#3b82f6', 'Proceso': '#6b7280', 'Servicio': '#94a3b8' };
+    const cells = ['Asesor', 'Externo', 'Proceso', 'Servicio'].map(label => {
+        const r = rows.find(x => x.label === label) || { count: 0 };
+        const pct = total ? Math.round(100 * r.count / total) : 0;
+        return `<div class="iterum-resp-cell">
+            <div class="iterum-resp-icon">${icons[label]}</div>
+            <div class="iterum-resp-pct" style="color:${colors[label]}">${pct}%</div>
+            <div class="iterum-resp-label">${label}</div>
+            <div class="iterum-meta">${r.count} casos</div>
+        </div>`;
+    }).join('');
+    el.innerHTML = cells;
 }
 
-function closeModal() {
-    document.getElementById('rcModal').style.display = 'none';
-    rcSurveyId = null;
-}
-
-async function save() {
-    if (!rcSurveyId) return;
-    const whys = [1, 2, 3, 4, 5].map(i => document.getElementById(`why${i}`).value);
-    const payload = {
-        whys,
-        root_cause: document.getElementById('rcRootCause').value,
-        due_date: document.getElementById('rcDueDate').value || null,
-        status: document.getElementById('rcStatus').value,
-    };
-    try {
-        await IterumAPI.post(`/iterum/api/root-cause/${rcSurveyId}`, payload);
-        closeModal();
-        loadOpen();
-        loadPending();
-    } catch (e) {
-        alert('Error al guardar: ' + e.message);
-    }
+function chain(id, rows) {
+    const el = document.getElementById(id);
+    if (!rows.length) { el.innerHTML = '<div class="iterum-empty">Sin análisis de causa raíz cargados</div>'; return; }
+    el.innerHTML = rows.map(r => `
+        <div class="iterum-chain-card iterum-chain-${(r.root_cause_type || '').toLowerCase().includes('empatia') ? 'empatia' : 'other'}">
+            <div class="iterum-chain-head">
+                <span class="iterum-chip ${r.root_cause_type ? 'chip-warn' : ''}">${IterumUtils.escapeHtml(r.root_cause_type || '—')}</span>
+                <span class="iterum-chip">${IterumUtils.escapeHtml(r.responsibility || '—')}</span>
+                <span class="iterum-meta" style="margin-left:auto">${IterumUtils.escapeHtml(r.agent_name || '')} · ${IterumUtils.escapeHtml(r.cell || '')}</span>
+            </div>
+            ${r.problem_description ? `<div><strong>Problema:</strong> ${IterumUtils.escapeHtml(r.problem_description)}</div>` : ''}
+            <div class="iterum-porques">
+                ${r.why_1 ? `<span class="iterum-porque-pill">1. ${IterumUtils.escapeHtml(r.why_1)}</span>` : ''}
+                ${r.why_2 ? `<span class="iterum-porque-pill">2. ${IterumUtils.escapeHtml(r.why_2)}</span>` : ''}
+                ${r.why_3 ? `<span class="iterum-porque-pill">3. ${IterumUtils.escapeHtml(r.why_3)}</span>` : ''}
+            </div>
+        </div>`).join('');
 }
