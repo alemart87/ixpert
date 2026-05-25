@@ -1,234 +1,371 @@
-/* Iterum - estilos scopeados con prefijo .iterum-
-   Usa CSS variables del proyecto iXpert. */
+/* ============================================================================
+   Iterum - estilos scopeados (.iterum-*)
+   IMPORTANTE: existe global `nav { background: azul }`, `nav a { color: white }`,
+   `a { color: azul-medio }` y `main { max-width: 1200px }`. Por eso usamos
+   <div class="iterum-nav"> (no <nav>) y .iterum-fullbleed para escapar del max-width.
+   ============================================================================ */
 
 :root {
-    --iterum-promotor: #2c7c2c;
-    --iterum-pasivo: #c98b00;
-    --iterum-detractor: #b71c1c;
+    --it-promotor: #16a34a;
+    --it-promotor-soft: #dcfce7;
+    --it-pasivo: #d97706;
+    --it-pasivo-soft: #fef3c7;
+    --it-detractor: #dc2626;
+    --it-detractor-soft: #fee2e2;
+    --it-bg: #f7f8fa;
+    --it-card: #ffffff;
+    --it-border: #e5e7eb;
+    --it-text: #1f2937;
+    --it-muted: #6b7280;
+    --it-brand: #ff6600;
+    --it-brand-dark: #ea580c;
+    --it-accent: #1e3a8a;
+    --it-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --it-shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+}
+
+/* Romper el max-width:1200px del <main> global de iXpert */
+.iterum-fullbleed {
+    margin: -20px -16px;
+    padding: 0;
+    background: var(--it-bg);
+    min-height: calc(100vh - 200px);
 }
 
 .iterum-shell {
     display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 20px;
-    max-width: 1400px;
-    margin: 20px auto;
-    padding: 0 16px;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px;
+    color: var(--it-text);
 }
 
-/* Sidebar */
+/* ============================================================================
+   SIDEBAR
+   ============================================================================ */
 .iterum-sidebar {
-    background: var(--blanco, #fff);
-    border-radius: 12px;
-    padding: 20px 12px;
-    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    background: var(--it-card);
+    border-radius: 14px;
+    padding: 20px 14px;
+    box-shadow: var(--it-shadow);
     height: fit-content;
     position: sticky;
-    top: 20px;
-}
-.iterum-brand {
-    color: var(--naranja-itau, #ff6600);
-    margin: 0 8px 4px;
-    font-size: 22px;
-}
-.iterum-tagline {
-    color: var(--gris-meta, #888);
-    font-size: 11px;
-    margin: 0 8px 16px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-.iterum-nav { display: flex; flex-direction: column; gap: 2px; }
-.iterum-nav-link {
-    display: block;
-    padding: 10px 12px;
-    color: var(--gris-texto, #333);
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: background 0.15s;
-}
-.iterum-nav-link:hover {
-    background: var(--gris-claro, #f2f2f2);
-    color: var(--naranja-itau, #ff6600);
-}
-.iterum-nav-link.active {
-    background: var(--azul-medio, #004080);
-    color: #fff;
-    font-weight: 600;
-}
-.iterum-nav-link.iterum-nav-cta {
-    background: var(--naranja-itau, #ff6600);
-    color: #fff;
-    text-align: center;
-    margin-top: 4px;
-    font-weight: 600;
-}
-.iterum-nav-link.iterum-nav-cta:hover { background: var(--naranja-claro, #ff9500); }
-.iterum-nav-sep {
-    border: none;
-    border-top: 1px solid #eee;
-    margin: 12px 0;
+    top: 24px;
+    border: 1px solid var(--it-border);
 }
 
-/* Main */
+.iterum-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 16px;
+    border-bottom: 1px solid var(--it-border);
+    margin-bottom: 12px;
+}
+.iterum-brand-logo {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--it-brand), var(--it-brand-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(255,102,0,0.25);
+}
+.iterum-shell .iterum-brand {
+    margin: 0;
+    font-size: 18px;
+    color: var(--it-text);
+    font-weight: 700;
+    line-height: 1;
+}
+.iterum-shell .iterum-tagline {
+    margin: 2px 0 0;
+    color: var(--it-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.iterum-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    /* Reset por si el navegador hereda algo */
+    background: transparent !important;
+    padding: 0 !important;
+}
+.iterum-shell .iterum-nav-link {
+    /* !important para ganar a `nav a` global */
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px !important;
+    color: var(--it-text) !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    line-height: 1.2;
+}
+.iterum-shell .iterum-nav-link:hover {
+    background: #f3f4f6 !important;
+    color: var(--it-brand) !important;
+}
+.iterum-shell .iterum-nav-link.active {
+    background: linear-gradient(135deg, var(--it-accent), #1e40af) !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(30,58,138,0.25);
+}
+.iterum-nav-icon {
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.iterum-shell .iterum-nav-link.iterum-nav-cta {
+    background: linear-gradient(135deg, var(--it-brand), var(--it-brand-dark)) !important;
+    color: #fff !important;
+    font-weight: 600;
+    justify-content: center;
+    text-align: center;
+    margin-top: 6px;
+    box-shadow: 0 4px 12px rgba(255,102,0,0.3);
+}
+.iterum-shell .iterum-nav-link.iterum-nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(255,102,0,0.4);
+}
+.iterum-nav-sep {
+    height: 1px;
+    background: var(--it-border);
+    margin: 12px 4px;
+}
+
+/* ============================================================================
+   MAIN
+   ============================================================================ */
 .iterum-main { min-width: 0; }
 
-/* Filters */
+.iterum-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.iterum-shell h1.iterum-h1 {
+    color: var(--it-text);
+    margin: 0 0 4px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+.iterum-shell .iterum-meta {
+    color: var(--it-muted);
+    font-size: 13px;
+    margin: 0 0 4px;
+}
+
+/* ============================================================================
+   FILTERS BAR
+   ============================================================================ */
 .iterum-filters {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    background: var(--blanco, #fff);
+    background: var(--it-card);
     padding: 12px;
-    border-radius: 10px;
-    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    border-radius: 12px;
+    box-shadow: var(--it-shadow);
+    border: 1px solid var(--it-border);
     margin-bottom: 16px;
+    align-items: center;
 }
 .iterum-filter {
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
+    border: 1px solid var(--it-border);
+    border-radius: 8px;
+    font-size: 13px;
     background: #fff;
+    color: var(--it-text);
+    font-family: inherit;
+    min-height: 36px;
 }
-.iterum-filter-wide { flex: 1 1 200px; min-width: 200px; }
+.iterum-filter:focus {
+    outline: none;
+    border-color: var(--it-brand);
+    box-shadow: 0 0 0 3px rgba(255,102,0,0.1);
+}
+.iterum-filter-wide { flex: 1 1 220px; min-width: 220px; }
+
 .iterum-btn {
     padding: 8px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     transition: all 0.15s;
+    font-family: inherit;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
-.iterum-btn-primary { background: var(--naranja-itau, #ff6600); color: #fff; }
-.iterum-btn-primary:hover { background: var(--naranja-claro, #ff9500); }
-.iterum-btn-ghost { background: transparent; color: var(--gris-texto, #333); border: 1px solid #ccc; }
-.iterum-btn-ghost:hover { background: #f4f4f4; }
-.iterum-btn-sm { padding: 5px 10px; font-size: 12px; }
-.iterum-btn-danger { background: var(--iterum-detractor); color: #fff; }
+.iterum-btn-primary {
+    background: linear-gradient(135deg, var(--it-brand), var(--it-brand-dark));
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(255,102,0,0.25);
+}
+.iterum-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,102,0,0.35);
+}
+.iterum-btn-ghost {
+    background: #fff;
+    color: var(--it-text);
+    border: 1px solid var(--it-border);
+}
+.iterum-btn-ghost:hover { background: #f3f4f6; border-color: #d1d5db; }
+.iterum-btn-sm { padding: 5px 10px; font-size: 12px; min-height: 28px; }
+.iterum-btn-danger {
+    background: var(--it-detractor); color: #fff;
+}
 
-/* Content */
-.iterum-content { display: flex; flex-direction: column; gap: 16px; }
-.iterum-h1 {
-    color: var(--azul-itau, #002776);
-    margin: 0 0 4px;
-    font-size: 24px;
-}
-.iterum-meta {
-    color: var(--gris-meta, #888);
-    font-size: 13px;
-    margin: 0 0 8px;
-}
-
-/* Cards */
+/* ============================================================================
+   CARDS
+   ============================================================================ */
 .iterum-card {
-    background: var(--blanco, #fff);
-    border-radius: 10px;
+    background: var(--it-card);
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    box-shadow: var(--it-shadow);
+    border: 1px solid var(--it-border);
 }
-.iterum-card h3 {
-    color: var(--azul-itau, #002776);
+.iterum-shell .iterum-card h3 {
+    color: var(--it-text);
     margin: 0 0 12px;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 600;
 }
 
-/* KPI grid */
+/* ============================================================================
+   KPI GRID
+   ============================================================================ */
 .iterum-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
 }
 .iterum-kpi-card {
-    background: var(--blanco, #fff);
-    border-radius: 10px;
-    padding: 16px;
-    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    background: var(--it-card);
+    border-radius: 12px;
+    padding: 18px 16px;
+    box-shadow: var(--it-shadow);
+    border: 1px solid var(--it-border);
+    border-top: 3px solid #d1d5db;
     display: flex;
     flex-direction: column;
-    text-align: center;
-    border-top: 4px solid #ddd;
+    gap: 4px;
 }
-.iterum-kpi-main { border-top-color: var(--naranja-itau, #ff6600); }
-.iterum-kpi-promotor { border-top-color: var(--iterum-promotor); }
-.iterum-kpi-pasivo { border-top-color: var(--iterum-pasivo); }
-.iterum-kpi-detractor { border-top-color: var(--iterum-detractor); }
+.iterum-kpi-main { border-top-color: var(--it-brand); }
+.iterum-kpi-promotor { border-top-color: var(--it-promotor); }
+.iterum-kpi-pasivo { border-top-color: var(--it-pasivo); }
+.iterum-kpi-detractor { border-top-color: var(--it-detractor); }
 
 .iterum-kpi-label {
-    color: var(--gris-meta, #888);
+    color: var(--it-muted);
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.6px;
+    font-weight: 600;
 }
 .iterum-kpi-value {
-    font-size: 32px;
+    font-size: 30px;
     font-weight: 700;
-    color: var(--azul-itau, #002776);
-    margin: 8px 0;
+    color: var(--it-text);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
 }
-.iterum-kpi-main .iterum-kpi-value { color: var(--naranja-itau, #ff6600); }
-.iterum-kpi-promotor .iterum-kpi-value { color: var(--iterum-promotor); }
-.iterum-kpi-pasivo .iterum-kpi-value { color: var(--iterum-pasivo); }
-.iterum-kpi-detractor .iterum-kpi-value { color: var(--iterum-detractor); }
-.iterum-kpi-sub { color: var(--gris-meta, #888); font-size: 12px; }
+.iterum-kpi-main .iterum-kpi-value { color: var(--it-brand); }
+.iterum-kpi-promotor .iterum-kpi-value { color: var(--it-promotor); }
+.iterum-kpi-pasivo .iterum-kpi-value { color: var(--it-pasivo); }
+.iterum-kpi-detractor .iterum-kpi-value { color: var(--it-detractor); }
+.iterum-kpi-sub { color: var(--it-muted); font-size: 12px; }
 
-/* Tables */
+/* ============================================================================
+   TABLES
+   ============================================================================ */
 .iterum-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--it-text);
 }
-.iterum-table th {
-    background: var(--gris-claro, #f2f2f2);
-    color: var(--azul-itau, #002776);
+.iterum-shell .iterum-table th {
+    background: #f9fafb;
+    color: var(--it-muted);
     padding: 10px 12px;
     text-align: left;
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 1px solid var(--it-border);
 }
-.iterum-table td {
+.iterum-shell .iterum-table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: top;
 }
-.iterum-table tbody tr:hover { background: #fafafa; }
-.iterum-table-sm { font-size: 13px; }
-.iterum-table-sm th, .iterum-table-sm td { padding: 6px 8px; }
+.iterum-shell .iterum-table tbody tr:hover { background: #fafbfc; }
+.iterum-shell .iterum-table tbody tr:last-child td { border-bottom: none; }
+.iterum-table-sm { font-size: 12px; }
+.iterum-table-sm th, .iterum-table-sm td { padding: 6px 10px; }
 
-/* Bar list (canales/celulas) */
-.iterum-bar-list { display: flex; flex-direction: column; gap: 8px; }
+/* ============================================================================
+   BAR LIST (canales/celulas)
+   ============================================================================ */
+.iterum-bar-list { display: flex; flex-direction: column; gap: 10px; }
 .iterum-bar-row {
     display: grid;
-    grid-template-columns: 120px 1fr 60px 80px;
-    gap: 8px;
+    grid-template-columns: 140px 1fr 50px 60px;
+    gap: 10px;
     align-items: center;
     font-size: 13px;
+    color: var(--it-text);
+}
+.iterum-bar-row > div:first-child {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .iterum-bar-track {
-    height: 22px;
-    background: #f0f0f0;
+    height: 20px;
+    background: #f3f4f6;
     border-radius: 4px;
     overflow: hidden;
     display: flex;
 }
-.iterum-bar-promotor { background: var(--iterum-promotor); height: 100%; }
-.iterum-bar-pasivo { background: var(--iterum-pasivo); height: 100%; }
-.iterum-bar-detractor { background: var(--iterum-detractor); height: 100%; }
+.iterum-bar-promotor { background: var(--it-promotor); height: 100%; }
+.iterum-bar-pasivo { background: var(--it-pasivo); height: 100%; }
+.iterum-bar-detractor { background: var(--it-detractor); height: 100%; }
 
-/* Timeseries */
+/* ============================================================================
+   TIMESERIES
+   ============================================================================ */
 .iterum-timeseries {
     display: flex;
     gap: 4px;
     align-items: flex-end;
-    height: 200px;
-    padding: 8px 0;
+    height: 220px;
+    padding: 12px 0 32px;
     overflow-x: auto;
 }
 .iterum-ts-col {
-    flex: 0 0 32px;
+    flex: 0 0 36px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -236,89 +373,120 @@
 }
 .iterum-ts-bar {
     width: 100%;
-    background: var(--azul-medio, #004080);
-    border-radius: 3px 3px 0 0;
-    transition: height 0.3s;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: opacity 0.2s;
 }
+.iterum-ts-bar:hover { opacity: 0.75; }
 .iterum-ts-label {
     font-size: 9px;
-    color: var(--gris-meta, #888);
+    color: var(--it-muted);
     transform: rotate(-45deg);
     transform-origin: top left;
     white-space: nowrap;
 }
 
-/* Layouts */
+/* ============================================================================
+   LAYOUTS
+   ============================================================================ */
 .iterum-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.iterum-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.iterum-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-/* Dropzone */
+/* ============================================================================
+   DROPZONE (upload)
+   ============================================================================ */
 .iterum-dropzone {
-    border: 3px dashed var(--naranja-itau, #ff6600);
-    border-radius: 10px;
-    padding: 40px;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 48px 24px;
     text-align: center;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    background: #fafbfc;
 }
 .iterum-dropzone.iterum-dropzone-active {
     background: #fff5e6;
+    border-color: var(--it-brand);
+    transform: scale(1.005);
 }
 .iterum-dropzone-icon {
-    font-size: 48px;
-    color: var(--naranja-itau, #ff6600);
+    font-size: 56px;
+    color: var(--it-brand);
+    line-height: 1;
+    margin-bottom: 8px;
 }
+.iterum-dropzone p {
+    margin: 8px 0;
+    color: var(--it-text);
+    font-size: 14px;
+}
+.iterum-dropzone .iterum-meta { margin-top: 16px; }
 
-/* Upload status */
+/* ============================================================================
+   UPLOAD STATUS
+   ============================================================================ */
 .iterum-upload-status {
     margin-top: 16px;
     padding: 16px;
-    background: #f4f4f4;
-    border-radius: 8px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid var(--it-border);
+}
+.iterum-upload-status h4 {
+    margin: 0 0 8px;
+    color: var(--it-text);
+    font-size: 15px;
 }
 .iterum-progress {
-    height: 8px;
-    background: #ddd;
-    border-radius: 4px;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
     overflow: hidden;
-    margin: 8px 0;
+    margin: 10px 0;
 }
 .iterum-progress-bar {
     height: 100%;
-    background: var(--naranja-itau, #ff6600);
+    background: linear-gradient(90deg, var(--it-brand), var(--it-brand-dark));
     width: 0;
-    transition: width 0.3s;
+    transition: width 0.4s;
 }
 
-/* Modal */
+/* ============================================================================
+   MODAL
+   ============================================================================ */
 .iterum-modal {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999;
+    backdrop-filter: blur(4px);
 }
 .iterum-modal-content {
     background: #fff;
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 16px;
+    padding: 28px;
     width: 90%;
-    max-width: 500px;
+    max-width: 520px;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: var(--it-shadow-lg);
 }
-.iterum-modal-wide { max-width: 720px; }
+.iterum-modal-wide { max-width: 760px; }
+.iterum-shell .iterum-modal-content h3,
 .iterum-modal-content h3 {
-    color: var(--azul-itau, #002776);
+    color: var(--it-text);
     margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
 }
 .iterum-modal-content label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    color: var(--gris-texto, #333);
-    margin: 12px 0 4px;
+    color: var(--it-muted);
+    margin: 14px 0 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -326,106 +494,199 @@
 .iterum-modal-content textarea,
 .iterum-modal-content select {
     width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--it-border);
+    border-radius: 8px;
     font-size: 14px;
     font-family: inherit;
+    color: var(--it-text);
+    background: #fff;
+}
+.iterum-modal-content input:focus,
+.iterum-modal-content textarea:focus,
+.iterum-modal-content select:focus {
+    outline: none;
+    border-color: var(--it-brand);
+    box-shadow: 0 0 0 3px rgba(255,102,0,0.1);
 }
 .iterum-modal-survey-info {
-    background: #f4f4f4;
-    padding: 12px;
-    border-radius: 6px;
+    background: #f9fafb;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border-left: 3px solid var(--it-brand);
     font-size: 13px;
     margin-bottom: 12px;
+    line-height: 1.5;
 }
 .iterum-verdict-group {
     display: flex;
-    gap: 16px;
-    margin: 8px 0;
+    gap: 8px;
+    margin: 6px 0;
+    flex-wrap: wrap;
 }
 .iterum-verdict-group label {
     margin: 0;
+    padding: 8px 14px;
+    border: 1px solid var(--it-border);
+    border-radius: 8px;
     cursor: pointer;
     text-transform: none;
     letter-spacing: 0;
+    color: var(--it-text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
 }
+.iterum-verdict-group label:has(input:checked) {
+    background: var(--it-brand);
+    color: #fff;
+    border-color: var(--it-brand);
+}
+.iterum-verdict-group input { width: auto; margin-right: 6px; }
 .iterum-modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--it-border);
 }
 
-/* Badges */
+/* ============================================================================
+   BADGES
+   ============================================================================ */
 .iterum-badge {
     display: inline-block;
     padding: 3px 10px;
-    border-radius: 12px;
+    border-radius: 999px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
-.iterum-badge-promotor { background: #e3f5e3; color: var(--iterum-promotor); }
-.iterum-badge-pasivo { background: #fff3cd; color: var(--iterum-pasivo); }
-.iterum-badge-detractor { background: #ffd6d6; color: var(--iterum-detractor); }
-.iterum-badge-ok { background: #e3f5e3; color: var(--iterum-promotor); }
-.iterum-badge-warn { background: #fff3cd; color: var(--iterum-pasivo); }
-.iterum-badge-err { background: #ffd6d6; color: var(--iterum-detractor); }
-.iterum-badge-high { background: var(--iterum-detractor); color: #fff; }
-.iterum-badge-med { background: var(--iterum-pasivo); color: #fff; }
-.iterum-badge-low { background: #e0e0e0; color: #555; }
-.iterum-badge-status-pending { background: #e0e0e0; color: #555; }
-.iterum-badge-status-done { background: var(--iterum-promotor); color: #fff; }
-.iterum-badge-status-skipped { background: #999; color: #fff; }
-.iterum-badge-status-open { background: var(--iterum-pasivo); color: #fff; }
-.iterum-badge-status-in_progress { background: var(--azul-medio, #004080); color: #fff; }
+.iterum-badge-promotor { background: var(--it-promotor-soft); color: var(--it-promotor); }
+.iterum-badge-pasivo { background: var(--it-pasivo-soft); color: var(--it-pasivo); }
+.iterum-badge-detractor { background: var(--it-detractor-soft); color: var(--it-detractor); }
+.iterum-badge-ok { background: var(--it-promotor-soft); color: var(--it-promotor); }
+.iterum-badge-warn { background: var(--it-pasivo-soft); color: var(--it-pasivo); }
+.iterum-badge-err { background: var(--it-detractor-soft); color: var(--it-detractor); }
+.iterum-badge-high { background: var(--it-detractor); color: #fff; }
+.iterum-badge-med { background: var(--it-pasivo); color: #fff; }
+.iterum-badge-low { background: #e5e7eb; color: #4b5563; }
+.iterum-badge-status-pending { background: #fef3c7; color: #92400e; }
+.iterum-badge-status-processing { background: #dbeafe; color: #1e40af; }
+.iterum-badge-status-done { background: var(--it-promotor-soft); color: var(--it-promotor); }
+.iterum-badge-status-failed { background: var(--it-detractor-soft); color: var(--it-detractor); }
+.iterum-badge-status-skipped { background: #e5e7eb; color: #4b5563; }
+.iterum-badge-status-open { background: var(--it-pasivo-soft); color: var(--it-pasivo); }
+.iterum-badge-status-in_progress { background: #dbeafe; color: var(--it-accent); }
 
-/* Pagination */
+/* ============================================================================
+   PAGINATION
+   ============================================================================ */
 .iterum-pagination {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     margin-top: 16px;
+    flex-wrap: wrap;
 }
 .iterum-pagination button {
     padding: 6px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--it-border);
     background: #fff;
-    border-radius: 4px;
+    color: var(--it-text);
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 13px;
+    min-width: 36px;
 }
+.iterum-pagination button:hover { background: #f3f4f6; }
 .iterum-pagination button.active {
-    background: var(--naranja-itau, #ff6600);
+    background: var(--it-brand);
     color: #fff;
-    border-color: var(--naranja-itau, #ff6600);
+    border-color: var(--it-brand);
+}
+.iterum-pagination span { padding: 6px 4px; color: var(--it-muted); }
+
+/* ============================================================================
+   ERROR DETAIL (failed uploads)
+   ============================================================================ */
+.iterum-error-toggle {
+    background: none;
+    border: none;
+    color: var(--it-detractor);
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+    padding: 0;
+}
+.iterum-error-detail {
+    background: var(--it-detractor-soft);
+    border-left: 3px solid var(--it-detractor);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    color: #7f1d1d;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
-/* Report preview iframe */
+/* ============================================================================
+   REPORT PREVIEW IFRAME
+   ============================================================================ */
 .iterum-report-preview {
     width: 100%;
     min-height: 600px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--it-border);
+    border-radius: 8px;
+    background: #fff;
 }
 
-/* Wordcloud */
+/* ============================================================================
+   WORDCLOUD
+   ============================================================================ */
 .iterum-wordcloud {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 24px;
+    min-height: 200px;
 }
 .iterum-wordcloud-word {
-    color: var(--azul-medio, #004080);
+    color: var(--it-accent);
     cursor: default;
+    font-weight: 600;
+    line-height: 1;
 }
 
-/* Responsive */
+/* ============================================================================
+   EMPTY STATES
+   ============================================================================ */
+.iterum-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--it-muted);
+    font-size: 14px;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
 @media (max-width: 900px) {
-    .iterum-shell { grid-template-columns: 1fr; }
-    .iterum-sidebar { position: relative; }
+    .iterum-shell {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 16px;
+    }
+    .iterum-sidebar { position: relative; top: auto; }
     .iterum-grid-2, .iterum-grid-3 { grid-template-columns: 1fr; }
+    .iterum-bar-row { grid-template-columns: 100px 1fr 40px 50px; }
 }

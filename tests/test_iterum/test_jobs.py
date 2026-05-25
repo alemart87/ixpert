@@ -73,3 +73,69 @@ def test_process_upload_dedupe_on_second_run(app, user_analista, sample_xlsx):
 
     if os.path.exists(tmp.name):
         os.remove(tmp.name)
+
+
+def test_upload_endpoint_allows_retry_after_failure(app, login_as, user_analista, sample_xlsx):
+    """Regression: si el primer upload del archivo X fallo, subir X de nuevo
+    debe procesarlo (no devolver duplicate_file)."""
+    from models import db
+    from iterum.models import NPSUpload
+    from iterum.services.dedup import file_hash
+
+    fhash = file_hash(sample_xlsx)
+
+    # Simular un upload previo que fallo
+    with app.app_context():
+        failed = NPSUpload(
+            uploaded_by_id=user_analista.id,
+            filename='oldname.xlsx',
+            file_hash=fhash,
+            status='failed',
+            error_message='Faltan columnas obligatorias (parser viejo)',
+        )
+        db.session.add(failed); db.session.commit()
+        failed_id = failed.id
+
+    client = login_as(user_analista)
+    with open(sample_xlsx, 'rb') as f:
+        r = client.post('/iterum/api/upload',
+                        data={'file': (f, 'newname.xlsx')},
+                        content_type='multipart/form-data')
+    assert r.status_code == 202, f"Expected 202, got {r.status_code}: {r.data}"
+    body = r.get_json()
+    assert not body.get('duplicate_file'), 'Deberia haber procesado de nuevo, no marcar como duplicado'
+    assert body['status'] == 'pending'
+
+    # No quedan uploads en estado failed para este hash; el nuevo es distinto
+    # (id puede coincidir si SQLite reusa autoincrement)
+    with app.app_context():
+        assert NPSUpload.query.filter_by(file_hash=fhash, status='failed').count() == 0
+        new_upload = db.session.get(NPSUpload, body['upload_id'])
+        assert new_upload is not None
+        assert new_upload.filename == 'newname.xlsx'
+
+
+def test_upload_endpoint_blocks_duplicate_when_done(app, login_as, user_analista, sample_xlsx):
+    """Si el upload previo termino bien (done), no se reprocesa."""
+    from models import db
+    from iterum.models import NPSUpload
+    from iterum.services.dedup import file_hash
+
+    fhash = file_hash(sample_xlsx)
+    with app.app_context():
+        done = NPSUpload(
+            uploaded_by_id=user_analista.id, filename='x.xlsx',
+            file_hash=fhash, status='done', rows_new=10,
+        )
+        db.session.add(done); db.session.commit()
+        done_id = done.id
+
+    client = login_as(user_analista)
+    with open(sample_xlsx, 'rb') as f:
+        r = client.post('/iterum/api/upload',
+                        data={'file': (f, 'x.xlsx')},
+                        content_type='multipart/form-data')
+    assert r.status_code == 200
+    body = r.get_json()
+    assert body['duplicate_file'] is True
+    assert body['upload_id'] == done_id
