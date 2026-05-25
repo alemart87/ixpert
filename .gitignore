@@ -24,3 +24,7 @@ desktop.ini
 # Claude
 .claude/
 *.lnk
+
+# pytest
+.pytest_cache/
+instance/

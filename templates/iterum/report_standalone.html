@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte Iterum · {{ period_label }}</title>
+<style>
+  @page { size: A4; margin: 18mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Helvetica', sans-serif; color: #1a1a1a; line-height: 1.5; }
+  h1 { color: #ff6600; margin: 0 0 4px; font-size: 28px; }
+  h2 { color: #002776; margin: 24px 0 8px; font-size: 18px; border-bottom: 2px solid #ff6600; padding-bottom: 4px; }
+  .meta { color: #666; font-size: 11px; margin-bottom: 24px; }
+  .kpis { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+  .kpi { flex: 1 1 120px; border: 1px solid #ddd; border-radius: 6px; padding: 12px; text-align: center; }
+  .kpi-label { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .kpi-value { font-size: 28px; font-weight: bold; display: block; margin-top: 4px; }
+  .kpi-promotor .kpi-value { color: #2c7c2c; }
+  .kpi-pasivo .kpi-value { color: #c98b00; }
+  .kpi-detractor .kpi-value { color: #b71c1c; }
+  .kpi-main .kpi-value { color: #ff6600; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #f4f4f4; color: #002776; font-size: 10px; text-transform: uppercase; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .footer { margin-top: 24px; color: #888; font-size: 10px; text-align: center; }
+  .nps-pos { color: #2c7c2c; font-weight: bold; }
+  .nps-neg { color: #b71c1c; font-weight: bold; }
+  .nps-neu { color: #c98b00; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Iterum · Reporte ejecutivo</h1>
+<p class="meta">
+  Período: <strong>{{ period_label or 'Sin etiqueta' }}</strong><br>
+  Generado: <strong>{{ payload.generated_at }}</strong>
+  {% if payload.filters %}<br>Filtros: {{ payload.filters | tojson }}{% endif %}
+</p>
+
+<h2>KPIs principales</h2>
+<div class="kpis">
+  <div class="kpi kpi-main">
+    <span class="kpi-label">NPS</span>
+    <span class="kpi-value">{{ payload.kpis.nps if payload.kpis.nps is not none else '—' }}</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">Respuestas</span>
+    <span class="kpi-value">{{ payload.kpis.total }}</span>
+  </div>
+  <div class="kpi kpi-promotor">
+    <span class="kpi-label">Promotores</span>
+    <span class="kpi-value">{{ payload.kpis.promotor_pct }}%</span>
+  </div>
+  <div class="kpi kpi-pasivo">
+    <span class="kpi-label">Pasivos</span>
+    <span class="kpi-value">{{ payload.kpis.pasivo_pct }}%</span>
+  </div>
+  <div class="kpi kpi-detractor">
+    <span class="kpi-label">Detractores</span>
+    <span class="kpi-value">{{ payload.kpis.detractor_pct }}%</span>
+  </div>
+</div>
+
+{% macro nps_class(n) -%}
+  {%- if n is none -%}nps-neu
+  {%- elif n >= 30 -%}nps-pos
+  {%- elif n >= 0 -%}nps-neu
+  {%- else -%}nps-neg{%- endif -%}
+{%- endmacro %}
+
+<h2>NPS por canal</h2>
+<table>
+  <thead><tr><th>Canal</th><th>Total</th><th>NPS</th><th>Promotores</th><th>Pasivos</th><th>Detractores</th></tr></thead>
+  <tbody>
+    {% for ch in payload.channels %}
+    <tr>
+      <td>{{ ch.channel }}</td><td>{{ ch.total }}</td>
+      <td class="{{ nps_class(ch.nps) }}">{{ ch.nps }}</td>
+      <td>{{ ch.promotor }}</td><td>{{ ch.pasivo }}</td><td>{{ ch.detractor }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;color:#888">Sin datos</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>NPS por célula</h2>
+<table>
+  <thead><tr><th>Célula</th><th>Total</th><th>NPS</th><th>P</th><th>Pa</th><th>D</th></tr></thead>
+  <tbody>
+    {% for c in payload.cells[:15] %}
+    <tr>
+      <td>{{ c.cell }}</td><td>{{ c.total }}</td>
+      <td class="{{ nps_class(c.nps) }}">{{ c.nps }}</td>
+      <td>{{ c.promotor }}</td><td>{{ c.pasivo }}</td><td>{{ c.detractor }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;color:#888">Sin datos</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Top 10 asesores</h2>
+<table>
+  <thead><tr><th>#</th><th>Asesor</th><th>Doc</th><th>Total</th><th>NPS</th></tr></thead>
+  <tbody>
+    {% for r in payload.ranking_top %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ r.agent_name or '—' }}</td>
+      <td>{{ r.agent_doc }}</td>
+      <td>{{ r.total }}</td>
+      <td class="{{ nps_class(r.nps) }}">{{ r.nps }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="text-align:center;color:#888">Sin datos suficientes</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Evolución semanal</h2>
+<table>
+  <thead><tr><th>Semana</th><th>Total</th><th>NPS</th><th>P</th><th>Pa</th><th>D</th></tr></thead>
+  <tbody>
+    {% for t in payload.timeseries %}
+    <tr>
+      <td>{{ t.period[:10] if t.period else '—' }}</td>
+      <td>{{ t.total }}</td>
+      <td class="{{ nps_class(t.nps) }}">{{ t.nps }}</td>
+      <td>{{ t.promotor }}</td><td>{{ t.pasivo }}</td><td>{{ t.detractor }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;color:#888">Sin datos</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="footer">
+  Generado por Iterum · iXpert CX Platform · ArrowX
+</div>
+
+</body>
+</html>

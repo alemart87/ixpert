@@ -1,0 +1,85 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Causa Raíz{% endblock %}
+
+{% block iterum_filters %}{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Causa Raíz (5 Porqués)</h1>
+<p class="iterum-meta">Análisis estructurado para detractores. Cada respuesta detractora puede tener su árbol de 5 porqués.</p>
+
+<div class="iterum-card">
+    <h3>Acciones abiertas</h3>
+    <table class="iterum-table" id="rcTable">
+        <thead>
+            <tr>
+                <th>Respuesta</th><th>Causa raíz</th><th>Responsable</th>
+                <th>Vencimiento</th><th>Estado</th><th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="iterum-card">
+    <h3>Detractores recientes sin análisis</h3>
+    <table class="iterum-table" id="rcPending">
+        <thead>
+            <tr>
+                <th>Fecha</th><th>Asesor</th><th>NPS</th><th>Comentario</th><th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Modal de 5 Whys -->
+<div id="rcModal" class="iterum-modal" style="display:none">
+    <div class="iterum-modal-content iterum-modal-wide">
+        <h3>5 Porqués · Respuesta #<span id="rcSurveyId"></span></h3>
+        <div class="iterum-modal-survey-info" id="rcSurveyInfo"></div>
+
+        <label>1. ¿Por qué ocurrió este detractor?</label>
+        <textarea id="why1" rows="2"></textarea>
+        <label>2. ¿Por qué pasó eso?</label>
+        <textarea id="why2" rows="2"></textarea>
+        <label>3. ¿Por qué pasó eso?</label>
+        <textarea id="why3" rows="2"></textarea>
+        <label>4. ¿Por qué pasó eso?</label>
+        <textarea id="why4" rows="2"></textarea>
+        <label>5. ¿Por qué pasó eso? (causa raíz)</label>
+        <textarea id="why5" rows="2"></textarea>
+
+        <label>Resumen de causa raíz</label>
+        <input type="text" id="rcRootCause" placeholder="En una oración…">
+
+        <div class="iterum-grid-3">
+            <div>
+                <label>Responsable de acción</label>
+                <select id="rcOwner"><option value="">— Sin asignar —</option></select>
+            </div>
+            <div>
+                <label>Vencimiento</label>
+                <input type="date" id="rcDueDate">
+            </div>
+            <div>
+                <label>Estado</label>
+                <select id="rcStatus">
+                    <option value="open">Abierta</option>
+                    <option value="in_progress">En progreso</option>
+                    <option value="done">Resuelta</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="iterum-modal-actions">
+            <button id="rcCancel" class="iterum-btn iterum-btn-ghost">Cancelar</button>
+            <button id="rcSave" class="iterum-btn iterum-btn-primary">Guardar análisis</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-root-cause.js') }}"></script>
+{% endblock %}

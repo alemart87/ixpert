@@ -1,0 +1,51 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Reporte ejecutivo{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Reporte ejecutivo</h1>
+<p class="iterum-meta">Generá un snapshot del período actual. El reporte queda persistido y se puede exportar como PDF nativo.</p>
+
+<div class="iterum-card">
+    <h3>Generar nuevo snapshot</h3>
+    <label>Etiqueta del período</label>
+    <input type="text" id="reportPeriodLabel" placeholder="Ej: Mayo 2026 · Semana 21">
+
+    <div class="iterum-grid-2">
+        <div>
+            <label>Desde</label>
+            <input type="date" id="reportFrom">
+        </div>
+        <div>
+            <label>Hasta</label>
+            <input type="date" id="reportTo">
+        </div>
+    </div>
+
+    {% if current_user.is_superadmin %}
+    <button id="reportGenerate" class="iterum-btn iterum-btn-primary">Generar y guardar snapshot</button>
+    {% else %}
+    <p class="iterum-meta">Solo el SuperAdmin puede persistir snapshots ejecutivos.</p>
+    {% endif %}
+    <button id="reportPreview" class="iterum-btn iterum-btn-ghost">Vista previa (sin guardar)</button>
+</div>
+
+<div class="iterum-card">
+    <h3>Snapshots persistidos</h3>
+    <table class="iterum-table" id="reportsTable">
+        <thead>
+            <tr><th>Período</th><th>Generado por</th><th>Fecha</th><th>Acciones</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="reportPreviewArea" class="iterum-card" style="display:none">
+    <h3>Vista previa</h3>
+    <iframe id="reportPreviewFrame" class="iterum-report-preview" sandbox="allow-same-origin"></iframe>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-report.js') }}"></script>
+{% endblock %}

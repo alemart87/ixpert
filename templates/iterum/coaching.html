@@ -1,0 +1,66 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Coaching{% endblock %}
+
+{% block iterum_filters %}
+<div class="iterum-filters" id="iterumFilters">
+    <select id="filterStatus" class="iterum-filter">
+        <option value="">Todos los estados</option>
+        <option value="pending">Pendientes</option>
+        <option value="done">Completadas</option>
+        <option value="skipped">Omitidas</option>
+    </select>
+    <input type="text" id="filterAgent" class="iterum-filter" placeholder="Documento del asesor…">
+    <button id="filterApply" class="iterum-btn iterum-btn-primary">Aplicar</button>
+    <button id="filterClear" class="iterum-btn iterum-btn-ghost">Limpiar</button>
+    {% if current_user.can_admin_training %}
+    <button id="newCoaching" class="iterum-btn iterum-btn-primary" style="margin-left:auto">+ Nueva sesión</button>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Coaching</h1>
+
+<div class="iterum-card">
+    <table class="iterum-table" id="coachingTable">
+        <thead>
+            <tr>
+                <th>Asesor</th><th>Coach</th><th>Tema</th>
+                <th>Urgencia</th><th>Estado</th><th>Agendada</th><th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="coachingModal" class="iterum-modal" style="display:none">
+    <div class="iterum-modal-content">
+        <h3 id="coachingModalTitle">Nueva sesión de coaching</h3>
+        <label>Documento del asesor</label>
+        <input type="text" id="coachAgentDoc" required>
+        <label>Nombre del asesor</label>
+        <input type="text" id="coachAgentName">
+        <label>Tema</label>
+        <input type="text" id="coachTopic">
+        <label>Urgencia</label>
+        <select id="coachUrgency">
+            <option value="low">Baja</option>
+            <option value="med" selected>Media</option>
+            <option value="high">Alta</option>
+        </select>
+        <label>Fecha y hora agendada</label>
+        <input type="datetime-local" id="coachScheduledAt">
+        <label>Notas</label>
+        <textarea id="coachNotes" rows="3"></textarea>
+        <div class="iterum-modal-actions">
+            <button id="coachCancel" class="iterum-btn iterum-btn-ghost">Cancelar</button>
+            <button id="coachSave" class="iterum-btn iterum-btn-primary">Guardar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-coaching.js') }}"></script>
+{% endblock %}

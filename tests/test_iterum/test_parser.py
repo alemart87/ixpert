@@ -1,0 +1,52 @@
+"""Tests del parser de XLSX y dedupe."""
+from iterum.services.excel_parser import parse_xlsx_stream, _map_headers, _categorize_nps
+from iterum.services.dedup import survey_hash, file_hash
+
+
+def test_parse_basic(sample_xlsx):
+    rows = [r for r in parse_xlsx_stream(sample_xlsx) if not r.get('_invalid')]
+    assert len(rows) == 5
+    assert rows[0]['nps_score'] == 10
+    assert rows[0]['category'] == 'promotor'
+    assert rows[0]['channel'] == 'whatsapp'
+
+
+def test_categorize():
+    assert _categorize_nps(10) == 'promotor'
+    assert _categorize_nps(9) == 'promotor'
+    assert _categorize_nps(8) == 'pasivo'
+    assert _categorize_nps(7) == 'pasivo'
+    assert _categorize_nps(6) == 'detractor'
+    assert _categorize_nps(0) == 'detractor'
+    assert _categorize_nps(None) is None
+
+
+def test_map_headers_flexible():
+    m = _map_headers(['Fecha', 'Canal', 'NPS', 'Comentario'])
+    assert 'response_date' in m
+    assert 'channel' in m
+    assert 'nps_score' in m
+    assert 'comment' in m
+
+
+def test_survey_hash_stable():
+    from datetime import datetime
+    d = datetime(2026, 5, 1, 10, 0)
+    h1 = survey_hash(d, '111', 10, 'Hola', 'whatsapp')
+    h2 = survey_hash(d, '111', 10, 'Hola', 'whatsapp')
+    assert h1 == h2
+
+
+def test_survey_hash_distinct():
+    from datetime import datetime
+    d = datetime(2026, 5, 1, 10, 0)
+    h1 = survey_hash(d, '111', 10, 'a', 'whatsapp')
+    h2 = survey_hash(d, '111', 9, 'a', 'whatsapp')
+    assert h1 != h2
+
+
+def test_file_hash(sample_xlsx):
+    h1 = file_hash(sample_xlsx)
+    h2 = file_hash(sample_xlsx)
+    assert h1 == h2
+    assert len(h1) == 64  # sha256 hex

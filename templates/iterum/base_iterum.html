@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-base.css') }}">
+{% block iterum_head %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="iterum-shell">
+    <aside class="iterum-sidebar">
+        <h2 class="iterum-brand">🔁 Iterum</h2>
+        <p class="iterum-tagline">CX Management Platform</p>
+        <nav class="iterum-nav">
+            <a href="{{ url_for('iterum.dashboard') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.dashboard' %}active{% endif %}">📊 Dashboard</a>
+            <a href="{{ url_for('iterum.ranking') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.ranking' %}active{% endif %}">🏆 Ranking</a>
+            <a href="{{ url_for('iterum.comments') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.comments' %}active{% endif %}">💬 Comentarios</a>
+            <a href="{{ url_for('iterum.patterns') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.patterns' %}active{% endif %}">🔍 Patrones</a>
+            {% if current_user.can_admin_training %}
+            <a href="{{ url_for('iterum.audit') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.audit' %}active{% endif %}">📋 Auditoría</a>
+            <a href="{{ url_for('iterum.root_cause') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.root_cause' %}active{% endif %}">🎯 Causa Raíz</a>
+            {% endif %}
+            <a href="{{ url_for('iterum.coaching') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.coaching' %}active{% endif %}">👥 Coaching</a>
+            <a href="{{ url_for('iterum.report') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.report' %}active{% endif %}">📄 Reporte</a>
+            {% if current_user.can_admin_training %}
+            <hr class="iterum-nav-sep">
+            <a href="{{ url_for('iterum.upload_page') }}" class="iterum-nav-link iterum-nav-cta {% if request.endpoint == 'iterum.upload_page' %}active{% endif %}">⬆ Cargar datos</a>
+            {% endif %}
+        </nav>
+    </aside>
+    <section class="iterum-main">
+        {% block iterum_filters %}
+        <div class="iterum-filters" id="iterumFilters">
+            <select id="filterChannel" class="iterum-filter">
+                <option value="">Todos los canales</option>
+            </select>
+            <select id="filterCell" class="iterum-filter">
+                <option value="">Todas las células</option>
+            </select>
+            <input type="date" id="filterFrom" class="iterum-filter" title="Desde">
+            <input type="date" id="filterTo" class="iterum-filter" title="Hasta">
+            <button id="filterApply" class="iterum-btn iterum-btn-primary">Aplicar</button>
+            <button id="filterClear" class="iterum-btn iterum-btn-ghost">Limpiar</button>
+        </div>
+        {% endblock %}
+
+        <div class="iterum-content">
+            {% block iterum_content %}{% endblock %}
+        </div>
+    </section>
+</div>
+
+<script src="{{ url_for('static', filename='iterum/js/iterum-core.js') }}"></script>
+{% block iterum_scripts %}{% endblock %}
+{% endblock %}
