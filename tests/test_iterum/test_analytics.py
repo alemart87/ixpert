@@ -109,3 +109,20 @@ def test_coaching_by_agent_groups_correctly(app, db_session):
     assert a['sin_resolver'] == 3
     assert a['promotores_count'] == 1
     assert a['urgency'] == 'urgente'  # 3+ detractores
+
+
+def test_nps_target_constant():
+    """El objetivo del canal viene del backend (no hardcoded en JS)."""
+    from iterum.services import analytics
+    assert analytics.OBJETIVO_NPS_CANAL == 77
+
+    import os
+    # Configurable via env
+    os.environ['ITERUM_NPS_TARGET'] = '85'
+    import importlib
+    importlib.reload(analytics)
+    assert analytics.OBJETIVO_NPS_CANAL == 85
+    # Restaurar
+    os.environ['ITERUM_NPS_TARGET'] = '77'
+    importlib.reload(analytics)
+    assert analytics.OBJETIVO_NPS_CANAL == 77
