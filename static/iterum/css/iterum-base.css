@@ -678,6 +678,48 @@
 }
 
 /* ============================================================================
+   LOADER OVERLAY
+   ============================================================================ */
+.iterum-loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    pointer-events: auto;
+}
+.iterum-spinner-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 32px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--it-shadow-lg);
+}
+.iterum-spinner-box span {
+    color: var(--it-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.iterum-spinner {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 3px solid #f3f4f6;
+    border-top-color: var(--it-brand);
+    animation: iterum-spin 0.7s linear infinite;
+}
+@keyframes iterum-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
    RESPONSIVE
    ============================================================================ */
 @media (max-width: 900px) {

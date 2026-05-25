@@ -125,6 +125,33 @@ def api_upload_status(upload_id):
     })
 
 
+@iterum_bp.route('/api/upload/<int:upload_id>', methods=['DELETE'])
+@login_required
+@iterum_editor_required
+def api_upload_delete(upload_id):
+    """Elimina un upload Y todas las encuestas que trajo (cascada).
+    Las nps_audit, nps_root_cause y nps_access_log relacionadas tambien
+    se borran por cascade='all, delete-orphan' definido en los modelos.
+    """
+    u = db.session.get(NPSUpload, upload_id)
+    if not u:
+        return jsonify({'error': 'No encontrado'}), 404
+
+    # Contar surveys antes de borrar (para el log de auditoria)
+    n_surveys = NPSSurvey.query.filter_by(upload_id=upload_id).count()
+
+    # Borrar surveys en bulk (cascade borra audit/root_cause asociados via ORM)
+    surveys = NPSSurvey.query.filter_by(upload_id=upload_id).all()
+    for s in surveys:
+        db.session.delete(s)
+    db.session.delete(u)
+    db.session.commit()
+
+    log_access('delete', 'upload', upload_id,
+               {'filename': u.filename, 'surveys_deleted': n_surveys})
+    return jsonify({'deleted': True, 'surveys_deleted': n_surveys})
+
+
 @iterum_bp.route('/api/uploads')
 @login_required
 @iterum_required

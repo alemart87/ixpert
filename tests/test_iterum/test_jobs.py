@@ -139,3 +139,38 @@ def test_upload_endpoint_blocks_duplicate_when_done(app, login_as, user_analista
     body = r.get_json()
     assert body['duplicate_file'] is True
     assert body['upload_id'] == done_id
+
+
+def test_delete_upload_cascades_surveys(app, login_as, user_analista, sample_xlsx):
+    """DELETE /api/upload/<id> borra el upload Y sus surveys asociadas."""
+    from models import db
+    from iterum.models import NPSUpload, NPSSurvey
+    from iterum.services.jobs import _process_upload
+    from iterum.services.dedup import file_hash
+
+    fhash = file_hash(sample_xlsx)
+    with app.app_context():
+        u = NPSUpload(uploaded_by_id=user_analista.id, filename='x.xlsx',
+                      file_hash=fhash, status='pending')
+        db.session.add(u); db.session.commit()
+        upload_id = u.id
+        _process_upload(upload_id, sample_xlsx)
+        assert NPSSurvey.query.filter_by(upload_id=upload_id).count() == 5
+
+    client = login_as(user_analista)
+    r = client.delete(f'/iterum/api/upload/{upload_id}')
+    assert r.status_code == 200
+    body = r.get_json()
+    assert body['deleted'] is True
+    assert body['surveys_deleted'] == 5
+
+    with app.app_context():
+        assert db.session.get(NPSUpload, upload_id) is None
+        assert NPSSurvey.query.filter_by(upload_id=upload_id).count() == 0
+
+
+def test_delete_upload_requires_editor(app, login_as, user_supervisor):
+    """Supervisor no puede eliminar uploads."""
+    client = login_as(user_supervisor)
+    r = client.delete('/iterum/api/upload/9999')
+    assert r.status_code == 403
