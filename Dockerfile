@@ -2,6 +2,20 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Dependencias de sistema:
+# - libpango/libcairo/libgdk-pixbuf: WeasyPrint (PDF nativo de reportes Iterum)
+# - libffi: dependencia transitiva de WeasyPrint
+# - shared-mime-info: deteccion de mime types en WeasyPrint
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf2.0-0 \
+    libffi8 \
+    shared-mime-info \
+    fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -31,5 +45,7 @@ CMD ["sh", "-c", "\
   python migrate_v10.py && \
   python migrate_v11.py && \
   python migrate_v12.py && \
+  python migrate_iterum.py && \
+  python migrate_iterum_retire_legacy.py && \
   python update_keywords.py && \
   gunicorn --bind 0.0.0.0:10000 --timeout 120 app:app"]

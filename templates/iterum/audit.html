@@ -1,0 +1,69 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Auditoría{% endblock %}
+
+{% block iterum_filters %}
+<div class="iterum-filters" id="iterumFilters">
+    <select id="filterChannel" class="iterum-filter"><option value="">Todos los canales</option></select>
+    <select id="filterCell" class="iterum-filter"><option value="">Todas las células</option></select>
+    <select id="filterVerdict" class="iterum-filter">
+        <option value="">Todos los veredictos</option>
+        <option value="">Sin auditar</option>
+        <option value="ok">OK</option>
+        <option value="warn">Atención</option>
+        <option value="err">Error</option>
+    </select>
+    <input type="date" id="filterFrom" class="iterum-filter">
+    <input type="date" id="filterTo" class="iterum-filter">
+    <button id="filterApply" class="iterum-btn iterum-btn-primary">Aplicar</button>
+    <button id="filterClear" class="iterum-btn iterum-btn-ghost">Limpiar</button>
+</div>
+{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Auditoría operativa</h1>
+<p class="iterum-meta">Clasificá cada respuesta. Tus veredictos quedan registrados con tu usuario y fecha.</p>
+
+<div class="iterum-card">
+    <table class="iterum-table" id="auditTable">
+        <thead>
+            <tr>
+                <th>Fecha</th><th>Canal</th><th>Asesor</th>
+                <th>NPS</th><th>Comentario</th><th>Veredicto actual</th><th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="iterum-pagination" id="auditPagination"></div>
+</div>
+
+<!-- Modal de veredicto -->
+<div id="auditModal" class="iterum-modal" style="display:none">
+    <div class="iterum-modal-content">
+        <h3>Auditar respuesta #<span id="modalSurveyId"></span></h3>
+        <div class="iterum-modal-survey-info" id="modalSurveyInfo"></div>
+
+        <label>Veredicto</label>
+        <div class="iterum-verdict-group">
+            <label><input type="radio" name="verdict" value="ok"> ✅ OK</label>
+            <label><input type="radio" name="verdict" value="warn"> ⚠ Atención</label>
+            <label><input type="radio" name="verdict" value="err"> ❌ Error</label>
+        </div>
+
+        <label>Clasificación (motivo)</label>
+        <input type="text" id="auditClassification" placeholder="Ej: Tiempo de respuesta, Información incorrecta...">
+
+        <label>Notas</label>
+        <textarea id="auditNotes" rows="4" placeholder="Observaciones..."></textarea>
+
+        <div class="iterum-modal-actions">
+            <button id="auditCancel" class="iterum-btn iterum-btn-ghost">Cancelar</button>
+            <button id="auditSave" class="iterum-btn iterum-btn-primary">Guardar veredicto</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-audit.js') }}"></script>
+{% endblock %}

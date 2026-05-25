@@ -71,6 +71,26 @@
                 </div>
                 {% endif %}
 
+                {% if current_user.role != 'asesor' %}
+                <!-- Iterum dropdown (CX Management Platform) -->
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn">🔁 Iterum ▾</button>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('iterum.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('iterum.ranking') }}">Ranking</a>
+                        <a href="{{ url_for('iterum.comments') }}">Comentarios</a>
+                        <a href="{{ url_for('iterum.patterns') }}">Patrones</a>
+                        {% if current_user.can_admin_training %}
+                        <a href="{{ url_for('iterum.upload_page') }}">Cargar datos</a>
+                        <a href="{{ url_for('iterum.audit') }}">Auditoría</a>
+                        <a href="{{ url_for('iterum.root_cause') }}">Causa Raíz</a>
+                        {% endif %}
+                        <a href="{{ url_for('iterum.coaching') }}">Coaching</a>
+                        <a href="{{ url_for('iterum.report') }}">Reporte ejecutivo</a>
+                    </div>
+                </div>
+                {% endif %}
+
                 {% if current_user.is_superadmin %}
 
                 <!-- Admin dropdown -->

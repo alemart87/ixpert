@@ -1,0 +1,431 @@
+/* Iterum - estilos scopeados con prefijo .iterum-
+   Usa CSS variables del proyecto iXpert. */
+
+:root {
+    --iterum-promotor: #2c7c2c;
+    --iterum-pasivo: #c98b00;
+    --iterum-detractor: #b71c1c;
+}
+
+.iterum-shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 16px;
+}
+
+/* Sidebar */
+.iterum-sidebar {
+    background: var(--blanco, #fff);
+    border-radius: 12px;
+    padding: 20px 12px;
+    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+.iterum-brand {
+    color: var(--naranja-itau, #ff6600);
+    margin: 0 8px 4px;
+    font-size: 22px;
+}
+.iterum-tagline {
+    color: var(--gris-meta, #888);
+    font-size: 11px;
+    margin: 0 8px 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.iterum-nav { display: flex; flex-direction: column; gap: 2px; }
+.iterum-nav-link {
+    display: block;
+    padding: 10px 12px;
+    color: var(--gris-texto, #333);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+.iterum-nav-link:hover {
+    background: var(--gris-claro, #f2f2f2);
+    color: var(--naranja-itau, #ff6600);
+}
+.iterum-nav-link.active {
+    background: var(--azul-medio, #004080);
+    color: #fff;
+    font-weight: 600;
+}
+.iterum-nav-link.iterum-nav-cta {
+    background: var(--naranja-itau, #ff6600);
+    color: #fff;
+    text-align: center;
+    margin-top: 4px;
+    font-weight: 600;
+}
+.iterum-nav-link.iterum-nav-cta:hover { background: var(--naranja-claro, #ff9500); }
+.iterum-nav-sep {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 12px 0;
+}
+
+/* Main */
+.iterum-main { min-width: 0; }
+
+/* Filters */
+.iterum-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--blanco, #fff);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    margin-bottom: 16px;
+}
+.iterum-filter {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+}
+.iterum-filter-wide { flex: 1 1 200px; min-width: 200px; }
+.iterum-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+.iterum-btn-primary { background: var(--naranja-itau, #ff6600); color: #fff; }
+.iterum-btn-primary:hover { background: var(--naranja-claro, #ff9500); }
+.iterum-btn-ghost { background: transparent; color: var(--gris-texto, #333); border: 1px solid #ccc; }
+.iterum-btn-ghost:hover { background: #f4f4f4; }
+.iterum-btn-sm { padding: 5px 10px; font-size: 12px; }
+.iterum-btn-danger { background: var(--iterum-detractor); color: #fff; }
+
+/* Content */
+.iterum-content { display: flex; flex-direction: column; gap: 16px; }
+.iterum-h1 {
+    color: var(--azul-itau, #002776);
+    margin: 0 0 4px;
+    font-size: 24px;
+}
+.iterum-meta {
+    color: var(--gris-meta, #888);
+    font-size: 13px;
+    margin: 0 0 8px;
+}
+
+/* Cards */
+.iterum-card {
+    background: var(--blanco, #fff);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+}
+.iterum-card h3 {
+    color: var(--azul-itau, #002776);
+    margin: 0 0 12px;
+    font-size: 16px;
+}
+
+/* KPI grid */
+.iterum-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+.iterum-kpi-card {
+    background: var(--blanco, #fff);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--sombra-sm, 0 2px 5px rgba(0,0,0,0.08));
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    border-top: 4px solid #ddd;
+}
+.iterum-kpi-main { border-top-color: var(--naranja-itau, #ff6600); }
+.iterum-kpi-promotor { border-top-color: var(--iterum-promotor); }
+.iterum-kpi-pasivo { border-top-color: var(--iterum-pasivo); }
+.iterum-kpi-detractor { border-top-color: var(--iterum-detractor); }
+
+.iterum-kpi-label {
+    color: var(--gris-meta, #888);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.iterum-kpi-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--azul-itau, #002776);
+    margin: 8px 0;
+}
+.iterum-kpi-main .iterum-kpi-value { color: var(--naranja-itau, #ff6600); }
+.iterum-kpi-promotor .iterum-kpi-value { color: var(--iterum-promotor); }
+.iterum-kpi-pasivo .iterum-kpi-value { color: var(--iterum-pasivo); }
+.iterum-kpi-detractor .iterum-kpi-value { color: var(--iterum-detractor); }
+.iterum-kpi-sub { color: var(--gris-meta, #888); font-size: 12px; }
+
+/* Tables */
+.iterum-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.iterum-table th {
+    background: var(--gris-claro, #f2f2f2);
+    color: var(--azul-itau, #002776);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #ddd;
+}
+.iterum-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+}
+.iterum-table tbody tr:hover { background: #fafafa; }
+.iterum-table-sm { font-size: 13px; }
+.iterum-table-sm th, .iterum-table-sm td { padding: 6px 8px; }
+
+/* Bar list (canales/celulas) */
+.iterum-bar-list { display: flex; flex-direction: column; gap: 8px; }
+.iterum-bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 60px 80px;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+}
+.iterum-bar-track {
+    height: 22px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+}
+.iterum-bar-promotor { background: var(--iterum-promotor); height: 100%; }
+.iterum-bar-pasivo { background: var(--iterum-pasivo); height: 100%; }
+.iterum-bar-detractor { background: var(--iterum-detractor); height: 100%; }
+
+/* Timeseries */
+.iterum-timeseries {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 200px;
+    padding: 8px 0;
+    overflow-x: auto;
+}
+.iterum-ts-col {
+    flex: 0 0 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.iterum-ts-bar {
+    width: 100%;
+    background: var(--azul-medio, #004080);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.3s;
+}
+.iterum-ts-label {
+    font-size: 9px;
+    color: var(--gris-meta, #888);
+    transform: rotate(-45deg);
+    transform-origin: top left;
+    white-space: nowrap;
+}
+
+/* Layouts */
+.iterum-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.iterum-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* Dropzone */
+.iterum-dropzone {
+    border: 3px dashed var(--naranja-itau, #ff6600);
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    transition: background 0.2s;
+}
+.iterum-dropzone.iterum-dropzone-active {
+    background: #fff5e6;
+}
+.iterum-dropzone-icon {
+    font-size: 48px;
+    color: var(--naranja-itau, #ff6600);
+}
+
+/* Upload status */
+.iterum-upload-status {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f4f4f4;
+    border-radius: 8px;
+}
+.iterum-progress {
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+.iterum-progress-bar {
+    height: 100%;
+    background: var(--naranja-itau, #ff6600);
+    width: 0;
+    transition: width 0.3s;
+}
+
+/* Modal */
+.iterum-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+}
+.iterum-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.iterum-modal-wide { max-width: 720px; }
+.iterum-modal-content h3 {
+    color: var(--azul-itau, #002776);
+    margin: 0 0 16px;
+}
+.iterum-modal-content label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gris-texto, #333);
+    margin: 12px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.iterum-modal-content input,
+.iterum-modal-content textarea,
+.iterum-modal-content select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+.iterum-modal-survey-info {
+    background: #f4f4f4;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.iterum-verdict-group {
+    display: flex;
+    gap: 16px;
+    margin: 8px 0;
+}
+.iterum-verdict-group label {
+    margin: 0;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.iterum-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+/* Badges */
+.iterum-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.iterum-badge-promotor { background: #e3f5e3; color: var(--iterum-promotor); }
+.iterum-badge-pasivo { background: #fff3cd; color: var(--iterum-pasivo); }
+.iterum-badge-detractor { background: #ffd6d6; color: var(--iterum-detractor); }
+.iterum-badge-ok { background: #e3f5e3; color: var(--iterum-promotor); }
+.iterum-badge-warn { background: #fff3cd; color: var(--iterum-pasivo); }
+.iterum-badge-err { background: #ffd6d6; color: var(--iterum-detractor); }
+.iterum-badge-high { background: var(--iterum-detractor); color: #fff; }
+.iterum-badge-med { background: var(--iterum-pasivo); color: #fff; }
+.iterum-badge-low { background: #e0e0e0; color: #555; }
+.iterum-badge-status-pending { background: #e0e0e0; color: #555; }
+.iterum-badge-status-done { background: var(--iterum-promotor); color: #fff; }
+.iterum-badge-status-skipped { background: #999; color: #fff; }
+.iterum-badge-status-open { background: var(--iterum-pasivo); color: #fff; }
+.iterum-badge-status-in_progress { background: var(--azul-medio, #004080); color: #fff; }
+
+/* Pagination */
+.iterum-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+.iterum-pagination button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.iterum-pagination button.active {
+    background: var(--naranja-itau, #ff6600);
+    color: #fff;
+    border-color: var(--naranja-itau, #ff6600);
+}
+
+/* Report preview iframe */
+.iterum-report-preview {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* Wordcloud */
+.iterum-wordcloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.iterum-wordcloud-word {
+    color: var(--azul-medio, #004080);
+    cursor: default;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .iterum-shell { grid-template-columns: 1fr; }
+    .iterum-sidebar { position: relative; }
+    .iterum-grid-2, .iterum-grid-3 { grid-template-columns: 1fr; }
+}

@@ -305,6 +305,32 @@ Por defecto al primer deploy, `migrate_v10.py` extrae las 42 preguntas del archi
 - [`scoring.md`](./scoring.md) — Referencia técnica completa del sistema de scoring (fórmulas, pisos, umbrales, hard caps, ART).
 - `/admin/vex/methodology` — Versión visible al usuario (HTML) con la metodología, dimensiones, escala Sten, patrones diagnósticos y referencias bibliográficas.
 - `/admin/novedades` — Página de novedades destacada para el SuperAdmin: explica los cambios recientes en lenguaje claro para compartir con el equipo.
+- [`docs/iterum/README.md`](./docs/iterum/README.md) — Iterum CX Management Platform (NPS, auditoría, causa raíz, coaching, reportes PDF).
+- [`docs/iterum/DATA_MODEL.md`](./docs/iterum/DATA_MODEL.md) — Esquema de tablas Iterum.
+- [`docs/iterum/API.md`](./docs/iterum/API.md) — Contrato REST de Iterum.
+- [`docs/iterum/EXCEL_FORMAT.md`](./docs/iterum/EXCEL_FORMAT.md) — Formato de XLSX aceptado.
+- [`docs/iterum/DEPLOY.md`](./docs/iterum/DEPLOY.md) — Deploy y rollback de Iterum.
+
+## Iterum · CX Management Platform
+
+Módulo de gestión integral del NPS (mayo 2026). Reemplaza al HTML standalone
+legacy `/content/iterum-cx` por una app full-stack con:
+
+- Ingesta server-side de XLSX (background jobs con ThreadPoolExecutor, polling de estado)
+- Deduplicación automática (hash sha256 por respuesta) → cargas incrementales seguras
+- Dashboard, ranking de asesores, breakdown por canal/célula, evolución temporal
+- Auditoría operativa con trazabilidad legal (NPSAccessLog: quién vio/editó qué)
+- Causa Raíz (5 Porqués) + plan de acción con responsable y vencimiento
+- Coaching con urgencia automática basada en proporción de detractores
+- Reporte ejecutivo persistido como snapshot + export **PDF nativo** (WeasyPrint)
+- Acceso vía dropdown navbar para superadmin/analista/supervisor (asesor sin acceso)
+
+Roles: superadmin (todo), analista (todo salvo snapshots), supervisor (read-only).
+Snapshots ejecutivos y consulta del access-log restringidos a superadmin.
+
+Arquitectura modular (`iterum/routes.py` + `api.py` + `services/*` + `models.py`),
+cada archivo bajo 500 líneas para facilitar mantenimiento. 27 tests automatizados
+cubren parser, dedupe, scoring, audit, root cause, coaching, permisos y access log.
 
 ---
 

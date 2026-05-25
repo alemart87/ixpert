@@ -1,0 +1,61 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Cargar datos{% endblock %}
+
+{% block iterum_filters %}{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Cargar datos NPS</h1>
+<p class="iterum-meta">Subí un archivo XLSX/XLS con las respuestas NPS. El sistema deduplica automáticamente respuestas ya cargadas.</p>
+
+<div class="iterum-card">
+    <div id="dropZone" class="iterum-dropzone">
+        <div class="iterum-dropzone-icon">⬆</div>
+        <p><strong>Arrastrá tu archivo aquí</strong> o</p>
+        <button id="pickFile" class="iterum-btn iterum-btn-primary">Seleccionar archivo</button>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+        <p class="iterum-meta">Formato XLSX o XLS, máximo 50 MB.</p>
+    </div>
+
+    <div id="uploadStatus" class="iterum-upload-status" style="display:none">
+        <h4 id="uploadStatusTitle">Procesando...</h4>
+        <div class="iterum-progress"><div class="iterum-progress-bar" id="uploadProgress"></div></div>
+        <p id="uploadStatusMessage" class="iterum-meta"></p>
+        <div id="uploadStatusDetails"></div>
+    </div>
+</div>
+
+<div class="iterum-card">
+    <h3>Columnas esperadas</h3>
+    <p class="iterum-meta">El parser detecta automáticamente variaciones de nombres. Mínimo necesario: fecha y NPS.</p>
+    <table class="iterum-table iterum-table-sm">
+        <thead><tr><th>Campo</th><th>Aliases reconocidos</th><th>Obligatorio</th></tr></thead>
+        <tbody>
+            <tr><td>response_date</td><td>fecha, fecha respuesta, date, timestamp</td><td>Sí</td></tr>
+            <tr><td>nps_score</td><td>nps, score, puntaje, nota, calificación</td><td>Sí</td></tr>
+            <tr><td>channel</td><td>canal, channel, medio</td><td>No</td></tr>
+            <tr><td>cell</td><td>célula, equipo, grupo, sector</td><td>No</td></tr>
+            <tr><td>agent_name</td><td>asesor, agente, operador</td><td>No</td></tr>
+            <tr><td>agent_doc</td><td>documento, doc, dni, cédula, legajo</td><td>No</td></tr>
+            <tr><td>comment</td><td>comentario, feedback, observación</td><td>No</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="iterum-card">
+    <h3>Historial de cargas</h3>
+    <table class="iterum-table" id="uploadsHistory">
+        <thead>
+            <tr>
+                <th>Archivo</th><th>Estado</th><th>Total</th><th>Nuevas</th>
+                <th>Duplicadas</th><th>Inválidas</th><th>Usuario</th><th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-upload.js') }}"></script>
+{% endblock %}

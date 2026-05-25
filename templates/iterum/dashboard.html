@@ -1,0 +1,69 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Dashboard{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Dashboard NPS</h1>
+<p class="iterum-meta" id="iterumLastUpdated"></p>
+
+<div class="iterum-kpi-grid">
+    <div class="iterum-kpi-card iterum-kpi-main">
+        <span class="iterum-kpi-label">NPS</span>
+        <span class="iterum-kpi-value" id="kpiNps">—</span>
+        <span class="iterum-kpi-sub" id="kpiTotal">0 respuestas</span>
+    </div>
+    <div class="iterum-kpi-card iterum-kpi-promotor">
+        <span class="iterum-kpi-label">Promotores</span>
+        <span class="iterum-kpi-value" id="kpiPromotor">—</span>
+        <span class="iterum-kpi-sub" id="kpiPromotorPct">0%</span>
+    </div>
+    <div class="iterum-kpi-card iterum-kpi-pasivo">
+        <span class="iterum-kpi-label">Pasivos</span>
+        <span class="iterum-kpi-value" id="kpiPasivo">—</span>
+        <span class="iterum-kpi-sub" id="kpiPasivoPct">0%</span>
+    </div>
+    <div class="iterum-kpi-card iterum-kpi-detractor">
+        <span class="iterum-kpi-label">Detractores</span>
+        <span class="iterum-kpi-value" id="kpiDetractor">—</span>
+        <span class="iterum-kpi-sub" id="kpiDetractorPct">0%</span>
+    </div>
+    <div class="iterum-kpi-card">
+        <span class="iterum-kpi-label">Score promedio</span>
+        <span class="iterum-kpi-value" id="kpiAvg">—</span>
+        <span class="iterum-kpi-sub">0 a 10</span>
+    </div>
+</div>
+
+<div class="iterum-grid-2">
+    <div class="iterum-card">
+        <h3>NPS por canal</h3>
+        <div id="byChannel" class="iterum-bar-list"></div>
+    </div>
+    <div class="iterum-card">
+        <h3>NPS por célula</h3>
+        <div id="byCell" class="iterum-bar-list"></div>
+    </div>
+</div>
+
+<div class="iterum-card">
+    <h3>Evolución temporal (NPS semanal)</h3>
+    <div id="timeseries" class="iterum-timeseries"></div>
+</div>
+
+<div class="iterum-card">
+    <h3>Últimas cargas</h3>
+    <table class="iterum-table" id="uploadsTable">
+        <thead>
+            <tr>
+                <th>Archivo</th><th>Estado</th><th>Nuevas</th>
+                <th>Duplicadas</th><th>Inválidas</th><th>Usuario</th><th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-dashboard.js') }}"></script>
+{% endblock %}

@@ -74,11 +74,21 @@ from admin import admin_bp
 from analytics import analytics_bp
 from chat import chat_bp
 from training import training_bp
+from iterum import iterum_bp
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(chat_bp)
 app.register_blueprint(training_bp)
+app.register_blueprint(iterum_bp)
+
+# Iterum: sweep de uploads colgados en 'processing' al arrancar el worker.
+# Best-effort, no rompe el boot si falla.
+try:
+    from iterum.services.jobs import sweep_stale_processing
+    sweep_stale_processing(app)
+except Exception as _e:
+    print(f"[INIT] Iterum sweep skipped: {_e}", flush=True)
 
 
 # ===== Auth routes directly in app (no blueprint) =====

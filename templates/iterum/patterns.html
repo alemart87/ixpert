@@ -1,0 +1,22 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Patrones{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Patrones</h1>
+<p class="iterum-meta">Análisis de palabras frecuentes en comentarios de detractores (top 30).</p>
+
+<div class="iterum-card">
+    <h3>Palabras más frecuentes en comentarios</h3>
+    <div id="wordCloud" class="iterum-wordcloud"></div>
+</div>
+
+<div class="iterum-card">
+    <h3>Clasificaciones más usadas</h3>
+    <div id="classificationStats" class="iterum-bar-list"></div>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-patterns.js') }}"></script>
+{% endblock %}

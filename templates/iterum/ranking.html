@@ -1,0 +1,25 @@
+{% extends "iterum/base_iterum.html" %}
+
+{% block title %}Iterum · Ranking{% endblock %}
+
+{% block iterum_content %}
+<h1 class="iterum-h1">Ranking de asesores</h1>
+<p class="iterum-meta">Solo se muestran asesores con 3 o más respuestas en el período filtrado.</p>
+
+<div class="iterum-card">
+    <table class="iterum-table" id="rankingTable">
+        <thead>
+            <tr>
+                <th>#</th><th>Asesor</th><th>Documento</th><th>NPS</th>
+                <th>Total</th><th>Promotores</th><th>Pasivos</th><th>Detractores</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody><tr><td colspan="9" class="iterum-meta" style="text-align:center">Sin datos</td></tr></tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block iterum_scripts %}
+<script src="{{ url_for('static', filename='iterum/js/iterum-ranking.js') }}"></script>
+{% endblock %}
