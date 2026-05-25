@@ -5,29 +5,38 @@
 {% block iterum_head %}{% endblock %}
 {% endblock %}
 
+{# Wrapper que rompe el max-width:1200px del <main> global #}
 {% block content %}
+<div class="iterum-fullbleed">
 <div class="iterum-shell">
-    <aside class="iterum-sidebar">
-        <h2 class="iterum-brand">🔁 Iterum</h2>
-        <p class="iterum-tagline">CX Management Platform</p>
-        <nav class="iterum-nav">
-            <a href="{{ url_for('iterum.dashboard') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.dashboard' %}active{% endif %}">📊 Dashboard</a>
-            <a href="{{ url_for('iterum.ranking') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.ranking' %}active{% endif %}">🏆 Ranking</a>
-            <a href="{{ url_for('iterum.comments') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.comments' %}active{% endif %}">💬 Comentarios</a>
-            <a href="{{ url_for('iterum.patterns') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.patterns' %}active{% endif %}">🔍 Patrones</a>
+    <div class="iterum-sidebar">
+        <div class="iterum-brand-block">
+            <div class="iterum-brand-logo">🔁</div>
+            <div>
+                <h2 class="iterum-brand">Iterum</h2>
+                <p class="iterum-tagline">CX Management</p>
+            </div>
+        </div>
+
+        <div class="iterum-nav">
+            <a href="{{ url_for('iterum.dashboard') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.dashboard' %}active{% endif %}"><span class="iterum-nav-icon">📊</span><span>Dashboard</span></a>
+            <a href="{{ url_for('iterum.ranking') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.ranking' %}active{% endif %}"><span class="iterum-nav-icon">🏆</span><span>Ranking</span></a>
+            <a href="{{ url_for('iterum.comments') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.comments' %}active{% endif %}"><span class="iterum-nav-icon">💬</span><span>Comentarios</span></a>
+            <a href="{{ url_for('iterum.patterns') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.patterns' %}active{% endif %}"><span class="iterum-nav-icon">🔍</span><span>Patrones</span></a>
             {% if current_user.can_admin_training %}
-            <a href="{{ url_for('iterum.audit') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.audit' %}active{% endif %}">📋 Auditoría</a>
-            <a href="{{ url_for('iterum.root_cause') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.root_cause' %}active{% endif %}">🎯 Causa Raíz</a>
+            <a href="{{ url_for('iterum.audit') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.audit' %}active{% endif %}"><span class="iterum-nav-icon">📋</span><span>Auditoría</span></a>
+            <a href="{{ url_for('iterum.root_cause') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.root_cause' %}active{% endif %}"><span class="iterum-nav-icon">🎯</span><span>Causa Raíz</span></a>
             {% endif %}
-            <a href="{{ url_for('iterum.coaching') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.coaching' %}active{% endif %}">👥 Coaching</a>
-            <a href="{{ url_for('iterum.report') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.report' %}active{% endif %}">📄 Reporte</a>
+            <a href="{{ url_for('iterum.coaching') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.coaching' %}active{% endif %}"><span class="iterum-nav-icon">👥</span><span>Coaching</span></a>
+            <a href="{{ url_for('iterum.report') }}" class="iterum-nav-link {% if request.endpoint == 'iterum.report' %}active{% endif %}"><span class="iterum-nav-icon">📄</span><span>Reporte</span></a>
             {% if current_user.can_admin_training %}
-            <hr class="iterum-nav-sep">
-            <a href="{{ url_for('iterum.upload_page') }}" class="iterum-nav-link iterum-nav-cta {% if request.endpoint == 'iterum.upload_page' %}active{% endif %}">⬆ Cargar datos</a>
+            <div class="iterum-nav-sep"></div>
+            <a href="{{ url_for('iterum.upload_page') }}" class="iterum-nav-link iterum-nav-cta {% if request.endpoint == 'iterum.upload_page' %}active{% endif %}"><span class="iterum-nav-icon">⬆</span><span>Cargar datos</span></a>
             {% endif %}
-        </nav>
-    </aside>
-    <section class="iterum-main">
+        </div>
+    </div>
+
+    <div class="iterum-main">
         {% block iterum_filters %}
         <div class="iterum-filters" id="iterumFilters">
             <select id="filterChannel" class="iterum-filter">
@@ -46,7 +55,8 @@
         <div class="iterum-content">
             {% block iterum_content %}{% endblock %}
         </div>
-    </section>
+    </div>
+</div>
 </div>
 
 <script src="{{ url_for('static', filename='iterum/js/iterum-core.js') }}"></script>

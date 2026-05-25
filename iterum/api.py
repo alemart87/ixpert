@@ -58,16 +58,25 @@ def api_upload():
         os.remove(tmp_path)
         return jsonify({'error': f'No se pudo leer el archivo: {e}'}), 400
 
-    # Si ya se subio el mismo archivo, devolver el upload existente
+    # Dedupe por file_hash. Si el upload previo del mismo archivo TERMINO BIEN
+    # (done) o esta en curso (pending/processing), devolvemos el existente.
+    # Si fallo, lo eliminamos para permitir reintentar (caso tipico: el parser
+    # mejoro y ahora si puede procesar el archivo que antes fallaba).
     existing = NPSUpload.query.filter_by(file_hash=fhash).first()
     if existing:
-        os.remove(tmp_path)
-        return jsonify({
-            'upload_id': existing.id,
-            'status': existing.status,
-            'duplicate_file': True,
-            'message': 'Este archivo ya fue procesado anteriormente.',
-        }), 200
+        if existing.status == 'failed':
+            db.session.delete(existing)
+            db.session.commit()
+            log_access('delete', 'upload', existing.id,
+                       {'reason': 'retry_after_failure', 'file_hash': fhash})
+        else:
+            os.remove(tmp_path)
+            return jsonify({
+                'upload_id': existing.id,
+                'status': existing.status,
+                'duplicate_file': True,
+                'message': 'Este archivo ya fue procesado anteriormente.',
+            }), 200
 
     size = os.path.getsize(tmp_path)
     upload = NPSUpload(
@@ -127,8 +136,10 @@ def api_upload_list():
             'id': u.id, 'filename': u.filename, 'status': u.status,
             'rows_new': u.rows_new, 'rows_duplicate': u.rows_duplicate,
             'rows_invalid': u.rows_invalid,
+            'rows_total': u.rows_total,
             'uploaded_by': u.uploader.name if u.uploader else '',
             'created_at': u.created_at.isoformat() if u.created_at else None,
+            'error_message': u.error_message,
         })
     return jsonify({'uploads': out})
 
