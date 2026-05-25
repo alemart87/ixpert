@@ -1,23 +1,41 @@
 /* Iterum AI Analyst — layout 3 columnas (sidebar + chat + canvas). */
 
-/* En la pagina AI, escapamos de los wrappers globales para usar full screen. */
+/* En la pagina AI escapamos de los wrappers globales y usamos flexbox real
+   para que el input quede siempre visible sin importar la altura del header. */
+html.iterum-ai-mode, html.iterum-ai-mode body {
+    height: 100vh;
+    overflow: hidden;
+}
+html.iterum-ai-mode body {
+    display: flex;
+    flex-direction: column;
+}
 html.iterum-ai-mode footer { display: none !important; }
 html.iterum-ai-mode main {
+    flex: 1 1 auto;
     padding: 0 !important;
     max-width: none !important;
     width: 100% !important;
     margin: 0 !important;
+    min-height: 0;       /* clave para que flex hijo pueda hacer overflow */
+    overflow: hidden;
+    display: flex;
 }
-html.iterum-ai-mode body { overflow: hidden; }
 
 .ai-shell {
     display: grid;
-    grid-template-columns: 260px minmax(0, 1fr) minmax(420px, 520px);
+    grid-template-columns: 240px minmax(0, 1fr) minmax(380px, 480px);
     gap: 0;
-    /* Full height del viewport menos header (~95px) y nav (~55px) */
-    height: calc(100vh - 150px);
-    min-height: 500px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
     background: var(--it-bg);
+}
+.ai-sidebar, .ai-chat-col, .ai-canvas-col {
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ============================================================================
@@ -557,40 +575,150 @@ html.iterum-ai-mode body { overflow: hidden; }
 }
 
 .ai-canvas-textarea {
-    flex: 0 0 50%;
-    padding: 16px 18px;
+    flex: 0 0 35%;
+    min-height: 120px;
+    padding: 14px 18px;
     border: none;
     resize: none;
     font-family: 'SF Mono', Consolas, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--it-text);
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--it-muted);
     outline: none;
-    background: #fafbfc;
+    background: #f9fafb;
     border-bottom: 1px solid var(--it-border);
 }
+.ai-canvas-textarea:focus { color: var(--it-text); background: #fff; }
 
 .ai-canvas-preview {
-    flex: 1;
-    padding: 16px 20px;
+    flex: 1 1 auto;
+    padding: 20px 24px;
     overflow-y: auto;
     color: var(--it-text);
-    background: #fff;
-    font-size: 13px;
-    line-height: 1.6;
+    background: linear-gradient(180deg, #fff, #fafbfc);
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 0;
 }
+.ai-canvas-preview > *:first-child { margin-top: 0; }
 .ai-canvas-preview h1, .ai-canvas-preview h2, .ai-canvas-preview h3 {
-    margin: 14px 0 6px; color: var(--it-text);
+    margin: 18px 0 8px;
+    color: var(--it-text);
+    font-weight: 700;
+    letter-spacing: -0.2px;
 }
-.ai-canvas-preview h1 { font-size: 18px; border-bottom: 1px solid var(--it-border); padding-bottom: 4px; }
-.ai-canvas-preview h2 { font-size: 16px; }
-.ai-canvas-preview h3 { font-size: 14px; color: #6366f1; }
-.ai-canvas-preview ul, .ai-canvas-preview ol { padding-left: 22px; }
-.ai-canvas-preview li { margin: 3px 0; }
-.ai-canvas-preview strong { color: var(--it-text); font-weight: 600; }
+.ai-canvas-preview h1 {
+    font-size: 22px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border-bottom: 2px solid #e0e7ff;
+    padding-bottom: 6px;
+}
+.ai-canvas-preview h2 {
+    font-size: 17px;
+    color: #4f46e5;
+    border-left: 4px solid #6366f1;
+    padding-left: 10px;
+}
+.ai-canvas-preview h3 {
+    font-size: 14px;
+    color: #6366f1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.ai-canvas-preview p { margin: 8px 0; }
+.ai-canvas-preview ul, .ai-canvas-preview ol {
+    padding-left: 24px;
+    margin: 10px 0;
+}
+.ai-canvas-preview ul li, .ai-canvas-preview ol li {
+    margin: 6px 0;
+    line-height: 1.55;
+}
+.ai-canvas-preview ul li::marker { color: #6366f1; }
+.ai-canvas-preview ol li::marker { color: #a855f7; font-weight: 700; }
+.ai-canvas-preview strong {
+    color: var(--it-text);
+    font-weight: 700;
+    background: linear-gradient(180deg, transparent 60%, #fef3c7 60%);
+    padding: 0 2px;
+}
+.ai-canvas-preview em { color: #6b7280; font-style: italic; }
 .ai-canvas-preview code {
-    background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 11px;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #be185d;
+    font-family: 'SF Mono', Consolas, monospace;
 }
+.ai-canvas-preview pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+.ai-canvas-preview pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+}
+.ai-canvas-preview blockquote {
+    border-left: 4px solid #fbbf24;
+    background: #fffbeb;
+    padding: 10px 14px;
+    margin: 12px 0;
+    color: #92400e;
+    border-radius: 0 6px 6px 0;
+}
+.ai-canvas-preview hr {
+    border: none;
+    border-top: 1px dashed var(--it-border);
+    margin: 20px 0;
+}
+.ai-canvas-preview table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 14px 0;
+    width: 100%;
+    font-size: 12.5px;
+    border: 1px solid var(--it-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--it-shadow);
+}
+.ai-canvas-preview table th, .ai-canvas-preview table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: left;
+}
+.ai-canvas-preview table tr:first-child td,
+.ai-canvas-preview table th {
+    background: linear-gradient(180deg, #eef2ff, #e0e7ff);
+    color: #4338ca;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+}
+.ai-canvas-preview table tr:last-child td { border-bottom: none; }
+.ai-canvas-preview table tbody tr:hover { background: #fafbfc; }
+.ai-canvas-preview a {
+    color: #6366f1;
+    text-decoration: none;
+    border-bottom: 1px dashed #c7d2fe;
+}
+.ai-canvas-preview a:hover { color: #4338ca; border-bottom-style: solid; }
+/* Callouts: parrafos que arrancan con [!nota], [!alerta], [!ok] */
+.ai-canvas-preview p:has(strong:first-child) { /* fallback styling */ }
 
 .ai-canvas-flash {
     animation: ai-canvas-flash 0.7s ease;
