@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Iterum · AI Analyst{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='iterum/css/iterum-ai.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="iterum-fullbleed">
+<div class="ai-shell">
+    <!-- Sidebar: historial de chats -->
+    <aside class="ai-sidebar">
+        <div class="ai-brand">
+            <div class="ai-brand-icon">🤖</div>
+            <div>
+                <h2>AI Analyst</h2>
+                <p>Iterum · gpt-5.4</p>
+            </div>
+        </div>
+        <button id="aiNewChat" class="ai-btn ai-btn-primary ai-btn-block">＋ Nueva conversación</button>
+        <div class="ai-chats-list" id="aiChatsList"></div>
+        <a href="{{ url_for('iterum.dashboard') }}" class="ai-back-link">← Volver al dashboard</a>
+    </aside>
+
+    <!-- Chat central -->
+    <section class="ai-chat-col">
+        <header class="ai-chat-header">
+            <h1 id="aiChatTitle">Seleccioná o creá una conversación</h1>
+            <div class="ai-chat-meta">
+                <span id="aiChatTokens" class="ai-meta-chip"></span>
+                <button id="aiRenameChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Renombrar">✏️</button>
+                <button id="aiArchiveChat" class="ai-btn ai-btn-ghost ai-btn-sm" title="Archivar">🗑</button>
+                <button id="aiToggleCanvas" class="ai-btn ai-btn-ghost ai-btn-sm" title="Mostrar/ocultar canvas">📋</button>
+            </div>
+        </header>
+
+        <div class="ai-messages" id="aiMessages">
+            <div class="ai-welcome">
+                <h2>👋 Hola SuperAdmin</h2>
+                <p>Soy tu analista IA de Iterum. Pensemos juntos cómo mejorar el NPS.</p>
+                <div class="ai-suggestions">
+                    <button class="ai-suggestion">📊 Resumime la semana</button>
+                    <button class="ai-suggestion">🚨 Qué asesores necesitan coaching urgente</button>
+                    <button class="ai-suggestion">📉 Por qué bajó el NPS</button>
+                    <button class="ai-suggestion">🎯 Plan de acción para PERSONAL BANK</button>
+                    <button class="ai-suggestion">🔍 Top 5 detractores con causa raíz</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-input-area">
+            <textarea id="aiInput" placeholder="Escribí tu pregunta... (Enter para enviar, Shift+Enter nueva línea)" rows="2"></textarea>
+            <button id="aiSend" class="ai-btn ai-btn-primary" title="Enviar (Enter)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/></svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Canvas / Workspace -->
+    <aside class="ai-canvas-col" id="aiCanvasCol">
+        <header class="ai-canvas-header">
+            <input type="text" id="aiCanvasTitle" class="ai-canvas-title-input" placeholder="Workspace">
+            <span class="ai-canvas-version" id="aiCanvasVersion">v0</span>
+            <button id="aiCanvasSave" class="ai-btn ai-btn-ghost ai-btn-sm">💾 Guardar</button>
+        </header>
+        <textarea id="aiCanvas" class="ai-canvas-textarea"
+            placeholder="El AI Analyst va a escribir acá planes de acción, listados, drafts...&#10;&#10;Vos también podés editar — todo queda en esta conversación."></textarea>
+        <div class="ai-canvas-preview" id="aiCanvasPreview"></div>
+    </aside>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='iterum/js/iterum-ai.js') }}"></script>
+{% endblock %}
