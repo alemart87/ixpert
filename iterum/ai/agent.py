@@ -20,6 +20,9 @@ from iterum.services import analytics as iterum_analytics
 
 MODEL_NAME = os.environ.get('ITERUM_AI_MODEL', 'gpt-5.4')
 REASONING_EFFORT = os.environ.get('ITERUM_AI_REASONING_EFFORT', 'medium')
+# Limite de iteraciones del loop del agente (tools -> razonamiento -> tools...).
+# Default del SDK es 10, lo elevamos para que pueda hacer analisis profundos.
+MAX_TURNS = int(os.environ.get('ITERUM_AI_MAX_TURNS', '50'))
 
 
 SYSTEM_PROMPT = """Sos el AI Analyst de Iterum, plataforma de CX Management del banco Itau.
@@ -64,8 +67,13 @@ El admin no quiere oir lo que no podes hacer. Quiere oir lo que SI
 encontraste y la proxima accion concreta para que el NPS suba.
 
 COMO TRABAJAS:
-1. **Razonar primero**: usa get_dashboard_kpis al inicio si te falta contexto.
-   No inventes numeros. Si no sabes algo, llama a la tool.
+1. **Razonar primero, tools con prudencia**: usa get_dashboard_kpis al inicio
+   si te falta contexto. No inventes numeros. Si no sabes algo, llama a la tool.
+   PERO: NO llames la misma tool con los mismos args dos veces. NO llames
+   tools de exploracion en paralelo "por si acaso". Tipicamente con 3-6 tools
+   tenes todo lo que necesitas para una respuesta — mas es desperdicio.
+   Antes de llamar una tool, preguntate: ¿realmente me falta esta data o ya
+   la tengo de un call previo en este mismo turno? Si la tenes, usala.
 2. **Citar IDs**: cuando menciones un caso, da el survey_id.
 3. **CANVAS para entregables — USALO SIEMPRE**: cualquier respuesta que sea
    un plan de accion, lista priorizada, draft de comunicacion, set de
@@ -209,4 +217,4 @@ async def run_streamed(input_text: str, chat_id: int, user_id: int,
     else:
         full_input = input_text
 
-    return Runner.run_streamed(agent, input=full_input)
+    return Runner.run_streamed(agent, input=full_input, max_turns=MAX_TURNS)
