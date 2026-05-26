@@ -78,18 +78,37 @@
     mermaid.initialize({
         startOnLoad: false,
         theme: 'base',
+        // Paleta corporativa Itaú navy + gold. Mantiene legibilidad por default
+        // y permite que el modelo aplique `style NODO fill:...` para acentos.
         themeVariables: {
-            primaryColor: '#002776',
-            primaryTextColor: '#ffffff',
-            primaryBorderColor: '#c8a247',
-            lineColor: '#64748b',
-            secondaryColor: '#c8a247',
-            tertiaryColor: '#f1f5f9',
+            primaryColor: '#f8fafc',          // fondo de nodos default = slate claro
+            primaryTextColor: '#0f172a',      // texto de nodos = slate-900
+            primaryBorderColor: '#002776',    // borde nodos = navy
+            secondaryColor: '#fef3c7',        // amarillo claro (segundo grupo)
+            secondaryTextColor: '#7a5b00',
+            secondaryBorderColor: '#c8a247',
+            tertiaryColor: '#eff6ff',         // azul claro (tercer grupo)
+            tertiaryTextColor: '#1e3a8a',
+            tertiaryBorderColor: '#1e40af',
+            mainBkg: '#f8fafc',
+            nodeBkg: '#f8fafc',
+            nodeTextColor: '#0f172a',
+            lineColor: '#64748b',             // lineas = slate-500
+            edgeLabelBackground: '#ffffff',
             background: '#ffffff',
-            mainBkg: '#002776',
-            secondBkg: '#c8a247',
-            fontFamily: 'Inter, sans-serif',
+            fontFamily: 'Inter, -apple-system, sans-serif',
+            fontSize: '13px',
+            // Mindmap especifico
+            cScale0: '#002776', cScaleLabel0: '#ffffff',
+            cScale1: '#c8a247', cScaleLabel1: '#1f1300',
+            cScale2: '#1e40af', cScaleLabel2: '#ffffff',
+            cScale3: '#dc2626', cScaleLabel3: '#ffffff',
+            cScale4: '#16a34a', cScaleLabel4: '#ffffff',
+            cScale5: '#d97706', cScaleLabel5: '#ffffff',
         },
+        flowchart: { curve: 'basis', useMaxWidth: true, htmlLabels: true },
+        mindmap: { useMaxWidth: true, padding: 20 },
+        gantt: { useMaxWidth: true, fontFamily: 'Inter' },
     });
     window.IterumMermaid = mermaid;
     // Notificar al main script

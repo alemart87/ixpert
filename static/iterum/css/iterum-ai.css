@@ -929,16 +929,81 @@ body.ai-resizing iframe { pointer-events: none !important; }
 
 /* Mermaid diagrams */
 .ai-mermaid-block {
-    background: var(--ai-slate-50);
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
     border: 1px solid var(--ai-slate-200);
-    border-radius: 4px;
-    padding: 18px;
-    margin: 14px 0;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 16px 0;
     text-align: center;
     overflow-x: auto;
+    box-shadow: var(--ai-shadow-sm);
 }
-.ai-mermaid-block svg { max-width: 100%; height: auto; }
-.ai-mermaid-loading { color: var(--ai-slate-500); font-size: 12px; padding: 20px; }
+.ai-mermaid-block svg {
+    max-width: 100%;
+    height: auto;
+}
+/* Defaults legibles para mermaid (anula los oscuros que rompen contraste) */
+.ai-mermaid-block .node rect,
+.ai-mermaid-block .node circle,
+.ai-mermaid-block .node ellipse,
+.ai-mermaid-block .node polygon,
+.ai-mermaid-block .node path {
+    stroke-width: 1.5px !important;
+}
+.ai-mermaid-block .node:not([style*="fill"]) rect,
+.ai-mermaid-block .node:not([style*="fill"]) circle,
+.ai-mermaid-block .node:not([style*="fill"]) polygon {
+    fill: #f8fafc !important;
+    stroke: var(--ai-navy) !important;
+}
+.ai-mermaid-block .nodeLabel,
+.ai-mermaid-block .node .label {
+    color: var(--ai-slate-900) !important;
+    fill: var(--ai-slate-900) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+/* Mindmap: nodos coloreados explicitamente */
+.ai-mermaid-block .mindmap-node > rect,
+.ai-mermaid-block .mindmap-node > circle {
+    fill: var(--ai-slate-50) !important;
+    stroke: var(--ai-navy) !important;
+    stroke-width: 1.5px !important;
+}
+.ai-mermaid-block .mindmap-node.section-root > rect,
+.ai-mermaid-block .mindmap-node.section-root > circle {
+    fill: var(--ai-navy) !important;
+    stroke: var(--ai-gold) !important;
+    stroke-width: 2.5px !important;
+}
+.ai-mermaid-block .mindmap-node.section-root .nodeLabel,
+.ai-mermaid-block .mindmap-node.section-root text {
+    fill: #fff !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+}
+.ai-mermaid-block .edge path,
+.ai-mermaid-block .edgePath path,
+.ai-mermaid-block .flowchart-link,
+.ai-mermaid-block path.edge {
+    stroke: var(--ai-slate-500) !important;
+    stroke-width: 1.5px !important;
+    fill: none !important;
+}
+.ai-mermaid-block .edgeLabel {
+    background-color: #fff !important;
+    color: var(--ai-slate-700) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+}
+.ai-mermaid-loading {
+    color: var(--ai-slate-500);
+    font-size: 12px;
+    padding: 20px;
+    font-style: italic;
+}
 
 .ai-canvas-flash {
     box-shadow: inset 0 0 0 3px var(--ai-gold);
