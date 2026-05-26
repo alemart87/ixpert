@@ -15,6 +15,7 @@ from datetime import datetime, date
 from typing import Annotated
 
 from agents import function_tool
+from pydantic import BaseModel, Field
 
 from models import db
 from iterum.models import NPSSurvey
@@ -232,6 +233,293 @@ def compare_periods(
 
 
 # ============================================================================
+# FRAMEWORKS DE ANALISIS (devuelven markdown listo para el canvas)
+# ============================================================================
+@function_tool
+def generate_ishikawa_estimate(
+    channel: str | None = None,
+    cell: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> dict:
+    """Genera un diagrama Ishikawa (6M) tentativo de las causas raiz del NPS bajo,
+    cruzando los datos disponibles. Devuelve markdown listo para canvas con un
+    flowchart mermaid + interpretacion. Las 6 categorias adaptadas a CX bancario:
+    Persona (asesor), Proceso, Producto, Plataforma, Politica, Cliente.
+
+    Es una HIPOTESIS analitica basada en patrones; el admin debe validar."""
+    from collections import Counter
+    f = _parse_filters(channel=channel, cell=cell,
+                       from_date=from_date, to_date=to_date)
+    kpis = analytics.dashboard_full(**f)
+    detractors = NPSSurvey.query.filter(NPSSurvey.category == 'detractor')
+    if f.get('channel'): detractors = detractors.filter(NPSSurvey.channel == f['channel'])
+    if f.get('cell'): detractors = detractors.filter(NPSSurvey.cell == f['cell'])
+    if f.get('from_date'): detractors = detractors.filter(NPSSurvey.response_date >= f['from_date'])
+    if f.get('to_date'): detractors = detractors.filter(NPSSurvey.response_date < f['to_date'])
+    rows = detractors.limit(500).all()
+
+    # Heuristica de clasificacion por palabras en motivo/origen/comment
+    classify = {'Persona': 0, 'Proceso': 0, 'Producto': 0,
+                'Plataforma': 0, 'Politica': 0, 'Cliente': 0}
+    examples: dict[str, list[str]] = {k: [] for k in classify}
+    KEYWORDS = {
+        'Persona': ['asesor', 'mal trato', 'empatia', 'capacitacion', 'comunicacion', 'atencion'],
+        'Proceso': ['demora', 'tarda', 'tiempo', 'retorno', 'derivacion', 'transferir', 'sla'],
+        'Producto': ['producto', 'prestamo', 'tarjeta', 'comision', 'tasa', 'limite'],
+        'Plataforma': ['app', 'sistema', 'web', 'caido', 'error', 'tecnico', 'pin', 'token'],
+        'Politica': ['regla', 'politica', 'restriccion', 'requisito', 'aprobacion'],
+        'Cliente': ['informado', 'no entiende', 'expectativa', 'desconoc'],
+    }
+    for s in rows:
+        haystack = ' '.join(filter(None, [
+            (s.comment or '').lower(),
+            (s.motive or '').lower(),
+            (s.origin or '').lower(),
+            (s.root_cause_type or '').lower(),
+        ]))
+        for cat, words in KEYWORDS.items():
+            if any(w in haystack for w in words):
+                classify[cat] += 1
+                if s.comment and len(examples[cat]) < 3:
+                    examples[cat].append(s.comment[:120])
+                break
+    total_clasificados = sum(classify.values()) or 1
+
+    md = f"""# Ishikawa (6M) — Hipotesis de causa raiz NPS
+
+**NPS actual:** {kpis.get('nps', '—')}% · **Detractores:** {kpis.get('detractores', 0)} · **Resolucion:** {kpis.get('resolucion_pct') or '—'}%
+
+```flowchart
+LR
+  ROOT[NPS por debajo del objetivo 77%]
+  PERS[Persona<br/>{classify['Persona']} casos] --> ROOT
+  PROC[Proceso<br/>{classify['Proceso']} casos] --> ROOT
+  PROD[Producto<br/>{classify['Producto']} casos] --> ROOT
+  PLAT[Plataforma<br/>{classify['Plataforma']} casos] --> ROOT
+  POLI[Politica<br/>{classify['Politica']} casos] --> ROOT
+  CLI[Cliente<br/>{classify['Cliente']} casos] --> ROOT
+  style ROOT fill:#002776,stroke:#c8a247,color:#fff,stroke-width:2px
+  style PERS fill:#fef2f2,stroke:#dc2626
+  style PROC fill:#fffbeb,stroke:#d97706
+  style PROD fill:#f0fdf4,stroke:#16a34a
+  style PLAT fill:#eff6ff,stroke:#1e40af
+  style POLI fill:#fdf4ff,stroke:#a21caf
+  style CLI fill:#f8fafc,stroke:#64748b
+```
+
+## Interpretacion por categoria
+"""
+    for cat, count in sorted(classify.items(), key=lambda x: -x[1]):
+        pct = round(100 * count / total_clasificados)
+        md += f"\n### {cat} ({count} casos · {pct}%)\n"
+        if examples[cat]:
+            for ex in examples[cat]:
+                md += f"- > {ex}\n"
+        else:
+            md += "_Sin ejemplos clasificados._\n"
+    md += """
+## Lectura
+La categoria con mas casos NO es necesariamente la causa raiz unica; suele ser un sintoma.
+Cruza con `add_root_cause_analysis(survey_id, ...)` para profundizar en cada caso critico.
+"""
+    return {'markdown': md, 'classification': classify, 'total': total_clasificados}
+
+
+@function_tool
+def generate_pareto_motives(
+    top_n: Annotated[int, 'Cantidad de items en el Pareto'] = 10,
+    channel: str | None = None,
+    cell: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> dict:
+    """Analisis de Pareto (80/20) sobre los motivos de detractores. Devuelve
+    una tabla acumulada que muestra cuales pocos motivos generan la mayoria de
+    los casos. Util para priorizar acciones."""
+    from collections import Counter
+    f = _parse_filters(channel=channel, cell=cell,
+                       from_date=from_date, to_date=to_date)
+    q = NPSSurvey.query.filter(NPSSurvey.category == 'detractor')
+    if f.get('channel'): q = q.filter(NPSSurvey.channel == f['channel'])
+    if f.get('cell'): q = q.filter(NPSSurvey.cell == f['cell'])
+    if f.get('from_date'): q = q.filter(NPSSurvey.response_date >= f['from_date'])
+    if f.get('to_date'): q = q.filter(NPSSurvey.response_date < f['to_date'])
+    rows = q.all()
+
+    motives = Counter(s.motive for s in rows if s.motive)
+    cells = Counter(s.cell for s in rows if s.cell)
+    agents = Counter(s.agent_name for s in rows if s.agent_name)
+
+    def _pareto(counter, n):
+        items = counter.most_common(n)
+        total = sum(counter.values()) or 1
+        out, cum = [], 0
+        for label, count in items:
+            pct = round(100 * count / total, 1)
+            cum += pct
+            out.append({'label': label, 'count': count, 'pct': pct, 'cum_pct': round(cum, 1)})
+        return out, total
+
+    pm, ptm = _pareto(motives, top_n)
+    pc, ptc = _pareto(cells, top_n)
+    pa, pta = _pareto(agents, top_n)
+
+    def _table(rows, header):
+        if not rows:
+            return f'_{header}: sin datos_\n\n'
+        s = f'### {header}\n\n| # | {header} | Casos | % | Acum % |\n|---|---|---|---|---|\n'
+        for i, r in enumerate(rows, 1):
+            s += f"| {i} | {r['label']} | {r['count']} | {r['pct']}% | {r['cum_pct']}% |\n"
+        s += '\n'
+        return s
+
+    md = f"""# Analisis de Pareto (80/20) — Detractores
+
+Total detractores analizados: **{len(rows)}**
+
+{_table(pm, 'Motivo')}
+{_table(pc, 'Celula')}
+{_table(pa, 'Asesor')}
+
+## Lectura
+Foco los motivos cuya **Acum %** llega al ~80%. Suelen ser 2-4 items que concentran
+la mayoria del problema. Ataca esos primero — mueven la aguja.
+"""
+    return {
+        'markdown': md,
+        'motives': pm, 'cells': pc, 'agents': pa,
+        'totals': {'motives': ptm, 'cells': ptc, 'agents': pta},
+    }
+
+
+class ImpactEffortAction(BaseModel):
+    action: str = Field(description='Texto descriptivo de la accion')
+    impact: str = Field(description='alto | medio | bajo')
+    effort: str = Field(description='alto | medio | bajo')
+
+
+@function_tool
+def generate_impact_effort_matrix(
+    actions: Annotated[list[ImpactEffortAction], 'Lista de acciones con impact y effort'],
+) -> dict:
+    """Clasifica una lista de acciones en 4 cuadrantes (Impacto x Esfuerzo)
+    para priorizar. Devuelve markdown con tabla por cuadrante. El modelo arma
+    la lista de acciones a partir de las recomendaciones derivadas del analisis.
+    Cada accion debe tener: action (texto), impact (alto/medio/bajo), effort (id)."""
+    QUADRANTS = {
+        'quick_wins': {'label': 'Quick Wins (alto impacto / bajo esfuerzo)', 'items': [], 'color': '#16a34a'},
+        'big_bets': {'label': 'Big Bets (alto impacto / alto esfuerzo)', 'items': [], 'color': '#1e40af'},
+        'fill_ins': {'label': 'Fill-Ins (bajo impacto / bajo esfuerzo)', 'items': [], 'color': '#fbbf24'},
+        'time_wasters': {'label': 'Time Wasters (bajo impacto / alto esfuerzo)', 'items': [], 'color': '#dc2626'},
+    }
+    def _bucket(a):
+        impact = (a.impact or '').lower()
+        effort = (a.effort or '').lower()
+        hi_imp = impact in ('alto', 'high', 'a')
+        hi_eff = effort in ('alto', 'high', 'a')
+        if hi_imp and not hi_eff: return 'quick_wins'
+        if hi_imp and hi_eff: return 'big_bets'
+        if not hi_imp and not hi_eff: return 'fill_ins'
+        return 'time_wasters'
+
+    for a in (actions or []):
+        QUADRANTS[_bucket(a)]['items'].append(a.action)
+
+    md = """# Matriz de Impacto vs Esfuerzo
+
+Prioriza primero los **Quick Wins**. Despues los **Big Bets** con plan formal.
+Evita Time Wasters salvo que sean obligatorios por compliance.
+
+| Cuadrante | Acciones |
+|-----------|----------|
+"""
+    for key in ('quick_wins', 'big_bets', 'fill_ins', 'time_wasters'):
+        q = QUADRANTS[key]
+        items = '<br/>'.join(f'• {a}' for a in q['items']) or '_(vacio)_'
+        md += f"| **{q['label']}** | {items} |\n"
+
+    md += """
+## Siguiente paso recomendado
+1. Empezar la semana 1 con todos los Quick Wins
+2. Asignar owner+fecha a los Big Bets, dividirlos en milestones
+3. Revisar matriz en 30 dias y reclasificar
+"""
+    return {'markdown': md, 'quadrants': {k: v['items'] for k, v in QUADRANTS.items()}}
+
+
+@function_tool
+def generate_executive_summary(
+    period_label: Annotated[str, 'Etiqueta del periodo (ej: "Semana 21 · Mayo 2026")'],
+    channel: str | None = None,
+    cell: str | None = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> dict:
+    """Genera un resumen ejecutivo estructurado del periodo seleccionado,
+    formato 1 pagina para directivos. Incluye: situacion, hallazgos, riesgos,
+    acciones recomendadas y proximo punto de control. Devuelve markdown."""
+    f = _parse_filters(channel=channel, cell=cell,
+                       from_date=from_date, to_date=to_date)
+    kpis = analytics.dashboard_full(**f)
+    rc = analytics.root_cause_analytics(**f)
+    top_alerts = analytics.top_alert_agents(limit=5, **f)
+    keywords = analytics.keyword_patterns(**f)
+    target = analytics.OBJETIVO_NPS_CANAL
+    gap = (target - (kpis.get('nps') or 0)) if kpis.get('nps') is not None else None
+
+    def _top(items, n=3):
+        return [(it.get('label'), it.get('count')) for it in (items or [])[:n]]
+
+    motivos_top = _top(rc.get('motivo', []))
+    causas_top = _top(rc.get('tipo_causa', []))
+    keywords_top = _top(keywords, 3)
+
+    md = f"""# Resumen ejecutivo — {period_label}
+
+## 1. Situacion
+- **NPS:** {kpis.get('nps', '—')}% (objetivo {target}%)
+- **Gap vs objetivo:** {f'-{gap:.1f} pts' if gap is not None and gap > 0 else 'al objetivo o por encima'}
+- **Encuestas:** {kpis.get('total', 0)} · Promotores {kpis.get('promotores', 0)} · Detractores {kpis.get('detractores', 0)}
+- **Resolucion en primer contacto:** {kpis.get('resolucion_pct') or '—'}%
+- **Esfuerzo alto (muy dificil):** {kpis.get('muy_dificil', 0)} casos
+
+## 2. Hallazgos principales
+"""
+    if motivos_top:
+        md += "**Motivos del cliente mas recurrentes (detractores):**\n"
+        for label, count in motivos_top:
+            md += f"- {label}: {count} casos\n"
+    if causas_top:
+        md += "\n**Tipos de causa raiz identificados:**\n"
+        for label, count in causas_top:
+            md += f"- {label}: {count} casos\n"
+    if keywords_top:
+        md += "\n**Patrones detectados en comentarios libres:**\n"
+        for label, count in keywords_top:
+            md += f"- {label}: {count} menciones\n"
+
+    md += "\n## 3. Asesores que demandan accion inmediata\n"
+    if top_alerts:
+        md += "| Asesor | Alertas |\n|---|---|\n"
+        for a in top_alerts:
+            md += f"| {a['agent_name']} | {a['alerts']} |\n"
+    else:
+        md += "_Sin alertas individuales destacadas._\n"
+
+    md += """
+## 4. Acciones recomendadas (proximos 7 dias)
+1. Coaching express con los asesores listados arriba.
+2. Auditar el motivo #1 del Pareto, mapear el flujo y ajustar SLA.
+3. Cerrar el ciclo con los detractores no resueltos (callback).
+
+## 5. Proximo punto de control
+Revisar este mismo resumen en 7 dias. Esperable: bajar 2-3 pts el gap.
+"""
+    return {'markdown': md, 'kpis': kpis, 'gap': gap}
+
+
+# ============================================================================
 # CANVAS — workspace compartido con el admin
 # ============================================================================
 def _get_or_create_canvas(chat_id: int) -> IterumAICanvas:
@@ -377,6 +665,11 @@ ALL_TOOLS = [
     get_coaching_panel,
     search_comments,
     compare_periods,
+    # Frameworks de analisis
+    generate_ishikawa_estimate,
+    generate_pareto_motives,
+    generate_impact_effort_matrix,
+    generate_executive_summary,
     # Canvas
     canvas_write,
     canvas_append,
