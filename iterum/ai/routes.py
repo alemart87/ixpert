@@ -25,7 +25,7 @@ from models import db, User
 from iterum.routes import iterum_bp
 from iterum.permissions import iterum_admin_required, log_access
 from iterum.ai.models import IterumAIChat, IterumAIMessage, IterumAICanvas
-from iterum.ai.agent import run_streamed, MODEL_NAME
+from iterum.ai.agent import run_streamed, MODEL_NAME, MAX_TURNS
 
 
 # ============================================================================
@@ -331,8 +331,20 @@ def ai_send_message(chat_id):
             except Exception as e:
                 import traceback
                 tb = traceback.format_exc()
-                current_app.logger.exception('[iterum.ai] stream error')
-                q.put({'event': 'error', 'data': {'error': str(e), 'trace': tb[:2000]}})
+                exc_name = type(e).__name__
+                friendly = str(e)
+                # Si pegamos contra el limite de turnos, mensaje claro
+                if 'MaxTurns' in exc_name or 'max_turns' in friendly.lower():
+                    friendly = (
+                        f'El agente uso las {MAX_TURNS} iteraciones disponibles. '
+                        'Decime que querias y lo retomamos en una conversacion nueva mas '
+                        'enfocada, o subimos ITERUM_AI_MAX_TURNS en config.'
+                    )
+                current_app.logger.exception('[iterum.ai] stream error: %s', exc_name)
+                q.put({'event': 'error', 'data': {
+                    'error': friendly, 'type': exc_name,
+                    'trace': tb[:2000],
+                }})
             finally:
                 q.put(None)  # sentinel
 
