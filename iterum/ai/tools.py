@@ -292,20 +292,20 @@ def generate_ishikawa_estimate(
 
 ```flowchart
 LR
-  ROOT[NPS por debajo del objetivo 77%]
-  PERS[Persona<br/>{classify['Persona']} casos] --> ROOT
-  PROC[Proceso<br/>{classify['Proceso']} casos] --> ROOT
-  PROD[Producto<br/>{classify['Producto']} casos] --> ROOT
-  PLAT[Plataforma<br/>{classify['Plataforma']} casos] --> ROOT
-  POLI[Politica<br/>{classify['Politica']} casos] --> ROOT
-  CLI[Cliente<br/>{classify['Cliente']} casos] --> ROOT
-  style ROOT fill:#002776,stroke:#c8a247,color:#fff,stroke-width:2px
-  style PERS fill:#fef2f2,stroke:#dc2626
-  style PROC fill:#fffbeb,stroke:#d97706
-  style PROD fill:#f0fdf4,stroke:#16a34a
-  style PLAT fill:#eff6ff,stroke:#1e40af
-  style POLI fill:#fdf4ff,stroke:#a21caf
-  style CLI fill:#f8fafc,stroke:#64748b
+  ROOT["NPS por debajo<br/>del objetivo 77%"]
+  PERS["Persona<br/>{classify['Persona']} casos"] --> ROOT
+  PROC["Proceso<br/>{classify['Proceso']} casos"] --> ROOT
+  PROD["Producto<br/>{classify['Producto']} casos"] --> ROOT
+  PLAT["Plataforma<br/>{classify['Plataforma']} casos"] --> ROOT
+  POLI["Politica<br/>{classify['Politica']} casos"] --> ROOT
+  CLI["Cliente<br/>{classify['Cliente']} casos"] --> ROOT
+  style ROOT fill:#002776,stroke:#c8a247,color:#ffffff,stroke-width:3px
+  style PERS fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+  style PROC fill:#fffbeb,stroke:#d97706,color:#7a5b00
+  style PROD fill:#f0fdf4,stroke:#16a34a,color:#14532d
+  style PLAT fill:#eff6ff,stroke:#1e40af,color:#1e3a8a
+  style POLI fill:#fdf4ff,stroke:#a21caf,color:#581c87
+  style CLI fill:#f8fafc,stroke:#64748b,color:#334155
 ```
 
 ## Interpretacion por categoria
