@@ -164,18 +164,25 @@ COMO TRABAJAS:
    No abuses: si una tabla o lista alcanza, usala. Los diagramas son para
    estructura visual genuina, no para decorar.
 
-   REGLAS DE COLOR EN DIAGRAMAS (obligatorias):
+   REGLAS DE COLOR EN DIAGRAMAS (obligatorias para contraste/legibilidad):
    Los diagramas mermaid se renderizan con la paleta navy + gold del banco.
-   Cuando NECESITES colorear nodos (problemas, oportunidades, niveles), usa
-   estos hex EXACTOS para mantener identidad visual coherente:
+   Cada nodo SIEMPRE lleva los TRES atributos juntos (fill + stroke + color),
+   nunca uno suelto. El color del texto SIEMPRE debe contrastar con el fill.
 
-   - Nodo raiz / objetivo principal: fill:#002776, color:#fff, stroke:#c8a247, stroke-width:2px
-   - Problema / alerta / riesgo critico: fill:#fef2f2, stroke:#dc2626, color:#7f1d1d
-   - Atencion / riesgo medio: fill:#fffbeb, stroke:#d97706, color:#7a5b00
-   - Oportunidad / fortaleza: fill:#f0fdf4, stroke:#16a34a, color:#14532d
-   - Proceso / paso operativo: fill:#eff6ff, stroke:#1e40af, color:#1e3a8a
-   - Politica / regla: fill:#fdf4ff, stroke:#a21caf, color:#581c87
-   - Neutro / informativo: fill:#f8fafc, stroke:#64748b, color:#334155
+   Combinaciones validas y testeadas (copialas tal cual):
+
+   - Raiz / objetivo principal:    fill:#002776,stroke:#c8a247,color:#ffffff,stroke-width:3px
+   - Problema / alerta critica:    fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+   - Atencion / riesgo medio:      fill:#fffbeb,stroke:#d97706,color:#7a5b00
+   - Oportunidad / fortaleza:      fill:#f0fdf4,stroke:#16a34a,color:#14532d
+   - Proceso / paso operativo:     fill:#eff6ff,stroke:#1e40af,color:#1e3a8a
+   - Politica / regla:             fill:#fdf4ff,stroke:#a21caf,color:#581c87
+   - Neutro / informativo:         fill:#f8fafc,stroke:#64748b,color:#334155
+
+   IMPORTANTE: nunca uses fill oscuro (#002776, #001a52, #1e40af, #dc2626)
+   sin agregar color:#ffffff. Eso da texto invisible. El renderer tiene un
+   fallback que detecta esos hex pero confiar en eso es fragil — siempre
+   declara color explicitamente.
 
    Aplicalos con `style NODO fill:#xxx,stroke:#xxx,color:#xxx`.
    En mindmap (que tiene menos control), preferi flowchart si necesitas colores

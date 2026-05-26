@@ -942,7 +942,8 @@ body.ai-resizing iframe { pointer-events: none !important; }
     max-width: 100%;
     height: auto;
 }
-/* Defaults legibles para mermaid (anula los oscuros que rompen contraste) */
+/* Defaults legibles para mermaid. NO usamos !important en color
+   para que los `style NODO fill:..,color:..` inline del modelo ganen. */
 .ai-mermaid-block .node rect,
 .ai-mermaid-block .node circle,
 .ai-mermaid-block .node ellipse,
@@ -956,13 +957,46 @@ body.ai-resizing iframe { pointer-events: none !important; }
     fill: #f8fafc !important;
     stroke: var(--ai-navy) !important;
 }
+/* Texto default: dark slate (legible sobre fills claros) */
 .ai-mermaid-block .nodeLabel,
-.ai-mermaid-block .node .label {
-    color: var(--ai-slate-900) !important;
-    fill: var(--ai-slate-900) !important;
+.ai-mermaid-block .node .label,
+.ai-mermaid-block .node foreignObject div,
+.ai-mermaid-block .node text {
     font-family: 'Inter', sans-serif !important;
     font-size: 13px !important;
     font-weight: 500 !important;
+    color: var(--ai-slate-900);
+    fill: var(--ai-slate-900);
+}
+/* Cuando el modelo aplica color inline (ej fondos oscuros), debe ganar.
+   Apuntamos a la propagacion desde el <g class="node" style="color:#fff">. */
+.ai-mermaid-block .node[style*="color:#fff"] .nodeLabel,
+.ai-mermaid-block .node[style*="color:#fff"] .nodeLabel p,
+.ai-mermaid-block .node[style*="color:#fff"] foreignObject div,
+.ai-mermaid-block .node[style*="color:#fff"] text,
+.ai-mermaid-block .node[style*="color: #fff"] .nodeLabel,
+.ai-mermaid-block .node[style*="color:#ffffff"] .nodeLabel,
+.ai-mermaid-block .node[style*="color: #ffffff"] .nodeLabel,
+.ai-mermaid-block .node[style*="color: white"] .nodeLabel {
+    color: #fff !important;
+    fill: #fff !important;
+}
+/* Detectar nodos con fill oscuro y forzar texto blanco (fallback por si
+   el modelo se olvida del color:#fff). Cubre los hex mas comunes oscuros. */
+.ai-mermaid-block .node[style*="fill:#002776"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#002776"] foreignObject div,
+.ai-mermaid-block .node[style*="fill:#002776"] text,
+.ai-mermaid-block .node[style*="fill:#001a52"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#1e3a8a"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#1e40af"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#0f172a"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#dc2626"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#16a34a"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#a21caf"] .nodeLabel,
+.ai-mermaid-block .node[style*="fill:#7c3aed"] .nodeLabel {
+    color: #fff !important;
+    fill: #fff !important;
+    font-weight: 600 !important;
 }
 /* Mindmap: nodos coloreados explicitamente */
 .ai-mermaid-block .mindmap-node > rect,
