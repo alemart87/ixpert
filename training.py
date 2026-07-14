@@ -1127,6 +1127,102 @@ def api_training_insights():
     avg_wpm = sum(s.words_per_minute or 0 for s in sessions) / total if total else 0
     avg_duration = sum(s.duration_seconds or 0 for s in sessions) / total if total else 0
 
+    # --- Personas entrenadas en el rango ---
+    # Cantidad de usuarios distintos con al menos una sesion completada en el
+    # rango, y promedio de entrenamientos por persona entrenada.
+    trained_user_ids = {s.user_id for s in sessions}
+    trained_users = len(trained_user_ids)
+    avg_sessions_per_user = round(total / trained_users, 1) if trained_users else 0
+
+    # --- Asesores nuevos (dados de alta dentro del rango) ---
+    # Promedio de entrenamientos realizados por cada asesor nuevo. Un asesor
+    # nuevo sin sesiones tambien cuenta en el denominador: el promedio refleja
+    # cuanto se entreno realmente a las altas del periodo.
+    new_advisors = User.query.filter(
+        User.role == 'asesor',
+        User.is_active_user.is_(True),
+        User.created_at.between(dt_from, dt_to)
+    ).all()
+    new_advisor_ids = {u.id for u in new_advisors}
+    new_advisor_sessions = sum(1 for s in sessions if s.user_id in new_advisor_ids)
+    new_advisors_trained = len(trained_user_ids & new_advisor_ids)
+    avg_sessions_new_advisor = round(new_advisor_sessions / len(new_advisors), 1) if new_advisors else 0
+
+    # --- Evolucion del NPS a lo largo de los entrenamientos ---
+    # Ordenamos las sesiones de cada operador cronologicamente y las numeramos
+    # (1er entrenamiento, 2do, ...). Asi se ve si el equipo mejora a medida
+    # que acumula practica, independientemente de la fecha calendario.
+    def _naive(dt):
+        if dt is None:
+            return datetime.min
+        return dt.replace(tzinfo=None) if dt.tzinfo else dt
+
+    seq_by_user = {}
+    for s in sorted(sessions, key=lambda x: _naive(x.created_at)):
+        if s.nps_score is None:
+            continue
+        seq_by_user.setdefault(s.user_id, []).append(s)
+
+    MAX_TRAININGS = 15  # cap del eje X para que el grafico siga siendo legible
+    max_len = min(max((len(v) for v in seq_by_user.values()), default=0), MAX_TRAININGS)
+    nps_evolution = []
+    for i in range(max_len):
+        vals = [seq[i].nps_score for seq in seq_by_user.values() if len(seq) > i]
+        nps_evolution.append({
+            'training_number': i + 1,
+            'avg_nps': round(sum(vals) / len(vals), 1),
+            'users': len(vals),
+        })
+
+    # --- Evolucion de tiempos: ¿bajan las duraciones con la practica? ---
+    duration_evolution = []
+    for i in range(max_len):
+        vals = [seq[i].duration_seconds or 0 for seq in seq_by_user.values() if len(seq) > i]
+        duration_evolution.append({
+            'training_number': i + 1,
+            'avg_duration': round(sum(vals) / len(vals)),
+            'users': len(vals),
+        })
+
+    def _trend_pct(points):
+        """Ajuste lineal (minimos cuadrados) sobre los promedios por numero de
+        entrenamiento. Devuelve el % de cambio entre el primer y el ultimo
+        entrenamiento segun la recta ajustada. Negativo = el valor baja."""
+        n = len(points)
+        if n < 2:
+            return None
+        sx = sum(x for x, _ in points)
+        sy = sum(y for _, y in points)
+        sxx = sum(x * x for x, _ in points)
+        sxy = sum(x * y for x, y in points)
+        denom = n * sxx - sx * sx
+        if denom == 0:
+            return None
+        slope = (n * sxy - sx * sy) / denom
+        intercept = (sy - slope * sx) / n
+        y_first = slope * points[0][0] + intercept
+        y_last = slope * points[-1][0] + intercept
+        if y_first <= 0:
+            return None
+        return round((y_last - y_first) / y_first * 100, 1)
+
+    duration_trend_pct = _trend_pct([(e['training_number'], e['avg_duration']) for e in duration_evolution])
+    nps_trend_pct = _trend_pct([(e['training_number'], e['avg_nps']) for e in nps_evolution])
+
+    # Series individuales: hasta 6 operadores con mas entrenamientos (min 2)
+    # para no saturar el grafico. El resto queda representado en el promedio.
+    operators_evolution = []
+    for uid, seq in sorted(seq_by_user.items(), key=lambda kv: len(kv[1]), reverse=True):
+        if len(operators_evolution) >= 6:
+            break
+        if len(seq) < 2:
+            continue
+        operators_evolution.append({
+            'name': seq[0].user.name,
+            'is_new': uid in new_advisor_ids,
+            'nps': [x.nps_score for x in seq[:MAX_TRAININGS]],
+        })
+
     # NPS per day
     nps_day = db.session.query(
         cast(TrainingSession.created_at, Date).label('date'),
@@ -1233,8 +1329,22 @@ def api_training_insights():
             'avg_nps': round(avg_nps, 1),
             'correct_rate': round(correct_rate, 1),
             'avg_wpm': round(avg_wpm, 1),
-            'avg_duration': round(avg_duration)
+            'avg_duration': round(avg_duration),
+            'trained_users': trained_users,
+            'avg_sessions_per_user': avg_sessions_per_user
         },
+        'new_advisors': {
+            'count': len(new_advisors),
+            'trained': new_advisors_trained,
+            'avg_sessions': avg_sessions_new_advisor
+        },
+        'nps_evolution': nps_evolution,
+        'duration_evolution': duration_evolution,
+        'trends': {
+            'nps_pct': nps_trend_pct,           # >0 = el NPS sube con la practica
+            'duration_pct': duration_trend_pct  # <0 = los tiempos bajan con la practica
+        },
+        'operators_evolution': operators_evolution,
         'nps_per_day': [{'date': str(d), 'avg_nps': round(float(n), 1), 'count': c} for d, n, c in nps_day],
         'nps_distribution': nps_dist,
         'rankings': rankings,
