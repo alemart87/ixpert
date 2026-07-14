@@ -75,13 +75,13 @@
     <div class="charts-grid">
         <div class="chart-card">
             <h3>📈 Evolución del NPS por Entrenamiento <span id="npsTrendBadge"></span></h3>
-            <p style="color:#888;font-size:12px;margin:0 0 10px">NPS obtenido en el 1º, 2º, 3º… entrenamiento de cada operador dentro del rango. La línea punteada es el promedio del equipo.</p>
+            <p style="color:#888;font-size:12px;margin:0 0 10px">NPS promedio del equipo en el 1º, 2º, 3º… entrenamiento de cada operador dentro del rango.</p>
             <p id="npsEvolutionEmpty" style="color:#888;display:none">Sin datos suficientes en el rango seleccionado.</p>
             <canvas id="chartNpsEvolution" style="max-height:320px"></canvas>
         </div>
         <div class="chart-card">
             <h3>⏱️ Evolución del Tiempo por Entrenamiento <span id="durTrendBadge"></span></h3>
-            <p style="color:#888;font-size:12px;margin:0 0 10px">Duración promedio (minutos) del 1º, 2º, 3º… entrenamiento de cada operador. Una tendencia a la baja indica mayor agilidad con la práctica.<span id="durOutliersNote"></span></p>
+            <p style="color:#888;font-size:12px;margin:0 0 10px">Minutos efectivos por chat en el 1º, 2º, 3º… entrenamiento: la duración se reparte entre los chats que el operador gestionaba en simultáneo, para que sea comparable. Una tendencia a la baja indica mayor agilidad.<span id="durOutliersNote"></span></p>
             <p id="durEvolutionEmpty" style="color:#888;display:none">Sin datos suficientes en el rango seleccionado.</p>
             <canvas id="chartDurEvolution" style="max-height:320px"></canvas>
         </div>
@@ -222,28 +222,17 @@ async function loadData() {
     } else {
         evoEmpty.style.display = 'none';
         evoCanvas.style.display = '';
-        // Paleta categórica validada (contraste y visión de color)
-        var OP_COLORS = ['#e65100', '#1565c0', '#00897b', '#8e24aa', '#c2185b', '#558b2f'];
-        var evoDatasets = [{
-            label: 'Promedio del equipo',
-            data: d.nps_evolution.map(function(x){return x.avg_nps}),
-            borderColor: '#555555', pointBackgroundColor: '#555555',
-            borderDash: [6,4], borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3
-        }];
-        d.operators_evolution.forEach(function(op, i) {
-            var col = OP_COLORS[i % OP_COLORS.length];
-            evoDatasets.push({
-                label: op.name + (op.is_new ? ' (nuevo)' : ''),
-                data: op.nps,
-                borderColor: col, pointBackgroundColor: col,
-                borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3
-            });
-        });
         c4 = new Chart(evoCanvas, {
             type: 'line',
             data: {
                 labels: d.nps_evolution.map(function(x){return x.training_number + 'º'}),
-                datasets: evoDatasets
+                datasets: [{
+                    label: 'NPS promedio del equipo',
+                    data: d.nps_evolution.map(function(x){return x.avg_nps}),
+                    borderColor: '#e65100', pointBackgroundColor: '#e65100',
+                    backgroundColor: 'rgba(230,81,0,0.08)',
+                    borderWidth: 2, pointRadius: 4, fill: true, tension: 0.3
+                }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
@@ -252,11 +241,9 @@ async function loadData() {
                     x: {title: {display: true, text: 'N° de entrenamiento del operador'}}
                 },
                 plugins: {
-                    legend: {display: true, position: 'bottom', labels: {usePointStyle: true, boxWidth: 8}},
+                    legend: {display: false},
                     tooltip: {callbacks: {footer: function(items) {
-                        var it = items[0];
-                        if (!it || it.datasetIndex !== 0) return '';
-                        var e = d.nps_evolution[it.dataIndex];
+                        var e = d.nps_evolution[items[0].dataIndex];
                         return e ? e.users + ' operador(es) llegaron a este entrenamiento' : '';
                     }}}
                 }
@@ -284,7 +271,7 @@ async function loadData() {
             data: {
                 labels: d.duration_evolution.map(function(x){return x.training_number + 'º'}),
                 datasets: [{
-                    label: 'Duración promedio (min)',
+                    label: 'Minutos efectivos por chat',
                     data: d.duration_evolution.map(function(x){return Math.round(x.avg_duration / 60 * 10) / 10}),
                     borderColor: '#1565c0', pointBackgroundColor: '#1565c0',
                     backgroundColor: 'rgba(21,101,192,0.08)',
@@ -294,14 +281,16 @@ async function loadData() {
             options: {
                 responsive: true, maintainAspectRatio: false,
                 scales: {
-                    y: {beginAtZero: true, title: {display: true, text: 'Minutos'}},
+                    y: {beginAtZero: true, title: {display: true, text: 'Minutos efectivos por chat'}},
                     x: {title: {display: true, text: 'N° de entrenamiento del operador'}}
                 },
                 plugins: {
                     legend: {display: false},
                     tooltip: {callbacks: {footer: function(items) {
                         var e = d.duration_evolution[items[0].dataIndex];
-                        return e ? e.users + ' operador(es) llegaron a este entrenamiento' : '';
+                        if (!e) return '';
+                        return e.users + ' operador(es) · prom. ' + e.avg_concurrent + ' chats simultáneos · ' +
+                            Math.round(e.avg_duration_raw / 60 * 10) / 10 + ' min reales por chat';
                     }}}
                 }
             }
