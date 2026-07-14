@@ -1180,6 +1180,29 @@ def api_training_insights():
         })
 
     # --- Evolucion de tiempos: ¿bajan las duraciones con la practica? ---
+    # Chats simultaneos: el asesor puede gestionar varios chats a la vez dentro
+    # de un batch (max_concurrent hasta 10). La duracion wall-clock de un chat
+    # gestionado junto a otros 2 no es comparable con la de un chat gestionado
+    # solo: la atencion se reparte. Para cada sesion contamos cuantas hermanas
+    # del mismo batch se solaparon en el tiempo y repartimos la duracion entre
+    # ellas -> "minutos efectivos por chat".
+    sessions_by_batch = {}
+    for s in sessions:
+        if s.batch_id:
+            sessions_by_batch.setdefault(s.batch_id, []).append(s)
+
+    def _concurrency(s):
+        if not s.batch_id or not s.started_at or not s.ended_at:
+            return 1
+        st, en = _naive(s.started_at), _naive(s.ended_at)
+        n = 0
+        for o in sessions_by_batch.get(s.batch_id, []):
+            if not o.started_at or not o.ended_at:
+                continue
+            if _naive(o.started_at) < en and _naive(o.ended_at) > st:
+                n += 1
+        return max(1, n)
+
     # Se excluyen las sesiones "colgadas": las que quedaron abiertas/encoladas
     # y se cerraron horas o dias despues (auto-cierre, pestaña abandonada).
     # Una interaccion real dura minutos; por encima de este umbral la duracion
@@ -1188,60 +1211,60 @@ def api_training_insights():
     duration_evolution = []
     duration_outliers = 0
     for i in range(max_len):
-        vals = []
+        effective, raw, conc = [], [], []
         for seq in seq_by_user.values():
             if len(seq) <= i:
                 continue
-            dur = seq[i].duration_seconds or 0
+            s = seq[i]
+            dur = s.duration_seconds or 0
             if dur > MAX_VALID_DURATION:
                 duration_outliers += 1
             elif dur > 0:
-                vals.append(dur)
-        if vals:
+                c = _concurrency(s)
+                raw.append(dur)
+                conc.append(c)
+                effective.append(dur / c)
+        if effective:
             duration_evolution.append({
                 'training_number': i + 1,
-                'avg_duration': round(sum(vals) / len(vals)),
-                'users': len(vals),
+                'avg_duration': round(sum(effective) / len(effective)),   # efectivo por chat
+                'avg_duration_raw': round(sum(raw) / len(raw)),
+                'avg_concurrent': round(sum(conc) / len(conc), 1),
+                'users': len(effective),
             })
 
-    def _trend_pct(points):
-        """Ajuste lineal (minimos cuadrados) sobre los promedios por numero de
-        entrenamiento. Devuelve el % de cambio entre el primer y el ultimo
-        entrenamiento segun la recta ajustada. Negativo = el valor baja."""
-        n = len(points)
-        if n < 2:
+    def _trend_pct(points, weights):
+        """Ajuste lineal por minimos cuadrados PONDERADOS sobre los promedios
+        por numero de entrenamiento. El peso es la cantidad de operadores que
+        llego a ese entrenamiento: el punto del 1er entrenamiento (todos) debe
+        pesar mucho mas que el del 15to (1-2 usuarios intensivos), si no la
+        cola ruidosa domina la tendencia. Devuelve el % de cambio entre el
+        primer y el ultimo entrenamiento segun la recta ajustada."""
+        if len(points) < 2:
             return None
-        sx = sum(x for x, _ in points)
-        sy = sum(y for _, y in points)
-        sxx = sum(x * x for x, _ in points)
-        sxy = sum(x * y for x, y in points)
-        denom = n * sxx - sx * sx
-        if denom == 0:
+        w_total = sum(weights)
+        if w_total <= 0:
             return None
-        slope = (n * sxy - sx * sy) / denom
-        intercept = (sy - slope * sx) / n
+        mean_x = sum(w * x for w, (x, _) in zip(weights, points)) / w_total
+        mean_y = sum(w * y for w, (_, y) in zip(weights, points)) / w_total
+        sxx = sum(w * (x - mean_x) ** 2 for w, (x, _) in zip(weights, points))
+        sxy = sum(w * (x - mean_x) * (y - mean_y) for w, (x, y) in zip(weights, points))
+        if sxx == 0:
+            return None
+        slope = sxy / sxx
+        intercept = mean_y - slope * mean_x
         y_first = slope * points[0][0] + intercept
         y_last = slope * points[-1][0] + intercept
         if y_first <= 0:
             return None
         return round((y_last - y_first) / y_first * 100, 1)
 
-    duration_trend_pct = _trend_pct([(e['training_number'], e['avg_duration']) for e in duration_evolution])
-    nps_trend_pct = _trend_pct([(e['training_number'], e['avg_nps']) for e in nps_evolution])
-
-    # Series individuales: hasta 6 operadores con mas entrenamientos (min 2)
-    # para no saturar el grafico. El resto queda representado en el promedio.
-    operators_evolution = []
-    for uid, seq in sorted(seq_by_user.items(), key=lambda kv: len(kv[1]), reverse=True):
-        if len(operators_evolution) >= 6:
-            break
-        if len(seq) < 2:
-            continue
-        operators_evolution.append({
-            'name': seq[0].user.name,
-            'is_new': uid in new_advisor_ids,
-            'nps': [x.nps_score for x in seq[:MAX_TRAININGS]],
-        })
+    duration_trend_pct = _trend_pct(
+        [(e['training_number'], e['avg_duration']) for e in duration_evolution],
+        [e['users'] for e in duration_evolution])
+    nps_trend_pct = _trend_pct(
+        [(e['training_number'], e['avg_nps']) for e in nps_evolution],
+        [e['users'] for e in nps_evolution])
 
     # NPS per day
     nps_day = db.session.query(
@@ -1367,7 +1390,6 @@ def api_training_insights():
             'nps_pct': nps_trend_pct,           # >0 = el NPS sube con la practica
             'duration_pct': duration_trend_pct  # <0 = los tiempos bajan con la practica
         },
-        'operators_evolution': operators_evolution,
         'nps_per_day': [{'date': str(d), 'avg_nps': round(float(n), 1), 'count': c} for d, n, c in nps_day],
         'nps_distribution': nps_dist,
         'rankings': rankings,
