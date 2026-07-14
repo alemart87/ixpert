@@ -54,7 +54,7 @@
 
     <!-- KPIs de cobertura de entrenamiento -->
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card"><h3 id="kTrained">-</h3><p>Personas Entrenadas</p></div>
+        <div class="stat-card"><h3 id="kTrained">-</h3><p>Personas Entrenadas</p><p id="kTrainedSub" style="font-size:12px"></p></div>
         <div class="stat-card"><h3 id="kAvgPerUser">-</h3><p>Prom. Entrenamientos por Persona</p></div>
         <div class="stat-card"><h3 id="kNewAdvisors">-</h3><p>Asesores Nuevos en el Período</p><p id="kNewAdvisorsSub" style="font-size:12px"></p></div>
     </div>
@@ -81,7 +81,7 @@
         </div>
         <div class="chart-card">
             <h3>⏱️ Evolución del Tiempo por Entrenamiento <span id="durTrendBadge"></span></h3>
-            <p style="color:#888;font-size:12px;margin:0 0 10px">Duración promedio (minutos) del 1º, 2º, 3º… entrenamiento de cada operador. Una tendencia a la baja indica mayor agilidad con la práctica.</p>
+            <p style="color:#888;font-size:12px;margin:0 0 10px">Duración promedio (minutos) del 1º, 2º, 3º… entrenamiento de cada operador. Una tendencia a la baja indica mayor agilidad con la práctica.<span id="durOutliersNote"></span></p>
             <p id="durEvolutionEmpty" style="color:#888;display:none">Sin datos suficientes en el rango seleccionado.</p>
             <canvas id="chartDurEvolution" style="max-height:320px"></canvas>
         </div>
@@ -171,11 +171,21 @@ async function loadData() {
 
     // KPIs de cobertura
     document.getElementById('kTrained').textContent = d.stats.trained_users;
+    document.getElementById('kTrainedSub').textContent = d.stats.trained_users > 0
+        ? d.stats.trained_asesores + ' asesor(es)' + (d.stats.trained_others > 0 ? ' · ' + d.stats.trained_others + ' de otros roles' : '')
+        : '';
     document.getElementById('kAvgPerUser').textContent = d.stats.avg_sessions_per_user;
     document.getElementById('kNewAdvisors').textContent = d.new_advisors.count;
-    document.getElementById('kNewAdvisorsSub').textContent = d.new_advisors.count > 0
-        ? d.new_advisors.trained + ' ya entrenado(s) · prom. ' + d.new_advisors.avg_sessions + ' entrenamientos c/u'
-        : 'Sin altas de asesores en el período';
+    var naSub;
+    if (d.new_advisors.count === 0) {
+        naSub = 'Sin altas de asesores en el período';
+    } else if (d.new_advisors.trained === 0) {
+        naSub = 'Ninguno entrenó todavía';
+    } else {
+        naSub = d.new_advisors.trained + ' de ' + d.new_advisors.count + ' ya entrenaron · promedian ' +
+            d.new_advisors.avg_sessions + ' entrenamientos c/u';
+    }
+    document.getElementById('kNewAdvisorsSub').textContent = naSub;
 
     // Recommendations
     var recEl = document.getElementById('recommendations');
@@ -260,6 +270,9 @@ async function loadData() {
     trendBadge('durTrendBadge', d.trends.duration_pct, true);
     var durEmpty = document.getElementById('durEvolutionEmpty');
     var durCanvas = document.getElementById('chartDurEvolution');
+    document.getElementById('durOutliersNote').textContent = d.duration_outliers > 0
+        ? ' Se excluyeron ' + d.duration_outliers + ' sesión(es) colgada(s) de más de 60 min (quedaron abiertas sin cerrar).'
+        : '';
     if (d.duration_evolution.length === 0) {
         durEmpty.style.display = '';
         durCanvas.style.display = 'none';
