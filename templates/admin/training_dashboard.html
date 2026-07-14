@@ -52,6 +52,13 @@
         <div class="stat-card"><h3 id="kWpm">-</h3><p>WPM Promedio</p></div>
     </div>
 
+    <!-- KPIs de cobertura de entrenamiento -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><h3 id="kTrained">-</h3><p>Personas Entrenadas</p></div>
+        <div class="stat-card"><h3 id="kAvgPerUser">-</h3><p>Prom. Entrenamientos por Persona</p></div>
+        <div class="stat-card"><h3 id="kNewAdvisors">-</h3><p>Asesores Nuevos en el Período</p><p id="kNewAdvisorsSub" style="font-size:12px"></p></div>
+    </div>
+
     <!-- Recommendations -->
     <div class="chart-card" style="margin-bottom:20px;border-left:4px solid #ff6600">
         <h3>💡 Recomendaciones de Capacitación</h3>
@@ -62,6 +69,22 @@
     <div class="charts-grid">
         <div class="chart-card"><h3>NPS por Día</h3><canvas id="chartNpsDay" style="max-height:280px"></canvas></div>
         <div class="chart-card"><h3>Distribución NPS</h3><canvas id="chartNpsDist" style="max-height:280px"></canvas></div>
+    </div>
+
+    <!-- Evolución con la práctica: NPS y tiempos por N° de entrenamiento -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>📈 Evolución del NPS por Entrenamiento <span id="npsTrendBadge"></span></h3>
+            <p style="color:#888;font-size:12px;margin:0 0 10px">NPS obtenido en el 1º, 2º, 3º… entrenamiento de cada operador dentro del rango. La línea punteada es el promedio del equipo.</p>
+            <p id="npsEvolutionEmpty" style="color:#888;display:none">Sin datos suficientes en el rango seleccionado.</p>
+            <canvas id="chartNpsEvolution" style="max-height:320px"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>⏱️ Evolución del Tiempo por Entrenamiento <span id="durTrendBadge"></span></h3>
+            <p style="color:#888;font-size:12px;margin:0 0 10px">Duración promedio (minutos) del 1º, 2º, 3º… entrenamiento de cada operador. Una tendencia a la baja indica mayor agilidad con la práctica.</p>
+            <p id="durEvolutionEmpty" style="color:#888;display:none">Sin datos suficientes en el rango seleccionado.</p>
+            <canvas id="chartDurEvolution" style="max-height:320px"></canvas>
+        </div>
     </div>
 
     <div class="charts-grid">
@@ -100,9 +123,27 @@
     </div>
 </div>
 
+{% endblock %}
+
 {% block extra_scripts %}
 <script>
-let c1, c2, c3;
+let c1, c2, c3, c4, c5;
+
+// Badge de tendencia: pct es el % de cambio entre el 1er y último entrenamiento
+// según ajuste lineal. lowerIsBetter=true para tiempos (bajar = mejorar).
+function trendBadge(elId, pct, lowerIsBetter) {
+    var el = document.getElementById(elId);
+    if (pct === null || pct === undefined) {
+        el.innerHTML = '<span style="color:#888;font-size:11px;font-weight:400">(sin datos para tendencia)</span>';
+        return;
+    }
+    var improving = lowerIsBetter ? pct < 0 : pct > 0;
+    var arrow = pct < 0 ? '▼' : (pct > 0 ? '▲' : '●');
+    var color = pct === 0 ? '#888' : (improving ? '#2e7d32' : '#c62828');
+    var label = pct === 0 ? 'estable' : (improving ? 'mejora' : 'empeora');
+    el.innerHTML = '<span style="background:' + color + ';color:#fff;padding:2px 10px;border-radius:12px;font-size:12px;vertical-align:middle">' +
+        arrow + ' ' + Math.abs(pct) + '% — ' + label + '</span>';
+}
 
 function setRange(days) {
     var to = new Date();
@@ -128,6 +169,14 @@ async function loadData() {
     document.getElementById('kCorrect').textContent = d.stats.correct_rate + '%';
     document.getElementById('kWpm').textContent = d.stats.avg_wpm;
 
+    // KPIs de cobertura
+    document.getElementById('kTrained').textContent = d.stats.trained_users;
+    document.getElementById('kAvgPerUser').textContent = d.stats.avg_sessions_per_user;
+    document.getElementById('kNewAdvisors').textContent = d.new_advisors.count;
+    document.getElementById('kNewAdvisorsSub').textContent = d.new_advisors.count > 0
+        ? d.new_advisors.trained + ' ya entrenado(s) · prom. ' + d.new_advisors.avg_sessions + ' entrenamientos c/u'
+        : 'Sin altas de asesores en el período';
+
     // Recommendations
     var recEl = document.getElementById('recommendations');
     var prColors = {alta:'#fff0e0;border-left:4px solid #ff6600', media:'#f0f4ff;border-left:4px solid #004080', info:'#f0faf0;border-left:4px solid #28a745'};
@@ -152,6 +201,99 @@ async function loadData() {
         },
         options: {responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:10}}, plugins:{legend:{display:false}}}
     });
+
+    // Evolución del NPS por N° de entrenamiento
+    if (c4) c4.destroy();
+    var evoEmpty = document.getElementById('npsEvolutionEmpty');
+    var evoCanvas = document.getElementById('chartNpsEvolution');
+    if (d.nps_evolution.length === 0) {
+        evoEmpty.style.display = '';
+        evoCanvas.style.display = 'none';
+    } else {
+        evoEmpty.style.display = 'none';
+        evoCanvas.style.display = '';
+        // Paleta categórica validada (contraste y visión de color)
+        var OP_COLORS = ['#e65100', '#1565c0', '#00897b', '#8e24aa', '#c2185b', '#558b2f'];
+        var evoDatasets = [{
+            label: 'Promedio del equipo',
+            data: d.nps_evolution.map(function(x){return x.avg_nps}),
+            borderColor: '#555555', pointBackgroundColor: '#555555',
+            borderDash: [6,4], borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3
+        }];
+        d.operators_evolution.forEach(function(op, i) {
+            var col = OP_COLORS[i % OP_COLORS.length];
+            evoDatasets.push({
+                label: op.name + (op.is_new ? ' (nuevo)' : ''),
+                data: op.nps,
+                borderColor: col, pointBackgroundColor: col,
+                borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3
+            });
+        });
+        c4 = new Chart(evoCanvas, {
+            type: 'line',
+            data: {
+                labels: d.nps_evolution.map(function(x){return x.training_number + 'º'}),
+                datasets: evoDatasets
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: {min: 0, max: 10},
+                    x: {title: {display: true, text: 'N° de entrenamiento del operador'}}
+                },
+                plugins: {
+                    legend: {display: true, position: 'bottom', labels: {usePointStyle: true, boxWidth: 8}},
+                    tooltip: {callbacks: {footer: function(items) {
+                        var it = items[0];
+                        if (!it || it.datasetIndex !== 0) return '';
+                        var e = d.nps_evolution[it.dataIndex];
+                        return e ? e.users + ' operador(es) llegaron a este entrenamiento' : '';
+                    }}}
+                }
+            }
+        });
+    }
+
+    // Evolución de tiempos por N° de entrenamiento
+    if (c5) c5.destroy();
+    trendBadge('npsTrendBadge', d.trends.nps_pct, false);
+    trendBadge('durTrendBadge', d.trends.duration_pct, true);
+    var durEmpty = document.getElementById('durEvolutionEmpty');
+    var durCanvas = document.getElementById('chartDurEvolution');
+    if (d.duration_evolution.length === 0) {
+        durEmpty.style.display = '';
+        durCanvas.style.display = 'none';
+    } else {
+        durEmpty.style.display = 'none';
+        durCanvas.style.display = '';
+        c5 = new Chart(durCanvas, {
+            type: 'line',
+            data: {
+                labels: d.duration_evolution.map(function(x){return x.training_number + 'º'}),
+                datasets: [{
+                    label: 'Duración promedio (min)',
+                    data: d.duration_evolution.map(function(x){return Math.round(x.avg_duration / 60 * 10) / 10}),
+                    borderColor: '#1565c0', pointBackgroundColor: '#1565c0',
+                    backgroundColor: 'rgba(21,101,192,0.08)',
+                    borderWidth: 2, pointRadius: 4, fill: true, tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: {beginAtZero: true, title: {display: true, text: 'Minutos'}},
+                    x: {title: {display: true, text: 'N° de entrenamiento del operador'}}
+                },
+                plugins: {
+                    legend: {display: false},
+                    tooltip: {callbacks: {footer: function(items) {
+                        var e = d.duration_evolution[items[0].dataIndex];
+                        return e ? e.users + ' operador(es) llegaron a este entrenamiento' : '';
+                    }}}
+                }
+            }
+        });
+    }
 
     // NPS Distribution
     if (c2) c2.destroy();
@@ -278,5 +420,4 @@ async function loadLive() {
 loadLive();
 setInterval(loadLive, 10000);
 </script>
-{% endblock %}
 {% endblock %}
