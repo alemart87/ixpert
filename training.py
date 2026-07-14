@@ -1134,19 +1134,24 @@ def api_training_insights():
     trained_users = len(trained_user_ids)
     avg_sessions_per_user = round(total / trained_users, 1) if trained_users else 0
 
+    # Desglose por rol: "Personas Entrenadas" incluye a cualquier usuario con
+    # sesiones (asesores, analistas, supervisores probando, etc.). El desglose
+    # evita confusion al compararlo con el contador de asesores nuevos.
+    trained_asesores = len({s.user_id for s in sessions if s.user and s.user.role == 'asesor'})
+    trained_others = trained_users - trained_asesores
+
     # --- Asesores nuevos (dados de alta dentro del rango) ---
-    # Promedio de entrenamientos realizados por cada asesor nuevo. Un asesor
-    # nuevo sin sesiones tambien cuenta en el denominador: el promedio refleja
-    # cuanto se entreno realmente a las altas del periodo.
+    # Se cuentan todas las altas del periodo (incluso desactivadas despues:
+    # igual fueron entrenadas en su momento). El promedio de entrenamientos se
+    # calcula SOLO sobre los asesores nuevos que efectivamente entrenaron.
     new_advisors = User.query.filter(
         User.role == 'asesor',
-        User.is_active_user.is_(True),
         User.created_at.between(dt_from, dt_to)
     ).all()
     new_advisor_ids = {u.id for u in new_advisors}
     new_advisor_sessions = sum(1 for s in sessions if s.user_id in new_advisor_ids)
     new_advisors_trained = len(trained_user_ids & new_advisor_ids)
-    avg_sessions_new_advisor = round(new_advisor_sessions / len(new_advisors), 1) if new_advisors else 0
+    avg_sessions_new_advisor = round(new_advisor_sessions / new_advisors_trained, 1) if new_advisors_trained else 0
 
     # --- Evolucion del NPS a lo largo de los entrenamientos ---
     # Ordenamos las sesiones de cada operador cronologicamente y las numeramos
@@ -1175,14 +1180,29 @@ def api_training_insights():
         })
 
     # --- Evolucion de tiempos: ¿bajan las duraciones con la practica? ---
+    # Se excluyen las sesiones "colgadas": las que quedaron abiertas/encoladas
+    # y se cerraron horas o dias despues (auto-cierre, pestaña abandonada).
+    # Una interaccion real dura minutos; por encima de este umbral la duracion
+    # no mide agilidad sino abandono, y un solo caso distorsiona todo el grafico.
+    MAX_VALID_DURATION = 3600  # 1 hora
     duration_evolution = []
+    duration_outliers = 0
     for i in range(max_len):
-        vals = [seq[i].duration_seconds or 0 for seq in seq_by_user.values() if len(seq) > i]
-        duration_evolution.append({
-            'training_number': i + 1,
-            'avg_duration': round(sum(vals) / len(vals)),
-            'users': len(vals),
-        })
+        vals = []
+        for seq in seq_by_user.values():
+            if len(seq) <= i:
+                continue
+            dur = seq[i].duration_seconds or 0
+            if dur > MAX_VALID_DURATION:
+                duration_outliers += 1
+            elif dur > 0:
+                vals.append(dur)
+        if vals:
+            duration_evolution.append({
+                'training_number': i + 1,
+                'avg_duration': round(sum(vals) / len(vals)),
+                'users': len(vals),
+            })
 
     def _trend_pct(points):
         """Ajuste lineal (minimos cuadrados) sobre los promedios por numero de
@@ -1331,6 +1351,8 @@ def api_training_insights():
             'avg_wpm': round(avg_wpm, 1),
             'avg_duration': round(avg_duration),
             'trained_users': trained_users,
+            'trained_asesores': trained_asesores,
+            'trained_others': trained_others,
             'avg_sessions_per_user': avg_sessions_per_user
         },
         'new_advisors': {
@@ -1340,6 +1362,7 @@ def api_training_insights():
         },
         'nps_evolution': nps_evolution,
         'duration_evolution': duration_evolution,
+        'duration_outliers': duration_outliers,
         'trends': {
             'nps_pct': nps_trend_pct,           # >0 = el NPS sube con la practica
             'duration_pct': duration_trend_pct  # <0 = los tiempos bajan con la practica
