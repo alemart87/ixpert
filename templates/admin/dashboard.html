@@ -52,6 +52,23 @@
         </div>
     </div>
 
+    <!-- Todas las páginas visitadas (vista expandida) -->
+    <div class="chart-card" style="margin-bottom:24px">
+        <details id="allPagesDetails">
+            <summary style="cursor:pointer;font-weight:700;color:#004080;font-size:15px">📄 Todas las Páginas Visitadas <span id="allPagesCount" style="color:#888;font-weight:400"></span></summary>
+            <div style="margin-top:12px">
+                <input type="text" id="allPagesFilter" placeholder="Filtrar por ruta… (ej: /admin, /content, iterum)"
+                       style="width:100%;max-width:400px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-size:13px">
+                <div class="table-responsive" style="max-height:420px;overflow-y:auto">
+                    <table class="admin-table">
+                        <thead><tr><th>Página</th><th>Visitas</th><th>Usuarios únicos</th><th>Última visita</th></tr></thead>
+                        <tbody id="allPagesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </details>
+    </div>
+
     <div class="charts-grid">
         <div class="chart-card">
             <h3>Búsquedas Más Frecuentes</h3>
@@ -63,10 +80,12 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_scripts %}
 <script>
 let viewsChart, pagesChart;
+let allPagesData = [];
 
 async function loadDashboard() {
     const from = document.getElementById('dateFrom').value;
@@ -100,13 +119,14 @@ async function loadDashboard() {
         options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // Top pages chart
+    // Top pages chart — ruta completa como etiqueta (antes se recortaba al
+    // último segmento y /admin/training y /training se veían iguales)
     if (pagesChart) pagesChart.destroy();
     const topPages = data.top_pages.slice(0, 8);
     pagesChart = new Chart(document.getElementById('pagesChart'), {
         type: 'bar',
         data: {
-            labels: topPages.map(p => p.path.split('/').pop() || p.path),
+            labels: topPages.map(p => p.path || '/'),
             datasets: [{
                 label: 'Visitas',
                 data: topPages.map(p => p.views),
@@ -119,6 +139,11 @@ async function loadDashboard() {
             indexAxis: 'y'
         }
     });
+
+    // Tabla completa de páginas visitadas
+    allPagesData = data.all_pages || [];
+    document.getElementById('allPagesCount').textContent = '(' + allPagesData.length + ' rutas distintas en el período)';
+    renderAllPages();
 
     // Top searches
     const searchesList = document.getElementById('searchesList');
@@ -139,7 +164,22 @@ async function loadDashboard() {
         : '<p>Sin datos</p>';
 }
 
+function renderAllPages() {
+    var filter = (document.getElementById('allPagesFilter').value || '').toLowerCase();
+    var rows = allPagesData.filter(function(p) {
+        return !filter || (p.path || '/').toLowerCase().indexOf(filter) !== -1;
+    });
+    document.getElementById('allPagesBody').innerHTML = rows.length
+        ? rows.map(function(p) {
+            return '<tr><td style="word-break:break-all">' + (p.path || '/') + '</td>' +
+                '<td>' + p.views.toLocaleString() + '</td>' +
+                '<td>' + p.unique_users + '</td>' +
+                '<td>' + p.last_visit + '</td></tr>';
+        }).join('')
+        : '<tr><td colspan="4" style="color:#888;text-align:center">Sin páginas que coincidan</td></tr>';
+}
+document.getElementById('allPagesFilter').addEventListener('input', renderAllPages);
+
 loadDashboard();
 </script>
-{% endblock %}
 {% endblock %}

@@ -63,57 +63,58 @@ def analytics_overview():
     if not current_user.is_superadmin:
         return jsonify({'error': 'No autorizado'}), 403
 
+    from sqlalchemy import func, cast, Date
+
     date_from = request.args.get('from', '')
     date_to = request.args.get('to', '')
 
-    pv_query = db.session.query(PageView)
-    ce_query = db.session.query(ClickEvent)
-    sl_query = db.session.query(SearchLog)
+    dt_from = datetime.strptime(date_from, '%Y-%m-%d').replace(tzinfo=timezone.utc) if date_from else None
+    dt_to = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59, tzinfo=timezone.utc) if date_to else None
 
-    if date_from:
-        dt_from = datetime.strptime(date_from, '%Y-%m-%d').replace(tzinfo=timezone.utc)
-        pv_query = pv_query.filter(PageView.created_at >= dt_from)
-        ce_query = ce_query.filter(ClickEvent.created_at >= dt_from)
-        sl_query = sl_query.filter(SearchLog.created_at >= dt_from)
-    if date_to:
-        dt_to = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
-        pv_query = pv_query.filter(PageView.created_at <= dt_to)
-        ce_query = ce_query.filter(ClickEvent.created_at <= dt_to)
-        sl_query = sl_query.filter(SearchLog.created_at <= dt_to)
+    def in_range(q, col):
+        if dt_from is not None:
+            q = q.filter(col >= dt_from)
+        if dt_to is not None:
+            q = q.filter(col <= dt_to)
+        return q
 
-    total_views = pv_query.count()
-    total_clicks = ce_query.count()
-    total_searches = sl_query.count()
+    total_views = in_range(db.session.query(PageView), PageView.created_at).count()
+    total_clicks = in_range(db.session.query(ClickEvent), ClickEvent.created_at).count()
+    total_searches = in_range(db.session.query(SearchLog), SearchLog.created_at).count()
 
-    # Top pages
-    top_pages = db.session.query(
+    # Todas las paginas visitadas (respetando el filtro de fechas, que antes
+    # solo aplicaba a los totales). Con visitas, usuarios distintos y ultima
+    # visita por ruta. El top-8 del grafico se recorta en el frontend.
+    all_pages = in_range(db.session.query(
         PageView.page_path,
-        db.func.count(PageView.id).label('views')
-    ).group_by(PageView.page_path).order_by(db.text('views DESC')).limit(10).all()
+        func.count(PageView.id).label('views'),
+        func.count(func.distinct(PageView.user_id)).label('unique_users'),
+        func.max(PageView.created_at).label('last_visit')
+    ), PageView.created_at).group_by(PageView.page_path
+    ).order_by(db.text('views DESC')).limit(500).all()
 
-    # Top searches
-    top_searches = db.session.query(
+    # Top searches (tambien respeta el filtro de fechas)
+    top_searches = in_range(db.session.query(
         SearchLog.query,
-        db.func.count(SearchLog.id).label('count')
-    ).group_by(SearchLog.query).order_by(db.text('count DESC')).limit(10).all()
+        func.count(SearchLog.id).label('count')
+    ), SearchLog.created_at).group_by(SearchLog.query
+    ).order_by(db.text('count DESC')).limit(10).all()
 
     # Views per day
-    from sqlalchemy import func, cast, Date
-    views_per_day = db.session.query(
+    views_per_day = in_range(db.session.query(
         cast(PageView.created_at, Date).label('date'),
         func.count(PageView.id).label('views')
-    )
-    if date_from:
-        views_per_day = views_per_day.filter(PageView.created_at >= dt_from)
-    if date_to:
-        views_per_day = views_per_day.filter(PageView.created_at <= dt_to)
-    views_per_day = views_per_day.group_by('date').order_by('date').all()
+    ), PageView.created_at).group_by('date').order_by('date').all()
 
     return jsonify({
         'total_views': total_views,
         'total_clicks': total_clicks,
         'total_searches': total_searches,
-        'top_pages': [{'path': p, 'views': v} for p, v in top_pages],
+        'top_pages': [{'path': p, 'views': v} for p, v, _, _ in all_pages[:10]],
+        'all_pages': [{
+            'path': p, 'views': v, 'unique_users': u,
+            'last_visit': lv.strftime('%d/%m/%Y %H:%M') if lv else ''
+        } for p, v, u, lv in all_pages],
         'top_searches': [{'query': q, 'count': c} for q, c in top_searches],
         'views_per_day': [{'date': str(d), 'views': v} for d, v in views_per_day]
     })

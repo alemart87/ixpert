@@ -532,35 +532,43 @@ def api_insights():
     else:
         dt_to = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
 
-    # Base filtered queries
-    convs_q = ChatConversation.query.filter(ChatConversation.created_at.between(dt_from, dt_to))
-    conv_ids = [c.id for c in convs_q.all()]
-    msgs_q = ChatMessage.query.filter(ChatMessage.conversation_id.in_(conv_ids)) if conv_ids else ChatMessage.query.filter(False)
+    # Filtrado por FECHA DEL MENSAJE, no por fecha de creacion de la
+    # conversacion. Antes, una consulta de hoy hecha en una conversacion
+    # abierta la semana pasada quedaba fuera del periodo de hoy (y sus tokens
+    # tambien): el chat reutiliza conversaciones, asi que los contadores de
+    # 24h/7 dias subcontaban de forma sistematica.
+    msgs_in_period = ChatMessage.query.filter(
+        ChatMessage.created_at.between(dt_from, dt_to)).all()
+    conv_ids = list({m.conversation_id for m in msgs_in_period})
+    user_messages = [m for m in msgs_in_period if m.role == 'user']
 
-    # Stats
+    # Stats: conversaciones ACTIVAS en el periodo (con al menos un mensaje),
+    # consultas (mensajes del usuario) y tokens de los mensajes del periodo.
     total_convs = len(conv_ids)
-    total_msgs = msgs_q.filter_by(role='user').count() if conv_ids else 0
-    total_tokens = db.session.query(func.coalesce(func.sum(ChatMessage.tokens_used), 0)).filter(
-        ChatMessage.conversation_id.in_(conv_ids)).scalar() if conv_ids else 0
+    total_msgs = len(user_messages)
+    total_tokens = sum(m.tokens_used or 0 for m in msgs_in_period)
     unique_users = db.session.query(func.count(func.distinct(ChatConversation.user_id))).filter(
         ChatConversation.id.in_(conv_ids)).scalar() if conv_ids else 0
 
-    # Conversations per day
+    # Consultas por dia (mensajes del usuario, por fecha del mensaje)
     convs_per_day = db.session.query(
-        cast(ChatConversation.created_at, Date).label('date'),
-        func.count(ChatConversation.id).label('count')
-    ).filter(ChatConversation.created_at.between(dt_from, dt_to)
+        cast(ChatMessage.created_at, Date).label('date'),
+        func.count(ChatMessage.id).label('count')
+    ).filter(ChatMessage.created_at.between(dt_from, dt_to),
+             ChatMessage.role == 'user'
     ).group_by('date').order_by('date').all()
 
-    # Top users
+    # Top users: conversaciones en las que participaron dentro del periodo
     top_users = db.session.query(
         User.name, User.role,
-        func.count(func.distinct(ChatConversation.id)).label('convs')
+        func.count(func.distinct(ChatMessage.conversation_id)).label('convs')
     ).join(ChatConversation, User.id == ChatConversation.user_id
-    ).filter(ChatConversation.created_at.between(dt_from, dt_to)
+    ).join(ChatMessage, ChatMessage.conversation_id == ChatConversation.id
+    ).filter(ChatMessage.created_at.between(dt_from, dt_to),
+             ChatMessage.role == 'user'
     ).filter(User.role != 'superadmin'
     ).group_by(User.id, User.name, User.role
-    ).order_by(func.count(func.distinct(ChatConversation.id)).desc()).limit(10).all()
+    ).order_by(func.count(func.distinct(ChatMessage.conversation_id)).desc()).limit(10).all()
 
     # Analyze ALL user messages in period for topics
     stop = {'hola', 'como', 'cómo', 'que', 'qué', 'para', 'por', 'con', 'una', 'uno',
@@ -568,14 +576,7 @@ def api_insights():
             'puedo', 'hacer', 'tiene', 'tiene', 'esta', 'esto', 'esos', 'esas', 'tiene',
             'favor', 'buenas', 'buenos', 'dias', 'gracias', 'muchas', 'bien', 'muy'}
 
-    user_messages = []
-    if conv_ids:
-        user_messages = ChatMessage.query.filter(
-            ChatMessage.conversation_id.in_(conv_ids),
-            ChatMessage.role == 'user'
-        ).all()
-
-    # Extract meaningful phrases (bigrams) from user messages
+    # Extract meaningful phrases (bigrams) from user messages (del periodo)
     all_text = ' '.join(m.content.lower() for m in user_messages)
     words_list = [w for w in re.findall(r'\w+', all_text) if len(w) > 2 and w not in stop]
 
@@ -698,8 +699,10 @@ def api_insights():
             'priority': 'info'
         })
 
-    # Recent conversations
-    recent_convs = convs_q.order_by(ChatConversation.updated_at.desc()).limit(30).all()
+    # Conversaciones recientes: las que tuvieron actividad en el periodo
+    recent_convs = ChatConversation.query.filter(
+        ChatConversation.id.in_(conv_ids)
+    ).order_by(ChatConversation.updated_at.desc()).limit(30).all() if conv_ids else []
 
     return jsonify({
         'stats': {
