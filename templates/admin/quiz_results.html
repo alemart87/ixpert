@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Resultados de Quiz{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Resultados de Quiz</h1>
+    <p style="color:var(--gris-meta);margin-top:-8px;margin-bottom:20px">
+        Registro de cada quiz rendido: quién lo hizo, cuándo y con qué puntaje.
+    </p>
+
+    <div class="admin-nav">
+        {% if current_user.is_superadmin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        {% endif %}
+        <a href="{{ url_for('quizzes.admin_quiz_results') }}" class="btn btn-primary">Resultados de Quiz</a>
+        {% if current_user.can_admin_training %}
+        <a href="{{ url_for('training.admin_dashboard') }}" class="btn btn-secondary">CX Entrenamiento</a>
+        {% endif %}
+    </div>
+
+    <!-- Filtros -->
+    <div class="date-filter" style="background:var(--blanco);padding:14px 20px;border-radius:10px;box-shadow:var(--sombra-sm);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <label>Desde: <input type="date" id="dateFrom"></label>
+        <label>Hasta: <input type="date" id="dateTo"></label>
+        <label>Quiz:
+            <select id="quizFilter" style="padding:6px 10px;border:1px solid #ddd;border-radius:8px">
+                <option value="">Todos</option>
+            </select>
+        </label>
+        <button class="btn btn-primary" onclick="loadData()">Filtrar</button>
+        <button class="btn btn-secondary" onclick="setRange(7)">7 días</button>
+        <button class="btn btn-secondary" onclick="setRange(30)">30 días</button>
+        <button class="btn btn-secondary" onclick="setRange(0)">Todo</button>
+        <a id="btnExport" class="btn btn-primary" href="/admin/quizzes/export.csv">⬇ Descargar CSV</a>
+    </div>
+
+    <!-- KPIs -->
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card"><h3 id="kAttempts">-</h3><p>Quiz Rendidos</p></div>
+        <div class="stat-card"><h3 id="kUsers">-</h3><p>Personas</p></div>
+        <div class="stat-card"><h3 id="kAvg">-</h3><p>Promedio</p></div>
+        <div class="stat-card"><h3 id="kPass">-</h3><p>% Aprobados</p></div>
+    </div>
+
+    <!-- Resumen por quiz -->
+    <div class="chart-card" style="margin-bottom:20px">
+        <h3>Resumen por Quiz</h3>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead><tr><th>Quiz</th><th>Personas</th><th>Intentos</th><th>Promedio</th><th>% Aprobados</th></tr></thead>
+                <tbody id="quizzesBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Resumen por persona -->
+    <div class="chart-card" style="margin-bottom:20px">
+        <h3>Resultado por Persona</h3>
+        <input type="text" id="userFilter" placeholder="Buscar por nombre o email…"
+               style="width:100%;max-width:340px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-size:13px">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead><tr><th>Persona</th><th>Rol</th><th>Intentos</th><th>Mejor</th><th>Último</th><th>Estado</th><th>Última vez</th></tr></thead>
+                <tbody id="usersBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detalle de intentos -->
+    <div class="chart-card">
+        <h3>Detalle de Intentos</h3>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead><tr><th>Persona</th><th>Quiz</th><th>Intento</th><th>Resultado</th><th>Detalle</th><th>Duración</th><th>Fecha</th></tr></thead>
+                <tbody id="attemptsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+var allUsers = [];
+
+function setRange(days) {
+    var to = new Date();
+    document.getElementById('dateTo').value = to.toISOString().split('T')[0];
+    if (days === 0) {
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+    } else {
+        var f = new Date(to.getTime() - days * 86400000);
+        document.getElementById('dateFrom').value = f.toISOString().split('T')[0];
+    }
+    loadData();
+}
+
+function queryString() {
+    var p = [];
+    var from = document.getElementById('dateFrom').value;
+    var to = document.getElementById('dateTo').value;
+    var quiz = document.getElementById('quizFilter').value;
+    if (from) p.push('from=' + from);
+    if (to) p.push('to=' + to);
+    if (quiz) p.push('quiz=' + encodeURIComponent(quiz));
+    return p.join('&');
+}
+
+function pctColor(p) {
+    return p >= 80 ? '#2e7d32' : p >= 60 ? '#e65100' : '#c62828';
+}
+
+async function loadData() {
+    var qs = queryString();
+    document.getElementById('btnExport').href = '/admin/quizzes/export.csv' + (qs ? '?' + qs : '');
+
+    var res = await fetch('/admin/api/quizzes/results' + (qs ? '?' + qs : ''));
+    var d = await res.json();
+
+    document.getElementById('kAttempts').textContent = d.stats.total_attempts;
+    document.getElementById('kUsers').textContent = d.stats.participants;
+    document.getElementById('kAvg').textContent = d.stats.avg_percentage + '%';
+    document.getElementById('kPass').textContent = d.stats.pass_rate + '%';
+
+    // Selector de quizzes (preservando la selección actual)
+    var sel = document.getElementById('quizFilter');
+    var current = sel.value;
+    sel.innerHTML = '<option value="">Todos</option>' + d.available_quizzes.map(function (q) {
+        return '<option value="' + q.slug + '">' + q.title + ' (' + q.attempts + ')</option>';
+    }).join('');
+    sel.value = current;
+
+    // Resumen por quiz
+    document.getElementById('quizzesBody').innerHTML = d.quizzes.length
+        ? d.quizzes.map(function (q) {
+            return '<tr><td>' + q.title + '</td><td>' + q.participants + '</td><td>' + q.attempts + '</td>' +
+                '<td><strong style="color:' + pctColor(q.avg) + '">' + q.avg + '%</strong></td>' +
+                '<td>' + q.pass_rate + '%</td></tr>';
+        }).join('')
+        : '<tr><td colspan="5" style="color:var(--gris-meta);text-align:center">Sin resultados registrados en el período</td></tr>';
+
+    allUsers = d.users;
+    renderUsers();
+
+    // Detalle de intentos
+    document.getElementById('attemptsBody').innerHTML = d.attempts.length
+        ? d.attempts.map(function (a) {
+            var detail = (a.correct !== null && a.total_questions)
+                ? a.correct + '/' + a.total_questions + ' correctas'
+                : (a.score !== null && a.max_score ? a.score + ' / ' + a.max_score + ' pts' : '—');
+            var dur = a.duration ? Math.floor(a.duration / 60) + ':' + ('0' + (a.duration % 60)).slice(-2) : '—';
+            return '<tr><td>' + a.user + '</td><td>' + a.quiz + '</td><td>' + a.attempt_number + '</td>' +
+                '<td><strong style="color:' + pctColor(a.percentage) + '">' + a.percentage + '%</strong> ' +
+                (a.passed ? '✅' : '❌') + '</td>' +
+                '<td>' + detail + '</td><td>' + dur + '</td><td>' + a.date + '</td></tr>';
+        }).join('')
+        : '<tr><td colspan="7" style="color:var(--gris-meta);text-align:center">Sin resultados registrados en el período</td></tr>';
+}
+
+function renderUsers() {
+    var f = (document.getElementById('userFilter').value || '').toLowerCase();
+    var rows = allUsers.filter(function (u) {
+        return !f || u.name.toLowerCase().indexOf(f) !== -1 || (u.email || '').toLowerCase().indexOf(f) !== -1;
+    });
+    document.getElementById('usersBody').innerHTML = rows.length
+        ? rows.map(function (u) {
+            return '<tr><td><strong>' + u.name + '</strong><br><small style="color:var(--gris-meta)">' + (u.email || '') + '</small></td>' +
+                '<td>' + u.role + '</td><td>' + u.attempts + '</td>' +
+                '<td><strong style="color:' + pctColor(u.best) + '">' + u.best + '%</strong></td>' +
+                '<td>' + u.last + '%</td>' +
+                '<td>' + (u.passed ? '<span class="badge" style="background:#2e7d32;color:#fff">Aprobado</span>'
+                                   : '<span class="badge" style="background:#c62828;color:#fff">No aprobado</span>') + '</td>' +
+                '<td>' + u.last_date + '</td></tr>';
+        }).join('')
+        : '<tr><td colspan="7" style="color:var(--gris-meta);text-align:center">Sin personas que coincidan</td></tr>';
+}
+
+document.getElementById('userFilter').addEventListener('input', renderUsers);
+document.getElementById('quizFilter').addEventListener('change', loadData);
+
+loadData();
+</script>
+{% endblock %}

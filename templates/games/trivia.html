@@ -127,6 +127,7 @@
 
     let shuffledQuestions = [];
     let score = 0;
+    let correctCount = 0;
     let questionIndex = 0;
     let timerInterval;
     let streak = 0;
@@ -139,7 +140,7 @@
           '<div class="empty-state">⚠ Esta trivia todavía no tiene preguntas cargadas.<br><br>El SuperAdmin puede agregarlas desde el panel de edición de contenido.</div>';
         return;
       }
-      score = 0; questionIndex = 0; streak = 0;
+      score = 0; correctCount = 0; questionIndex = 0; streak = 0;
       shuffledQuestions = shuffle([...preguntas]).slice(0, QUESTIONS_PER_ROUND);
       document.getElementById("start").style.display = "none";
       document.getElementById("end").style.display = "none";
@@ -172,6 +173,7 @@
       if (correct) {
         btn.classList.add("correct");
         score += 10;
+        correctCount++;
         streak++;
         if (streak % 3 === 0) score += 5;
         launchConfetti(150);
@@ -208,6 +210,19 @@
       document.getElementById("bestScore").innerText = `Tu récord actual es: ${localStorage.getItem("bestScore_{{ slug }}")} puntos`;
       document.getElementById("progress").style.width = "100%";
       launchConfetti(600);
+
+      // Registro del resultado en el servidor (queda asociado al usuario
+      // logueado). Es la via exacta: mandamos el puntaje real, no una
+      // deteccion desde el texto.
+      if (window.iXpertQuiz) {
+        window.iXpertQuiz.save({
+          score: score,
+          max_score: totalPosible,
+          correct_answers: correctCount,
+          total_questions: shuffledQuestions.length,
+          source: 'trivia'
+        });
+      }
     }
 
     const confettiCanvas = document.getElementById("confetti");

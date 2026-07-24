@@ -334,3 +334,46 @@ class ScoringModeOverride(db.Model):
                            onupdate=lambda: datetime.now(timezone.utc))
 
     editor = db.relationship('User', foreign_keys=[updated_by])
+
+
+class QuizResult(db.Model):
+    """Resultado de un quiz rendido por un usuario logueado.
+
+    Se guarda un registro por INTENTO (no se pisa el anterior), asi queda el
+    historial completo de la capacitacion: quien rindio, cuando, cuanto saco y
+    cuantas veces lo intento.
+
+    El puntaje se guarda en dos formas complementarias porque los quiz del CMS
+    son HTML libre y no todos reportan lo mismo:
+      - score / max_score: puntos crudos (ej: 85 de 100 puntos)
+      - correct_answers / total_questions: respuestas acertadas (ej: 8 de 10)
+      - percentage: normalizado 0-100, es lo unico comparable entre quizzes
+        distintos y lo que usan los rankings del panel.
+    """
+    __tablename__ = 'quiz_results'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    # content_id puede ser null si el quiz se rindio fuera de un contenido del CMS
+    content_id = db.Column(db.Integer, db.ForeignKey('contents.id'), nullable=True)
+    quiz_slug = db.Column(db.String(500))
+    quiz_title = db.Column(db.String(500))
+
+    score = db.Column(db.Float)
+    max_score = db.Column(db.Float)
+    correct_answers = db.Column(db.Integer)
+    total_questions = db.Column(db.Integer)
+    percentage = db.Column(db.Float)  # 0-100, normalizado
+    passed = db.Column(db.Boolean)    # percentage >= umbral de aprobacion
+
+    duration_seconds = db.Column(db.Integer, default=0)
+    attempt_number = db.Column(db.Integer, default=1)
+    # 'api'    -> el quiz llamo explicitamente a window.iXpertQuiz.save()
+    # 'trivia' -> plantilla stock de trivia (siempre exacto)
+    # 'auto'   -> detectado automaticamente desde la pantalla de resultados
+    source = db.Column(db.String(20), default='api')
+    detail = db.Column(db.Text)  # JSON libre: respuestas, texto detectado, etc.
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship('User', backref='quiz_results')
+    content = db.relationship('Content', backref='quiz_results')
