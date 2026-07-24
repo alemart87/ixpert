@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, redirect, url_for, request, jsonify, flash, send_from_directory
 from flask_login import LoginManager, login_required, current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -75,12 +76,14 @@ from analytics import analytics_bp
 from chat import chat_bp
 from training import training_bp
 from iterum import iterum_bp
+from quizzes import quizzes_bp
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(analytics_bp)
 app.register_blueprint(chat_bp)
 app.register_blueprint(training_bp)
 app.register_blueprint(iterum_bp)
+app.register_blueprint(quizzes_bp)
 
 # Iterum: sweep de uploads colgados en 'processing' al arrancar el worker.
 # Best-effort, no rompe el boot si falla.
@@ -256,14 +259,71 @@ def render_trivia_html(content):
     )
 
 
+# Pistas de que un contenido es un quiz/evaluacion y no un articulo comun.
+# Solo en esos casos se activa la deteccion automatica de resultados: en un
+# tutorial cualquiera, un "felicitaciones, completaste 3 de 5 pasos" podria
+# confundirse con un puntaje.
+_QUIZ_NAME_RE = re.compile(r'quiz|trivia|evaluaci|examen|cuestionario|\btest\b', re.I)
+_QUIZ_HTML_MARKERS = (
+    r'respuesta\s*correcta', r'\bcorrecta[s]?\b', r'type\s*=\s*["\']radio',
+    r'\bpregunta\b', r'\bopci[oó]n(es)?\b', r'\bpuntaje\b', r'\bpuntuaci[oó]n\b',
+    r'\bscore\b',
+)
+
+
+def _looks_like_quiz(content):
+    """Heuristica para decidir si activamos la deteccion automatica."""
+    if (content.content_type or 'visual') == 'trivia':
+        return True
+    name_hay = f"{content.slug or ''} {content.title or ''} {content.keywords or ''}"
+    if _QUIZ_NAME_RE.search(name_hay):
+        return True
+    html = content.html_content or ''
+    hits = sum(1 for pat in _QUIZ_HTML_MARKERS if re.search(pat, html, re.I))
+    return hits >= 3
+
+
+def inject_quiz_bridge(html, content):
+    """Inyecta el bridge de registro de quiz en el HTML que va al iframe.
+
+    El iframe usa srcdoc + sandbox allow-same-origin, asi que el script hereda
+    el origen de la app y puede guardar el resultado con la sesion del usuario.
+    """
+    if not html:
+        return html
+    from markupsafe import escape as _esc
+
+    tag = (
+        '<script src="/static/js/quiz-bridge.js" data-ixpert-quiz="1"'
+        f' data-content-id="{content.id}"'
+        f' data-quiz-slug="{_esc(content.slug or "")}"'
+        f' data-quiz-title="{_esc(content.title or "Quiz")}"'
+        f' data-user-name="{_esc(getattr(current_user, "name", "") or "")}"'
+        f' data-auto-detect="{"true" if _looks_like_quiz(content) else "false"}"'
+        '></script>'
+    )
+    lowered = html.lower()
+    idx = lowered.rfind('</body>')
+    if idx != -1:
+        return html[:idx] + tag + html[idx:]
+    return html + tag
+
+
 @app.route('/content/<slug>')
 @login_required
 def view_content(slug):
     content = Content.query.filter_by(slug=slug, is_active=True).first_or_404()
+    ctype = content.content_type or 'visual'
     trivia_html = None
-    if (content.content_type or 'visual') == 'trivia':
-        trivia_html = render_trivia_html(content)
-    return render_template('viewer.html', content=content, trivia_html=trivia_html)
+    iframe_html = None
+    if ctype == 'trivia':
+        trivia_html = inject_quiz_bridge(render_trivia_html(content), content)
+    elif ctype == 'raw_html' or is_full_html_doc(content.html_content):
+        # Contenido custom del CMS que se renderiza en iframe: le sumamos el
+        # bridge para que, si es un quiz, el resultado quede registrado.
+        iframe_html = inject_quiz_bridge(content.html_content, content)
+    return render_template('viewer.html', content=content,
+                           trivia_html=trivia_html, iframe_html=iframe_html)
 
 
 @app.route('/category/<slug>')

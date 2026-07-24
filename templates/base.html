@@ -46,6 +46,9 @@
                         <a href="{{ url_for('training.admin_scenarios') }}">Crear Escenarios</a>
                         <a href="{{ url_for('training.admin_dashboard') }}">CX Dashboard</a>
                         {% endif %}
+                        {% if current_user.role in ('superadmin', 'analista', 'supervisor') %}
+                        <a href="{{ url_for('quizzes.admin_quiz_results') }}">Resultados de Quiz</a>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -105,6 +108,7 @@
                         <a href="{{ url_for('admin.category_list') }}">Categorías</a>
                         <a href="{{ url_for('admin.user_list') }}">Usuarios</a>
                         <a href="{{ url_for('admin.chat_analytics') }}">Insights AI</a>
+                        <a href="{{ url_for('quizzes.admin_quiz_results') }}">Resultados de Quiz</a>
                     </div>
                 </div>
                 {% endif %}
